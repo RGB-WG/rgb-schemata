@@ -3,9 +3,10 @@ extern crate amplify;
 #[macro_use]
 extern crate strict_types;
 
+use aluvm::library::{Lib, LibSite};
 use amplify::ascii::AsciiString;
 use amplify::confinement::{Confined, SmallString};
-use rgb::vm::AluScript;
+use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use rgb::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     TransitionSchema,
@@ -101,18 +102,22 @@ fn schema() -> Schema {
         .expect("failed type definition")
         .compile(none!())
         .unwrap();
-    let sys = SystemBuilder::new()
+    let type_system = SystemBuilder::new()
         .import(lib)
         .expect("broken lib")
         .finalize()
         .expect("incomplete imports");
 
+    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSETS))];
+    let alu_lib = Lib::assemble(&code).unwrap();
+    let alu_id = alu_lib.id();
+
     Schema {
         ffv: none!(),
         subset_of: None,
         global_types: tiny_bmap! {
-            GS_NOMINAL => GlobalStateSchema::once(sys.id_by_name("RGBStd.Nominal").unwrap()),
-            GS_CONTRACT => GlobalStateSchema::once(sys.id_by_name("RGBStd.Contract").unwrap()),
+            GS_NOMINAL => GlobalStateSchema::once(type_system.id_by_name("RGBStd.Nominal").unwrap()),
+            GS_CONTRACT => GlobalStateSchema::once(type_system.id_by_name("RGBStd.Contract").unwrap()),
         },
         owned_types: tiny_bmap! {
             OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
@@ -143,8 +148,13 @@ fn schema() -> Schema {
                 valencies: none!(),
             }
         },
-        type_system: sys,
-        script: Script::AluVM(AluScript::default()),
+        type_system,
+        script: Script::AluVM(AluScript {
+            libs: confined_bmap! { alu_id => alu_lib },
+            entry_points: confined_bmap! {
+                EntryPoint::ValidateOwnedState(OS_ASSETS) => LibSite::with(0, alu_id)
+            },
+        }),
     }
 }
 
