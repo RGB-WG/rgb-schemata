@@ -9,7 +9,7 @@ edition = "2021"
 amplify = "4.0.0-beta.17"
 strict_encoding = "2.0.0-rc.1"
 strict_types = "1.0.0-beta.3"
-rgb-core = "0.10.0-beta.1"
+rgb-core = { version = "0.10.0-beta.1", features = ["base64"] }
 
 [patch.crates-io]
 strict_encoding = { git = "https://github.com/strict-types/strict-encoding" }

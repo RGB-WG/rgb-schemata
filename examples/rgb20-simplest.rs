@@ -150,4 +150,7 @@ fn schema() -> Schema {
 
 //fn iface() -> IfaceImpl {}
 
-fn main() {}
+fn main() {
+    let schema = schema();
+    eprintln!("{schema}")
+}
