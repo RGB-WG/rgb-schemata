@@ -6,11 +6,12 @@ extern crate strict_types;
 use aluvm::library::{Lib, LibSite};
 use amplify::ascii::AsciiString;
 use amplify::confinement::{Confined, SmallString};
-use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgb::{
+use rgb::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     TransitionSchema,
 };
+use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
+use rgb::IfaceImpl;
 use strict_encoding::StrictDumb;
 use strict_types::encoding::libname;
 use strict_types::typelib::build::LibBuilder;
@@ -158,7 +159,9 @@ fn schema() -> Schema {
     }
 }
 
-//fn iface() -> IfaceImpl {}
+fn iface() -> IfaceImpl {
+    todo!()
+}
 
 fn main() {
     let schema = schema();

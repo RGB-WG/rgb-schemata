@@ -10,11 +10,13 @@ amplify = "4.0.0-beta.17"
 strict_encoding = "2.0.0-rc.1"
 strict_types = "1.0.0-beta.3"
 aluvm = "0.10.0-alpha.1"
-rgb-core = { version = "0.10.0-beta.1", features = ["base64"] }
+rgb-std = { version = "0.10.0-alpha.1" }
 
 [patch.crates-io]
 strict_encoding = { git = "https://github.com/strict-types/strict-encoding" }
 strict_types = { git = "https://github.com/strict-types/strict-types" }
 bp-core = { git = "https://github.com/BP-WG/bp-core" }
 aluvm = { git = "https://github.com/AluVM/rust-aluvm" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation" }
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "develop" }
