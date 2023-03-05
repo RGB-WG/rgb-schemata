@@ -1,56 +1,35 @@
 name = "Simplest"
+implements = ["RGB20"]
 
 [TypeSystem]
-libs = ["RGBStd"]
+libs = ["RGBContract"]
 
 [GlobalState.Nominal]
-id = 1
+id = 0
 count = 1
-type = { Ticker = "RGBStd.Ticker", Name = "RGBStd.Name", Precision = "RGBStd.Precision" }
+matches = { RGB20 = "Nominal" }
+type = { Ticker = "RGBContract.Ticker", Name = "RGBContract.Name", Precision = "RGBContract.Precision" }
 
 [GlobalState.Contract]
-id = 2
-count = 2
-type = "RGBStd.Contract"
+id = 1
+count = 0
+matches = { RGB20 = "Contract" }
+type = "RGBContract.ContractText"
 
 [Assignments.Assets]
 id = 0
 type = "fungibleU64"
-aluasm = """
-.ROUTINE sum_inputs
-                scn.i   0, a16[2]
-loop:           pld.i   0, a16[2], r512[3], r512[4]
-                pdc.add r512[3], r512[4]
-                dec     a16[2]
-                ifz     a16[2]
-                stinv
-                jif     loop
-                ret
+matches = { RGB20 = "Assets" }
+aluasm = ["pdvs 0"]
 
-.ROUTINE sum_outputs
-                scn.o   0, a16[1]
-loop:           pld.o   0, a16[1], r512[2], r512[3]
-                call    sum
-                dec     a16[1]
-                ifz     a16[1]
-                stinv
-                jif     loop
-                ret
-
-.ROUTINE verify
-                call    sum_inputs
-                call    sum_outputs
-                pdc.vfy
-                succ
-"""
-
-[Schema.Genesis]
+[Genesis]
 global = ["Nominal", "Contract"]
 assigns = [
     { name = "Assets", min = 1 }
 ]
 
-[Schema.Transition]
+[Transition.Transfer]
+matches = { RGB20 = "Transfer" }
 global = []
 closes = [
     { name = "Assets", min = 1 }
@@ -58,3 +37,7 @@ closes = [
 assigns = [
     { name = "Assets", min = 1 }
 ]
+
+[[Script.AluVM]]
+proc = "sample"
+aluasm = ["noop"]
