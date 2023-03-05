@@ -11,7 +11,7 @@ use rgb::schema::{
     TransitionSchema,
 };
 use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgb::IfaceImpl;
+use rgb::{IfaceImpl, NamedType};
 use strict_encoding::StrictDumb;
 use strict_types::encoding::libname;
 use strict_types::typelib::build::LibBuilder;
@@ -160,7 +160,23 @@ fn schema() -> Schema {
 }
 
 fn iface() -> IfaceImpl {
-    todo!()
+    let schema = schema();
+
+    IfaceImpl {
+        schema_id: schema.schema_id(),
+        global_state: tiny_bset! {
+            NamedType::with(GS_NOMINAL, tn!("Nominal")),
+            NamedType::with(GS_CONTRACT, tn!("Contract")),
+        },
+        owned_state: tiny_bset! {
+            NamedType::with(OS_ASSETS, tn!("Assets")),
+        },
+        valencies: none!(),
+        transitions: tiny_bset! {
+            NamedType::with(TS_TRANSFER, tn!("Transfer")),
+        },
+        extensions: none!(),
+    }
 }
 
 fn main() {
