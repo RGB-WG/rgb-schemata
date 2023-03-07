@@ -2,22 +2,19 @@
 extern crate amplify;
 #[macro_use]
 extern crate strict_types;
-#[macro_use]
-extern crate serde_json;
 
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
-use rgb::containers::BindleContent;
+use amplify::hex::FromHex;
+use bp::{Chain, Outpoint, Txid};
+use rgb::containers::{BindleContent, ContractBuilder};
 use rgb::interface::{rgb20, IfaceImpl, NamedType};
 use rgb::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
-use rgb::stl::{ContractText, Nominal, StandardTypes};
+use rgb::stl::{ContractText, Nominal, Precision, StandardTypes};
 use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use strict_types::encoding::libname;
-use strict_types::typelib::build::LibBuilder;
-use strict_types::typesys::SystemBuilder;
 
 const GS_NOMINAL: u16 = 0;
 const GS_CONTRACT: u16 = 1;
@@ -77,7 +74,7 @@ fn schema() -> SubSchema {
     }
 }
 
-fn iface() -> IfaceImpl {
+fn iface_impl() -> IfaceImpl {
     let schema = schema();
     let iface = rgb20();
 
@@ -99,36 +96,44 @@ fn iface() -> IfaceImpl {
     }
 }
 
+#[rustfmt::skip]
 fn main() {
     let schema = schema();
     let schema_bindle = schema.bindle();
     eprintln!("{schema_bindle}");
 
-    let iface = iface();
-    let iface_bindle = iface.bindle();
-    eprintln!("{iface_bindle}");
+    let iimpl = iface_impl();
+    let iimpl_bindle = iimpl.bindle();
+    eprintln!("{iimpl_bindle}");
 
-    /*
-    let forge = Forge::with(schema, interface).unwrap();
+    let nominal = Nominal::new("TEST", "Test asset", Precision::CentiMicro);
+    let contract_text = ContractText::default();
+    let beneficiary = Outpoint::new(
+        Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(), 
+        0
+    );
 
-    let contract = forge.issue(
-        json!({
-            "Nominal": {
-                "Ticker": "TEST",
-                "Name": "Test asset",
-                "Precision": 8
-            },
-            "Contract": "",
-        }),
-        json!({
-            "Assets": [
-                "623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91:0": 1_000_000__0000_0000
-            ]
-        }),
-    ).unwrap();
+    let contract = ContractBuilder::with(
+        rgb20(),
+        schema_bindle.unbindle(),
+        iimpl_bindle.unbindle()
+    ).expect("schema fails to implement RGB20 interface")
 
-    eprintln!("{contract:X}");
+        .set_chain(Chain::Testnet3)
 
-    eprintln!("{}", contract.state());
-     */
+        .add_global_state("Nominal", nominal)
+        .expect("invalid nominal")
+        
+        .add_global_state("ContractText", contract_text)
+        .expect("invalid contract text")
+
+        .add_fungible_state("Assets", beneficiary, 1_000_000_0000_0000)
+        .expect("invalid asset amount")
+
+        .issue_contract()
+        .expect("contract doesn't fit schema requirements");
+
+    let bindle = contract.bindle();
+    eprintln!("{bindle}");
+
 }
