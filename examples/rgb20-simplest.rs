@@ -6,15 +6,36 @@ extern crate strict_types;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use amplify::hex::FromHex;
-use bp::{Chain, Outpoint, Txid};
+use bp::{Chain, Outpoint, Tx, Txid};
 use rgb::containers::{BindleContent, ContractBuilder};
 use rgb::interface::{rgb20, IfaceImpl, NamedType};
+use rgb::persistence::stock::Stock;
+use rgb::persistence::Inventory;
+use rgb::resolvers::HeightResolver;
 use rgb::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
 use rgb::stl::{ContractText, Nominal, Precision, StandardTypes};
+use rgb::validation::{ResolveTx, TxResolverError};
 use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
+use std::convert::Infallible;
+use strict_encoding::StrictDumb;
+
+struct DumbResolver;
+
+impl ResolveTx for DumbResolver {
+    fn resolve_tx(&self, txid: Txid) -> Result<Tx, TxResolverError> {
+        Ok(Tx::strict_dumb())
+    }
+}
+
+impl HeightResolver for DumbResolver {
+    type Error = Infallible;
+    fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> {
+        Ok(0)
+    }
+}
 
 const GS_NOMINAL: u16 = 0;
 const GS_CONTRACT: u16 = 1;
@@ -98,8 +119,8 @@ fn iface_impl() -> IfaceImpl {
 
 #[rustfmt::skip]
 fn main() {
-    let schema = schema();
-    let schema_bindle = schema.bindle();
+    let my_schema = schema();
+    let schema_bindle = my_schema.bindle();
     eprintln!("{schema_bindle}");
 
     let iimpl = iface_impl();
@@ -115,9 +136,9 @@ fn main() {
 
     let contract = ContractBuilder::with(
         rgb20(),
-        schema_bindle.unbindle(),
-        iimpl_bindle.unbindle()
-    ).expect("schema fails to implement RGB20 interface")
+        schema(),
+        iface_impl()
+        ).expect("schema fails to implement RGB20 interface")
 
         .set_chain(Chain::Testnet3)
 
@@ -133,7 +154,28 @@ fn main() {
         .issue_contract()
         .expect("contract doesn't fit schema requirements");
 
+    let contract_id = contract.contract_id();
+    
     let bindle = contract.bindle();
     eprintln!("{bindle}");
 
+    // Let's create some stock - an in-memory stash and inventory around it:
+    let mut stock = Stock::default();
+    stock.import_iface(rgb20()).unwrap();
+    stock.import_schema(schema()).unwrap();
+    stock.import_iface_impl(iface_impl()).unwrap();
+
+    // Noe we verify our contract consignment and add it to the stock
+    let verified_contract = bindle.unbindle().verify(&mut DumbResolver).expect("failed contract");
+    stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
+    
+    // Reading contract state through the interface from the stock:
+    let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
+    let nominal = contract.global("Nominal").unwrap();
+    let allocations = contract.fungible("Assets").unwrap();
+    eprintln!("{}", nominal[0]);
+    
+    for (txout, amount) in allocations {
+        eprintln!("(amount={amount}, txout={txout})");
+    }
 }
