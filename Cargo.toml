@@ -16,11 +16,6 @@ serde = "1.0.152"
 serde_json = "1.0.93"
 
 [patch.crates-io]
-strict_encoding = { git = "https://github.com/strict-types/strict-encoding" }
-strict_types = { git = "https://github.com/strict-types/strict-types" }
-aluvm = { git = "https://github.com/AluVM/rust-aluvm" }
-commit_verify = { git = "https://github.com/LNP-BP/client_side_validation" }
-single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation" }
 bp-core = { git = "https://github.com/BP-WG/bp-core" }
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "develop" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-wallet" }

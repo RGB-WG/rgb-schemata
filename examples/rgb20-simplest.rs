@@ -7,30 +7,29 @@ use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
-use rgb::containers::{BindleContent, ContractBuilder};
-use rgb::interface::{rgb20, IfaceImpl, NamedType};
-use rgb::persistence::stock::Stock;
-use rgb::persistence::Inventory;
-use rgb::resolvers::HeightResolver;
-use rgb::schema::{
+use rgbstd::containers::{BindleContent, ContractBuilder};
+use rgbstd::interface::{rgb20, IfaceImpl, NamedType};
+use rgbstd::persistence::{Inventory, Stock};
+use rgbstd::resolvers::ResolveHeight;
+use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
-use rgb::stl::{ContractText, Nominal, Precision, StandardTypes};
-use rgb::validation::{ResolveTx, TxResolverError};
-use rgb::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
+use rgbstd::stl::{ContractText, Nominal, Precision, StandardTypes};
+use rgbstd::validation::{ResolveTx, TxResolverError};
+use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use std::convert::Infallible;
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
 
 impl ResolveTx for DumbResolver {
-    fn resolve_tx(&self, txid: Txid) -> Result<Tx, TxResolverError> {
+    fn resolve_tx(&self, _txid: Txid) -> Result<Tx, TxResolverError> {
         Ok(Tx::strict_dumb())
     }
 }
 
-impl HeightResolver for DumbResolver {
+impl ResolveHeight for DumbResolver {
     type Error = Infallible;
     fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> {
         Ok(0)
@@ -166,7 +165,7 @@ fn main() {
     stock.import_iface_impl(iface_impl()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = bindle.unbindle().verify(&mut DumbResolver).expect("failed contract");
+    let verified_contract = bindle.unbindle().validate(&mut DumbResolver).expect("failed contract");
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
     
     // Reading contract state through the interface from the stock:
