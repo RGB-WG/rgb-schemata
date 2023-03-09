@@ -121,10 +121,12 @@ fn main() {
     let my_schema = schema();
     let schema_bindle = my_schema.bindle();
     eprintln!("{schema_bindle}");
+    schema_bindle.save("examples/rgb20-simplest.schema.rgb").expect("unable to save schema");
 
     let iimpl = iface_impl();
     let iimpl_bindle = iimpl.bindle();
     eprintln!("{iimpl_bindle}");
+    iimpl_bindle.save("examples/rgb20-simplest.iimpl.rgb").expect("unable to save implementation");
 
     let nominal = Nominal::new("TEST", "Test asset", Precision::CentiMicro);
     let contract_text = ContractText::default();
@@ -157,6 +159,7 @@ fn main() {
     
     let bindle = contract.bindle();
     eprintln!("{bindle}");
+    bindle.save("examples/rgb20-simplest.contract.rgb").expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
