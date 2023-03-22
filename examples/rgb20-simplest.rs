@@ -7,8 +7,8 @@ use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
-use rgbstd::containers::{BindleContent, ContractBuilder};
-use rgbstd::interface::{rgb20, IfaceImpl, NamedType};
+use rgbstd::containers::BindleContent;
+use rgbstd::interface::{rgb20, ContractBuilder, IfaceImpl, NamedType};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::schema::{
@@ -20,6 +20,7 @@ use rgbstd::validation::{ResolveTx, TxResolverError};
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use std::convert::Infallible;
 use strict_encoding::StrictDumb;
+use strict_types::{SemId, Ty};
 
 struct DumbResolver;
 
@@ -61,7 +62,7 @@ fn schema() -> SubSchema {
         },
         valency_types: none!(),
         genesis: GenesisSchema {
-            metadata: None,
+            metadata: Ty::<SemId>::UNIT.id(None),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
                 GS_CONTRACT => Occurrences::Once,
@@ -74,7 +75,7 @@ fn schema() -> SubSchema {
         extensions: none!(),
         transitions: tiny_bmap! {
             TS_TRANSFER => TransitionSchema {
-                metadata: None,
+                metadata: Ty::<SemId>::UNIT.id(None),
                 globals: none!(),
                 inputs: tiny_bmap! {
                     OS_ASSETS => Occurrences::OnceOrMore
