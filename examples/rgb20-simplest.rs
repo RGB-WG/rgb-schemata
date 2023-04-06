@@ -8,7 +8,7 @@ use amplify::confinement::Confined;
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, IfaceImpl, NamedType};
+use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedType};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::schema::{
@@ -106,7 +106,7 @@ fn iface_impl() -> IfaceImpl {
             NamedType::with(GS_NOMINAL, tn!("Nominal")),
             NamedType::with(GS_CONTRACT, tn!("ContractText")),
         },
-        owned_state: tiny_bset! {
+        assignments: tiny_bset! {
             NamedType::with(OS_ASSETS, tn!("Assets")),
         },
         valencies: none!(),
@@ -146,7 +146,7 @@ fn main() {
 
         .add_global_state("Nominal", nominal)
         .expect("invalid nominal")
-        
+
         .add_global_state("ContractText", contract_text)
         .expect("invalid contract text")
 
@@ -157,7 +157,7 @@ fn main() {
         .expect("contract doesn't fit schema requirements");
 
     let contract_id = contract.contract_id();
-    
+
     let bindle = contract.bindle();
     eprintln!("{bindle}");
     bindle.save("examples/rgb20-simplest.contract.rgb").expect("unable to save contract");
@@ -169,16 +169,21 @@ fn main() {
     stock.import_iface_impl(iface_impl()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = bindle.unbindle().validate(&mut DumbResolver).expect("failed contract");
+    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver) {
+        Ok(consignment) => consignment,
+        Err(consignment) => {
+            panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
+        }
+    };
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
-    
+
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
     let nominal = contract.global("Nominal").unwrap();
     let allocations = contract.fungible("Assets").unwrap();
     eprintln!("{}", nominal[0]);
     
-    for (txout, amount) in allocations {
-        eprintln!("(amount={amount}, txout={txout})");
+    for FungibleAllocation { owner, witness, value } in allocations {
+        eprintln!("(amount={value}, owner={owner}, witness={witness})");
     }
 }
