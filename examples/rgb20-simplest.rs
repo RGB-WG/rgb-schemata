@@ -169,7 +169,12 @@ fn main() {
     stock.import_iface_impl(iface_impl()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = bindle.unbindle().validate(&mut DumbResolver).expect("failed contract");
+    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver) {
+        Ok(consignment) => consignment,
+        Err(consignment) => {
+            panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
+        }
+    };
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
