@@ -106,14 +106,14 @@ fn iface_impl() -> IfaceImpl {
             NamedType::with(GS_NOMINAL, tn!("Nominal")),
             NamedType::with(GS_CONTRACT, tn!("ContractText")),
         },
+        assignments: tiny_bset! {
+            NamedType::with(OS_ASSETS, tn!("Assets")),
+        },
         valencies: none!(),
         transitions: tiny_bset! {
             NamedType::with(TS_TRANSFER, tn!("Transfer")),
         },
         extensions: none!(),
-        assignments: tiny_bset! {
-            NamedType::with(OS_ASSETS, tn!("Assets")),
-        },
     }
 }
 
@@ -177,8 +177,8 @@ fn main() {
     let nominal = contract.global("Nominal").unwrap();
     let allocations = contract.fungible("Assets").unwrap();
     eprintln!("{}", nominal[0]);
-
-    for FungibleAllocation { owner, witness: _, value } in allocations {
-        eprintln!("(amount={value}, txout={owner})");
+    
+    for FungibleAllocation { owner, witness, value } in allocations {
+        eprintln!("(amount={value}, owner={owner}, witness={witness})");
     }
 }
