@@ -4,11 +4,10 @@ extern crate amplify;
 extern crate strict_types;
 
 use aluvm::library::{Lib, LibSite};
-use amplify::confinement::Confined;
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedType};
+use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedType, VerNo};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::schema::{
@@ -100,6 +99,7 @@ fn iface_impl() -> IfaceImpl {
     let iface = rgb20();
 
     IfaceImpl {
+        version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
         global_state: tiny_bset! {
