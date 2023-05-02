@@ -157,6 +157,7 @@ fn main() {
         .expect("contract doesn't fit schema requirements");
 
     let contract_id = contract.contract_id();
+    debug_assert_eq!(contract_id, contract.contract_id());
 
     let bindle = contract.bindle();
     eprintln!("{bindle}");

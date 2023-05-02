@@ -5,10 +5,19 @@ edition = "2021"
 
 [dependencies]
 amplify = "4.0.0"
-strict_encoding = "2.0.1"
-strict_types = "1.0.0"
-aluvm = "0.10.0"
-bp-core = "0.10.0"
+strict_encoding = "2.1.0"
+strict_types = "1.1.0"
+aluvm = "0.10.1"
+bp-core = "0.10.1"
 rgb-std = { version = "0.10.0", features = ["serde", "fs"] }
 serde = "1.0.152"
 serde_json = "1.0.93"
+
+[patch.crates-io]
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "commit_encode_derive" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "commit_derive" }
+bp-primitives = { git = "https://github.com/BP-WG/bp-core", branch = "commit_derive" }
+bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "commit_derive" }
+bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "commit_derive" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "fix/op-conceal" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-wallet", branch = "rgb20" }
