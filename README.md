@@ -18,6 +18,21 @@ Lightning. To learn more about RGB please check [RGB blueprint][Blueprint] and
 The development of the project is supported and managed by [LNP/BP Standards
 Association][Association].
 
+## Catalog
+
+This repository provides the following RGB schemata:
+
+* __Non-inflatable assets (NIA)__, implementing RGB20 interface.
+  This is the simplest form of a fungible asset/token, which doesn't provide
+  such features as secondary issue, ability to change asset name and 
+  parameters, ability to burn or replace the asset.
+
+* __Unique digital asset (UDA)__, implementing RGB21 interface.
+  This is the simplest form of an NFT, which has one issuance of a single 
+  non-fungible and non-fractionable token with a representative attached 
+  media file and a preview.
+
+
 ## Library
 
 The library can be integrated into other rust projects via `Cargo.toml`

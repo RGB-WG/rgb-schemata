@@ -33,12 +33,12 @@ fn main() -> io::Result<()> {
 
 fn nia() -> io::Result<()> {
     let schema_bindle = nia_schema().bindle();
-    schema_bindle.save("schemata/NonInflatableAsset.rgb")?;
-    fs::write("schemata/NonInflatableAsset.rgba", schema_bindle.to_string())?;
+    schema_bindle.save("schemata/NonInflatableAssets.rgb")?;
+    fs::write("schemata/NonInflatableAssets.rgba", schema_bindle.to_string())?;
 
     let iimpl_bindle = nia_rgb20().bindle();
-    iimpl_bindle.save("schemata/NonInflatableAsset-RGB20.rgb")?;
-    fs::write("schemata/NonInflatableAsset-RGB20.rgba", iimpl_bindle.to_string())?;
+    iimpl_bindle.save("schemata/NonInflatableAssets-RGB20.rgb")?;
+    fs::write("schemata/NonInflatableAssets-RGB20.rgba", iimpl_bindle.to_string())?;
 
     Ok(())
 }

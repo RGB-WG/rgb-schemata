@@ -19,8 +19,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Non-inflatable asset (NIA) schema implementing RGB20 fungible asset
-//! interface.
+//! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
 use rgbstd::interface::{rgb21, rgb21_stl, IfaceImpl, NamedField, NamedType, VerNo};
 use rgbstd::schema::{

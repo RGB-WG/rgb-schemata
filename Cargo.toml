@@ -1,6 +1,6 @@
 [package]
 name = "rgb-schemata"
-version = "0.10.0-alpha.1"
+version = "0.10.0-beta.1"
 description = "Collection of the official RGB smart contract schemata"
 keywords = ["bitcoin", "lightning", "rgb", "smart-contracts", "lnp-bp"]
 categories = ["cryptography::cryptocurrencies"]
