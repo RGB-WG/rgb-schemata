@@ -24,16 +24,6 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let my_schema = nia_schema();
-    let schema_bindle = my_schema.bindle();
-    eprintln!("{schema_bindle}");
-    schema_bindle.save("examples/rgb20-simplest.schema.rgb").expect("unable to save schema");
-
-    let iimpl = nia_rgb20();
-    let iimpl_bindle = iimpl.bindle();
-    eprintln!("{iimpl_bindle}");
-    iimpl_bindle.save("examples/rgb20-simplest.iimpl.rgb").expect("unable to save implementation");
-
     let spec = DivisibleAssetSpec::new("TEST", "Test asset", Precision::CentiMicro);
     let terms = RicardianContract::default();
     let beneficiary = Outpoint::new(
