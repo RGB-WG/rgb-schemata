@@ -7,14 +7,16 @@ use aluvm::library::{Lib, LibSite};
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedType, VerNo};
+use rgbstd::interface::{
+    rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedField, NamedType, VerNo,
+};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
-use rgbstd::stl::{ContractText, Nominal, Precision, StandardTypes};
+use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, StandardTypes};
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use std::convert::Infallible;
@@ -53,8 +55,8 @@ fn schema() -> SubSchema {
         subset_of: None,
         type_system: types.type_system(),
         global_types: tiny_bmap! {
-            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.Nominal")),
-            GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.ContractText")),
+            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
+            GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
         },
         owned_types: tiny_bmap! {
             OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
@@ -103,11 +105,11 @@ fn iface_impl() -> IfaceImpl {
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
         global_state: tiny_bset! {
-            NamedType::with(GS_NOMINAL, tn!("Nominal")),
-            NamedType::with(GS_CONTRACT, tn!("ContractText")),
+            NamedField::with(GS_NOMINAL, fname!("spec")),
+            NamedField::with(GS_CONTRACT, fname!("terms")),
         },
         assignments: tiny_bset! {
-            NamedType::with(OS_ASSETS, tn!("Assets")),
+            NamedField::with(OS_ASSETS, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {
@@ -129,8 +131,8 @@ fn main() {
     eprintln!("{iimpl_bindle}");
     iimpl_bindle.save("examples/rgb20-simplest.iimpl.rgb").expect("unable to save implementation");
 
-    let nominal = Nominal::new("TEST", "Test asset", Precision::CentiMicro);
-    let contract_text = ContractText::default();
+    let spec = DivisibleAssetSpec::new("TEST", "Test asset", Precision::CentiMicro);
+    let terms = RicardianContract::default();
     let beneficiary = Outpoint::new(
         Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(), 
         0
@@ -144,13 +146,13 @@ fn main() {
 
         .set_chain(Chain::Testnet3)
 
-        .add_global_state("Nominal", nominal)
+        .add_global_state("spec", spec)
         .expect("invalid nominal")
 
-        .add_global_state("ContractText", contract_text)
+        .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_fungible_state("Assets", beneficiary, 1_000_000_0000_0000)
+        .add_fungible_state("assetOwner", beneficiary, 1_000_000_0000_0000)
         .expect("invalid asset amount")
 
         .issue_contract()
@@ -180,8 +182,8 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
-    let nominal = contract.global("Nominal").unwrap();
-    let allocations = contract.fungible("Assets").unwrap();
+    let nominal = contract.global("spec").unwrap();
+    let allocations = contract.fungible("assetOwner").unwrap();
     eprintln!("{}", nominal[0]);
     
     for FungibleAllocation { owner, witness, value } in allocations {
