@@ -1,132 +1,35 @@
-#[macro_use]
-extern crate amplify;
-#[macro_use]
-extern crate strict_types;
+use std::convert::Infallible;
 
-use aluvm::library::{Lib, LibSite};
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
+use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{
-    rgb20, ContractBuilder, FungibleAllocation, IfaceImpl, NamedField, NamedType, VerNo,
-};
+use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
-    SubSchema, TransitionSchema,
-};
-use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, StandardTypes};
+use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract};
 use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use std::convert::Infallible;
 use strict_encoding::StrictDumb;
-use strict_types::{SemId, Ty};
 
 struct DumbResolver;
 
 impl ResolveTx for DumbResolver {
-    fn resolve_tx(&self, _txid: Txid) -> Result<Tx, TxResolverError> {
-        Ok(Tx::strict_dumb())
-    }
+    fn resolve_tx(&self, _txid: Txid) -> Result<Tx, TxResolverError> { Ok(Tx::strict_dumb()) }
 }
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> {
-        Ok(0)
-    }
-}
-
-const GS_NOMINAL: u16 = 0;
-const GS_CONTRACT: u16 = 1;
-const OS_ASSETS: u16 = 0;
-const TS_TRANSFER: u16 = 0;
-
-fn schema() -> SubSchema {
-    let types = StandardTypes::new();
-
-    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSETS))];
-    let alu_lib = Lib::assemble(&code).unwrap();
-    let alu_id = alu_lib.id();
-
-    Schema {
-        ffv: zero!(),
-        subset_of: None,
-        type_system: types.type_system(),
-        global_types: tiny_bmap! {
-            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
-            GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
-        },
-        owned_types: tiny_bmap! {
-            OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
-        },
-        valency_types: none!(),
-        genesis: GenesisSchema {
-            metadata: Ty::<SemId>::UNIT.id(None),
-            globals: tiny_bmap! {
-                GS_NOMINAL => Occurrences::Once,
-                GS_CONTRACT => Occurrences::Once,
-            },
-            assignments: tiny_bmap! {
-                OS_ASSETS => Occurrences::OnceOrMore,
-            },
-            valencies: none!(),
-        },
-        extensions: none!(),
-        transitions: tiny_bmap! {
-            TS_TRANSFER => TransitionSchema {
-                metadata: Ty::<SemId>::UNIT.id(None),
-                globals: none!(),
-                inputs: tiny_bmap! {
-                    OS_ASSETS => Occurrences::OnceOrMore
-                },
-                assignments: tiny_bmap! {
-                    OS_ASSETS => Occurrences::OnceOrMore
-                },
-                valencies: none!(),
-            }
-        },
-        script: Script::AluVM(AluScript {
-            libs: confined_bmap! { alu_id => alu_lib },
-            entry_points: confined_bmap! {
-                EntryPoint::ValidateOwnedState(OS_ASSETS) => LibSite::with(0, alu_id)
-            },
-        }),
-    }
-}
-
-fn iface_impl() -> IfaceImpl {
-    let schema = schema();
-    let iface = rgb20();
-
-    IfaceImpl {
-        version: VerNo::V1,
-        schema_id: schema.schema_id(),
-        iface_id: iface.iface_id(),
-        global_state: tiny_bset! {
-            NamedField::with(GS_NOMINAL, fname!("spec")),
-            NamedField::with(GS_CONTRACT, fname!("terms")),
-        },
-        assignments: tiny_bset! {
-            NamedField::with(OS_ASSETS, fname!("assetOwner")),
-        },
-        valencies: none!(),
-        transitions: tiny_bset! {
-            NamedType::with(TS_TRANSFER, tn!("Transfer")),
-        },
-        extensions: none!(),
-    }
+    fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> { Ok(0) }
 }
 
 #[rustfmt::skip]
 fn main() {
-    let my_schema = schema();
+    let my_schema = nia_schema();
     let schema_bindle = my_schema.bindle();
     eprintln!("{schema_bindle}");
     schema_bindle.save("examples/rgb20-simplest.schema.rgb").expect("unable to save schema");
 
-    let iimpl = iface_impl();
+    let iimpl = nia_rgb20();
     let iimpl_bindle = iimpl.bindle();
     eprintln!("{iimpl_bindle}");
     iimpl_bindle.save("examples/rgb20-simplest.iimpl.rgb").expect("unable to save implementation");
@@ -140,8 +43,8 @@ fn main() {
 
     let contract = ContractBuilder::with(
         rgb20(),
-        schema(),
-        iface_impl()
+        nia_schema(),
+        nia_rgb20()
         ).expect("schema fails to implement RGB20 interface")
 
         .set_chain(Chain::Testnet3)
@@ -168,8 +71,8 @@ fn main() {
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
     stock.import_iface(rgb20()).unwrap();
-    stock.import_schema(schema()).unwrap();
-    stock.import_iface_impl(iface_impl()).unwrap();
+    stock.import_schema(nia_schema()).unwrap();
+    stock.import_iface_impl(nia_rgb20()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
     let verified_contract = match bindle.unbindle().validate(&mut DumbResolver) {
