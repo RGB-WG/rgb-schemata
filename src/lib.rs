@@ -25,7 +25,9 @@ extern crate amplify;
 extern crate strict_types;
 
 mod nia;
+mod uda;
 
 const GS_TIMESTAMP: u16 = 3;
 
 pub use nia::{nia_rgb20, nia_schema};
+pub use uda::{uda_rgb21, uda_schema};

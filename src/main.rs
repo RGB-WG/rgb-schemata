@@ -19,23 +19,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs;
+use std::{fs, io};
 
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
 
-fn main() {
+fn main() -> io::Result<()> {
+    nia()?;
+    uda()?;
+
+    Ok(())
+}
+
+fn nia() -> io::Result<()> {
     let schema_bindle = nia_schema().bindle();
-    schema_bindle
-        .save("schemata/NonInflatableAsset.rgb")
-        .expect("unable to save schema");
-    fs::write("schemata/NonInflatableAsset.rgba", schema_bindle.to_string())
-        .expect("unable to save schema");
+    schema_bindle.save("schemata/NonInflatableAsset.rgb")?;
+    fs::write("schemata/NonInflatableAsset.rgba", schema_bindle.to_string())?;
 
     let iimpl_bindle = nia_rgb20().bindle();
-    iimpl_bindle
-        .save("schemata/NonInflatableAsset-RGB20.rgb")
-        .expect("unable to save implementation");
-    fs::write("schemata/NonInflatableAsset-RGB20.rgba", iimpl_bindle.to_string())
-        .expect("unable to save schema");
+    iimpl_bindle.save("schemata/NonInflatableAsset-RGB20.rgb")?;
+    fs::write("schemata/NonInflatableAsset-RGB20.rgba", iimpl_bindle.to_string())?;
+
+    Ok(())
+}
+
+fn uda() -> io::Result<()> {
+    let schema_bindle = nia_schema().bindle();
+    schema_bindle.save("schemata/UniqueDigitalAsset.rgb")?;
+    fs::write("schemata/UniqueDigitalAsset.rgba", schema_bindle.to_string())?;
+
+    let iimpl_bindle = nia_rgb20().bindle();
+    iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB20.rgb")?;
+    fs::write("schemata/UniqueDigitalAsset-RGB20.rgba", iimpl_bindle.to_string())?;
+
+    Ok(())
 }
