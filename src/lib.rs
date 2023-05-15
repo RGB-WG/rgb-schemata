@@ -26,4 +26,6 @@ extern crate strict_types;
 
 mod nia;
 
+const GS_TIMESTAMP: u16 = 3;
+
 pub use nia::{nia_rgb20, nia_schema};

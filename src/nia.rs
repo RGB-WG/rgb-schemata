@@ -32,10 +32,12 @@ use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use strict_types::{SemId, Ty};
 
-const GS_NOMINAL: u16 = 0;
-const GS_CONTRACT: u16 = 1;
-const OS_ASSETS: u16 = 0;
-const TS_TRANSFER: u16 = 0;
+use crate::GS_TIMESTAMP;
+
+const GS_NOMINAL: u16 = 2000;
+const GS_CONTRACT: u16 = 2001;
+const OS_ASSETS: u16 = 2000;
+const TS_TRANSFER: u16 = 2000;
 
 pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::new();
@@ -51,6 +53,7 @@ pub fn nia_schema() -> SubSchema {
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
             GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
+            GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
         },
         owned_types: tiny_bmap! {
             OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
@@ -61,6 +64,7 @@ pub fn nia_schema() -> SubSchema {
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
                 GS_CONTRACT => Occurrences::Once,
+                GS_TIMESTAMP => Occurrences::Once,
             },
             assignments: tiny_bmap! {
                 OS_ASSETS => Occurrences::OnceOrMore,
@@ -101,6 +105,7 @@ pub fn nia_rgb20() -> IfaceImpl {
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_CONTRACT, fname!("terms")),
+            NamedField::with(GS_TIMESTAMP, fname!("created")),
         },
         assignments: tiny_bset! {
             NamedField::with(OS_ASSETS, fname!("assetOwner")),
