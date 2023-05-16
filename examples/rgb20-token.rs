@@ -7,7 +7,7 @@ use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract};
+use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use strict_encoding::StrictDumb;
 
@@ -26,6 +26,7 @@ impl ResolveHeight for DumbResolver {
 fn main() {
     let spec = DivisibleAssetSpec::new("TEST", "Test asset", Precision::CentiMicro);
     let terms = RicardianContract::default();
+    let created = Timestamp::default();
     let beneficiary = Outpoint::new(
         Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(), 
         0
@@ -38,8 +39,10 @@ fn main() {
         ).expect("schema fails to implement RGB20 interface")
 
         .set_chain(Chain::Testnet3)
-
         .add_global_state("spec", spec)
+        .expect("invalid nominal")
+
+        .add_global_state("created", created)
         .expect("invalid nominal")
 
         .add_global_state("terms", terms)
