@@ -23,8 +23,17 @@ use std::{fs, io};
 
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
+use rgbstd::interface::{rgb20, rgb21};
 
 fn main() -> io::Result<()> {
+    let rgb20_bindle = rgb20().bindle();
+    rgb20_bindle.save("interfaces/RGB20.rgb")?;
+    fs::write("interfaces/RGB20.rgba", rgb20_bindle.to_string())?;
+
+    let rgb21_bindle = rgb21().bindle();
+    rgb21_bindle.save("interfaces/RGB21.rgb")?;
+    fs::write("interfaces/RGB21.rgba", rgb21_bindle.to_string())?;
+
     nia()?;
     uda()?;
 
