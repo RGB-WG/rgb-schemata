@@ -56,7 +56,7 @@ pub fn uda_schema() -> SubSchema {
             GS_ATTACH => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => StateSchema::Structured(types.get("RGB21.ItemsCount")),
+            OS_ASSET => StateSchema::Structured(types.get("RGB21.Allocation")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
