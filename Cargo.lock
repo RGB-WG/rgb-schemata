@@ -679,8 +679,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c42b600802ac7c05f1d226b7676efa025d1dc13eadf39ccc2dacded670ab48ab"
+source = "git+https://github.com/crisdut/rgb-wallet?branch=feat/rgb21-state-data#e61487ead536495d5a823f236497e230fd4a43f9"
 dependencies = [
  "amplify",
  "baid58",

@@ -53,10 +53,10 @@ pub fn uda_schema() -> SubSchema {
             GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
             GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
             GS_TOKENS => GlobalStateSchema::once(types.get("RGB21.TokenData")),
-            GS_ATTACH => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
+            GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => StateSchema::Structured(types.get("RGB21.ItemsCount")),
+            OS_ASSET => StateSchema::Structured(types.get("RGB21.Allocation")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
@@ -65,6 +65,8 @@ pub fn uda_schema() -> SubSchema {
                 GS_NOMINAL => Occurrences::Once,
                 GS_CONTRACT => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
+                GS_TOKENS => Occurrences::NoneOrOnce,
+                GS_ATTACH => Occurrences::NoneOrOnce,                   
             },
             assignments: tiny_bmap! {
                 OS_ASSET => Occurrences::Once,
@@ -104,6 +106,7 @@ pub fn uda_rgb21() -> IfaceImpl {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_CONTRACT, fname!("terms")),
             NamedField::with(GS_TIMESTAMP, fname!("created")),
+            NamedField::with(GS_TOKENS, fname!("tokens")),
         },
         assignments: tiny_bset! {
             NamedField::with(OS_ASSET, fname!("assetOwner")),

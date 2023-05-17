@@ -24,3 +24,7 @@ serde_json = "1.0.93"
 
 [features]
 all=[]
+
+[patch.crates-io]
+# TODO: Remove after merge and release new version
+rgb-std = { git = "https://github.com/crisdut/rgb-wallet", branch = "feat/rgb21-state-data" }
