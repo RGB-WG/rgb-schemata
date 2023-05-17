@@ -4,7 +4,7 @@ use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::rgb21::{Allocation, TokenIndex, OwnedFraction};
+use rgbstd::interface::rgb21::{Allocation, TokenIndex, OwnedFraction, TokenData};
 use rgbstd::interface::{ContractBuilder, FungibleAllocation, rgb21};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
@@ -36,6 +36,8 @@ fn main() {
     let fraction = OwnedFraction::from_inner(1);
     let index = TokenIndex::from_inner(2);
 
+    let token_data = TokenData { index, ..Default::default()};
+
     let allocation = Allocation::with(index, fraction);
     let contract = ContractBuilder::with(
         rgb21(),
@@ -48,6 +50,9 @@ fn main() {
         .expect("invalid nominal")
 
         .add_global_state("created", created)
+        .expect("invalid nominal")
+
+        .add_global_state("tokens", token_data)
         .expect("invalid nominal")
 
         .add_global_state("terms", terms)

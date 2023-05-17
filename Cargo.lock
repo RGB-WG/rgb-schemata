@@ -679,7 +679,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.10.2"
-source = "git+https://github.com/crisdut/rgb-wallet?branch=feat/rgb21-state-data#79af2aeb0b7c49e1ecddcef25b073ad64541dc3f"
+source = "git+https://github.com/crisdut/rgb-wallet?branch=feat/rgb21-state-data#e61487ead536495d5a823f236497e230fd4a43f9"
 dependencies = [
  "amplify",
  "baid58",

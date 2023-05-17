@@ -14,7 +14,7 @@ readme = "README.md"
 
 [dependencies]
 amplify = "4.0.0"
-strict_encoding = "2.1.2"
+strict_encoding = "2.2.0"
 strict_types = "1.2.0"
 aluvm = "0.10.2"
 bp-core = "0.10.3"
