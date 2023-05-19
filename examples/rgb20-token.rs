@@ -48,7 +48,7 @@ fn main() {
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_fungible_state("assetOwner", beneficiary, 1_000_000_0000_0000)
+        .add_fungible_state("beneficiary", beneficiary, 1_000_000_0000_0000)
         .expect("invalid asset amount")
 
         .issue_contract()
@@ -79,7 +79,7 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
     let nominal = contract.global("spec").unwrap();
-    let allocations = contract.fungible("assetOwner").unwrap();
+    let allocations = contract.fungible("beneficiary").unwrap();
     eprintln!("{}", nominal[0]);
     
     for FungibleAllocation { owner, witness, value } in allocations {

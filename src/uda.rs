@@ -66,7 +66,7 @@ pub fn uda_schema() -> SubSchema {
                 GS_CONTRACT => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
                 GS_TOKENS => Occurrences::NoneOrOnce,
-                GS_ATTACH => Occurrences::NoneOrOnce,                   
+                GS_ATTACH => Occurrences::NoneOrOnce,
             },
             assignments: tiny_bmap! {
                 OS_ASSET => Occurrences::Once,
@@ -109,7 +109,7 @@ pub fn uda_rgb21() -> IfaceImpl {
             NamedField::with(GS_TOKENS, fname!("tokens")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSET, fname!("assetOwner")),
+            NamedField::with(OS_ASSET, fname!("beneficiary")),
         },
         valencies: none!(),
         transitions: tiny_bset! {
