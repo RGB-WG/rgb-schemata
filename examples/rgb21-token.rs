@@ -1,11 +1,12 @@
 use std::convert::Infallible;
-use amplify::Wrapper;
+
 use amplify::hex::FromHex;
+use amplify::Wrapper;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::rgb21::{Allocation, TokenIndex, OwnedFraction, TokenData};
-use rgbstd::interface::{ContractBuilder, FungibleAllocation, rgb21};
+use rgbstd::interface::rgb21::{Allocation, OwnedFraction, TokenData, TokenIndex};
+use rgbstd::interface::{rgb21, ContractBuilder, FungibleAllocation};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
@@ -58,7 +59,7 @@ fn main() {
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_data_state("assetOwner", beneficiary, allocation)
+        .add_data_state("beneficiary", beneficiary, allocation)
         .expect("invalid asset blob")
 
         .issue_contract()
@@ -89,7 +90,7 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb21().iface_id()).unwrap();
     let nominal = contract.global("spec").unwrap();
-    let allocations = contract.fungible("assetOwner").unwrap();
+    let allocations = contract.fungible("beneficiary").unwrap();
     eprintln!("{}", nominal[0]);
     
     for FungibleAllocation { owner, witness, value } in allocations {
