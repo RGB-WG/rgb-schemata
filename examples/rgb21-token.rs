@@ -1,15 +1,16 @@
 use std::convert::Infallible;
 
+use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
 use amplify::Wrapper;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::rgb21::{Allocation, OwnedFraction, TokenData, TokenIndex};
+use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
 use rgbstd::interface::{rgb21, ContractBuilder, FungibleAllocation};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
+use rgbstd::stl::{self, DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use strict_encoding::StrictDumb;
 
@@ -37,24 +38,29 @@ fn main() {
     let fraction = OwnedFraction::from_inner(1);
     let index = TokenIndex::from_inner(2);
 
-    let token_data = TokenData { index, ..Default::default()};
+    let preview = EmbeddedMedia {
+        ty: stl::MediaType::with("text/*"),     
+        data: SmallBlob::try_from_iter(vec![0, 0]).expect("invalid data"), 
+    };
+
+    let token_data = TokenData { index, preview: Some(preview), ..Default::default() };
 
     let allocation = Allocation::with(index, fraction);
     let contract = ContractBuilder::with(
         rgb21(),
         uda_schema(),
         uda_rgb21()
-        ).expect("schema fails to implement RGB20 interface")
+        ).expect("schema fails to implement RGB21 interface")
 
         .set_chain(Chain::Testnet3)
+        .add_global_state("tokens", token_data)
+        .expect("invalid token data")
+
         .add_global_state("spec", spec)
         .expect("invalid nominal")
 
         .add_global_state("created", created)
-        .expect("invalid nominal")
-
-        .add_global_state("tokens", token_data)
-        .expect("invalid nominal")
+        .expect("invalid creation date")
 
         .add_global_state("terms", terms)
         .expect("invalid contract text")

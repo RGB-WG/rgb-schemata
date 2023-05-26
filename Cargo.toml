@@ -27,4 +27,9 @@ all=[]
 
 [patch.crates-io]
 # TODO: Remove after merge and release new version
-rgb-std = { git = "https://github.com/crisdut/rgb-wallet", branch = "feat/rgb21-state-data" }
+strict_types = { git = "https://github.com/strict-types/strict-types" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation" }
+bp-core = { git = "https://github.com/BP-WG/bp-core" }
+aluvm = { git = "https://github.com/AluVM/rust-aluvm" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-wallet" }
