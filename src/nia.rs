@@ -19,7 +19,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Non-inflatable asset (NIA) schema implementing RGB20 fungible assets
+//! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
 use aluvm::library::{Lib, LibSite};
@@ -32,18 +32,12 @@ use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use strict_types::{SemId, Ty};
 
-use crate::GS_TIMESTAMP;
-
-const GS_NOMINAL: u16 = 2000;
-const GS_CONTRACT: u16 = 2001;
-const GS_ISSUED_SUPPLY: u16 = 2002;
-const OS_ASSETS: u16 = 4000;
-const TS_TRANSFER: u16 = 10000;
+use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
 
 pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::with(rgb20_stl());
 
-    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSETS))];
+    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
     let alu_lib = Lib::assemble(&code).unwrap();
     let alu_id = alu_lib.id();
 
@@ -53,24 +47,24 @@ pub fn nia_schema() -> SubSchema {
         type_system: types.type_system(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
-            GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
+            GS_DATA => GlobalStateSchema::once(types.get("RGBContract.ContractData")),
             GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
-            GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGB20.Amount")),
+            GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => StateSchema::Fungible(FungibleType::Unsigned64Bit),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
             metadata: Ty::<SemId>::UNIT.id(None),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
-                GS_CONTRACT => Occurrences::Once,
+                GS_DATA => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
                 GS_ISSUED_SUPPLY => Occurrences::Once,
             },
             assignments: tiny_bmap! {
-                OS_ASSETS => Occurrences::OnceOrMore,
+                OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
         },
@@ -80,10 +74,10 @@ pub fn nia_schema() -> SubSchema {
                 metadata: Ty::<SemId>::UNIT.id(None),
                 globals: none!(),
                 inputs: tiny_bmap! {
-                    OS_ASSETS => Occurrences::OnceOrMore
+                    OS_ASSET => Occurrences::OnceOrMore
                 },
                 assignments: tiny_bmap! {
-                    OS_ASSETS => Occurrences::OnceOrMore
+                    OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
             }
@@ -91,7 +85,7 @@ pub fn nia_schema() -> SubSchema {
         script: Script::AluVM(AluScript {
             libs: confined_bmap! { alu_id => alu_lib },
             entry_points: confined_bmap! {
-                EntryPoint::ValidateOwnedState(OS_ASSETS) => LibSite::with(0, alu_id)
+                EntryPoint::ValidateOwnedState(OS_ASSET) => LibSite::with(0, alu_id)
             },
         }),
     }
@@ -107,12 +101,12 @@ pub fn nia_rgb20() -> IfaceImpl {
         iface_id: iface.iface_id(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
-            NamedField::with(GS_CONTRACT, fname!("terms")),
-            NamedField::with(GS_ISSUED_SUPPLY, fname!("issuedSupply")),
+            NamedField::with(GS_DATA, fname!("data")),
             NamedField::with(GS_TIMESTAMP, fname!("created")),
+            NamedField::with(GS_ISSUED_SUPPLY, fname!("issuedSupply")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSETS, fname!("assetOwner")),
+            NamedField::with(OS_ASSET, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {

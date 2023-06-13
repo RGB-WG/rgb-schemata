@@ -9,7 +9,7 @@
 [![Apache-2 licensed](https://img.shields.io/crates/l/rgb-schemata)](./LICENSE)
 
 This repository provides rust source code and compiled versions of RGB
-contract schemata recommended for the use by contract developers. 
+contract schemata recommended for the use by contract developers.
 
 RGB is confidential & scalable client-validated smart contracts for Bitcoin &
 Lightning. To learn more about RGB please check [RGB blueprint][Blueprint] and
@@ -24,14 +24,16 @@ This repository provides the following RGB schemata:
 
 * __Non-inflatable assets (NIA)__, implementing RGB20 interface.
   This is the simplest form of a fungible asset/token, which doesn't provide
-  such features as secondary issue, ability to change asset name and 
+  such features as secondary issue, ability to change asset name and
   parameters, ability to burn or replace the asset.
 
 * __Unique digital asset (UDA)__, implementing RGB21 interface.
-  This is the simplest form of an NFT, which has one issuance of a single 
-  non-fungible and non-fractionable token with a representative attached 
+  This is the simplest form of an NFT, which has one issuance of a single
+  non-fungible and non-fractionable token with a representative attached
   media file and a preview.
 
+* __Collectible fungible assets (CFA)__, implementing RGB25 interface.
+  This is the simplest form of collectible fungible assets
 
 ## Library
 

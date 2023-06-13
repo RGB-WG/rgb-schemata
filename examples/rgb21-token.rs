@@ -31,7 +31,7 @@ fn main() {
     let terms = RicardianContract::default();
     let created = Timestamp::default();
     let beneficiary = Outpoint::new(
-        Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(), 
+        Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(),
         0
     );
 
@@ -39,8 +39,8 @@ fn main() {
     let index = TokenIndex::from_inner(2);
 
     let preview = EmbeddedMedia {
-        ty: stl::MediaType::with("text/*"),     
-        data: SmallBlob::try_from_iter(vec![0, 0]).expect("invalid data"), 
+        ty: stl::MediaType::with("text/*"),
+        data: SmallBlob::try_from_iter(vec![0, 0]).expect("invalid data"),
     };
 
     let token_data = TokenData { index, preview: Some(preview), ..Default::default() };
@@ -65,7 +65,7 @@ fn main() {
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_data_state("beneficiary", beneficiary, allocation)
+        .add_data_state("assetOwner", beneficiary, allocation)
         .expect("invalid asset blob")
 
         .issue_contract()
