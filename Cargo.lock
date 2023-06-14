@@ -296,7 +296,7 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.10.0"
-source = "git+https://github.com/LNP-BP/client_side_validation#46cb8a78847a880f2fa89bbe9e3d65c87efc779a"
+source = "git+https://github.com/LNP-BP/client_side_validation#b8c1704863d31d3a9a45bf55b68bcbc035f4b9c3"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -308,7 +308,7 @@ dependencies = [
 [[package]]
 name = "commit_verify"
 version = "0.10.2"
-source = "git+https://github.com/LNP-BP/client_side_validation#46cb8a78847a880f2fa89bbe9e3d65c87efc779a"
+source = "git+https://github.com/LNP-BP/client_side_validation#b8c1704863d31d3a9a45bf55b68bcbc035f4b9c3"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -665,7 +665,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.10.2"
-source = "git+https://github.com/RGB-WG/rgb-wallet?branch=fix/issued-supply#882ad6ba5053bbb8453f4279c3a53781fb9bbc91"
+source = "git+https://github.com/RGB-WG/rgb-wallet#a0f98cfbfe93aad4e8ceb81bddbc52bf7638911d"
 dependencies = [
  "amplify",
  "baid58",

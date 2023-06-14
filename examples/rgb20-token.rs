@@ -89,7 +89,7 @@ fn main() {
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
     
     for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("(amount={value}, owner={owner}, witness={witness})");
+        eprintln!("amount={value}, owner={owner}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_supply());
 }
