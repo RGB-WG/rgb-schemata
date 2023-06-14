@@ -27,7 +27,7 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let spec = DivisibleAssetSpec::new("TEST", "Test uda", Precision::CentiMicro);
+    let spec = DivisibleAssetSpec::new("TEST", "Test uda", Precision::Indivisible);
     let terms = RicardianContract::default();
     let created = Timestamp::default();
     let beneficiary = Outpoint::new(
