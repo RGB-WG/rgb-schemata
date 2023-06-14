@@ -36,8 +36,8 @@ use crate::GS_TIMESTAMP;
 
 const GS_NOMINAL: u16 = 2000;
 const GS_CONTRACT: u16 = 2001;
-const OS_ASSETS: u16 = 2000;
-const TS_TRANSFER: u16 = 2000;
+const OS_ASSETS: u16 = 4000;
+const TS_TRANSFER: u16 = 10000;
 
 pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::new();
