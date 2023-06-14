@@ -4,7 +4,7 @@ use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation};
+use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, Rgb20};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
@@ -78,9 +78,9 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
-    let nominal = contract.global("spec").unwrap();
+    let contract = Rgb20::from(contract);
     let allocations = contract.fungible("beneficiary").unwrap();
-    eprintln!("{}", nominal[0]);
+    eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
     
     for FungibleAllocation { owner, witness, value } in allocations {
         eprintln!("(amount={value}, owner={owner}, witness={witness})");
