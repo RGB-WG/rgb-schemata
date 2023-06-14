@@ -665,7 +665,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.10.2"
-source = "git+https://github.com/RGB-WG/rgb-wallet#d5d40fc9d2c0d1663f6b75edc8930e096e45a21f"
+source = "git+https://github.com/RGB-WG/rgb-wallet?branch=fix/issued-supply#882ad6ba5053bbb8453f4279c3a53781fb9bbc91"
 dependencies = [
  "amplify",
  "baid58",
@@ -877,7 +877,7 @@ dependencies = [
 [[package]]
 name = "strict_types"
 version = "1.2.0"
-source = "git+https://github.com/strict-types/strict-types#35056165b99dce1b1b14dfdeb41f2b879bb3f79c"
+source = "git+https://github.com/strict-types/strict-types#86975f2549d484d2b9a504df6054eea04eaf5c54"
 dependencies = [
  "amplify",
  "baid58",
