@@ -7,7 +7,7 @@ use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
-use rgbstd::interface::{rgb21, ContractBuilder, FungibleAllocation};
+use rgbstd::interface::{rgb21, ContractBuilder};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{self, DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
@@ -96,10 +96,5 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb21().iface_id()).unwrap();
     let nominal = contract.global("spec").unwrap();
-    let allocations = contract.fungible("beneficiary").unwrap();
     eprintln!("{}", nominal[0]);
-    
-    for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("(amount={value}, owner={owner}, witness={witness})");
-    }
 }
