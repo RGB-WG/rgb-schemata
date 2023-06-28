@@ -23,7 +23,7 @@
 //! interface.
 
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{rgb20, IfaceImpl, NamedField, NamedType, VerNo};
+use rgbstd::interface::{rgb20, rgb20_stl, IfaceImpl, NamedField, NamedType, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
@@ -36,11 +36,12 @@ use crate::GS_TIMESTAMP;
 
 const GS_NOMINAL: u16 = 2000;
 const GS_CONTRACT: u16 = 2001;
-const OS_ASSETS: u16 = 2000;
-const TS_TRANSFER: u16 = 2000;
+const GS_ISSUED_SUPPLY: u16 = 2002;
+const OS_ASSETS: u16 = 4000;
+const TS_TRANSFER: u16 = 10000;
 
 pub fn nia_schema() -> SubSchema {
-    let types = StandardTypes::new();
+    let types = StandardTypes::with(rgb20_stl());
 
     let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSETS))];
     let alu_lib = Lib::assemble(&code).unwrap();
@@ -54,6 +55,7 @@ pub fn nia_schema() -> SubSchema {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
             GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
             GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
+            GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGB20.Amount")),
         },
         owned_types: tiny_bmap! {
             OS_ASSETS => StateSchema::Fungible(FungibleType::Unsigned64Bit),
@@ -65,6 +67,7 @@ pub fn nia_schema() -> SubSchema {
                 GS_NOMINAL => Occurrences::Once,
                 GS_CONTRACT => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
+                GS_ISSUED_SUPPLY => Occurrences::Once,
             },
             assignments: tiny_bmap! {
                 OS_ASSETS => Occurrences::OnceOrMore,
@@ -105,10 +108,11 @@ pub fn nia_rgb20() -> IfaceImpl {
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_CONTRACT, fname!("terms")),
+            NamedField::with(GS_ISSUED_SUPPLY, fname!("issuedSupply")),
             NamedField::with(GS_TIMESTAMP, fname!("created")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSETS, fname!("beneficiary")),
+            NamedField::with(OS_ASSETS, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {

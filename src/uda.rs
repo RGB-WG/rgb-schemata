@@ -38,8 +38,8 @@ const GS_TOKENS: u16 = 2102;
 #[allow(dead_code)]
 const GS_ENGRAVINGS: u16 = 2103;
 const GS_ATTACH: u16 = 2104;
-const OS_ASSET: u16 = 2100;
-const TS_TRANSFER: u16 = 2100;
+const OS_ASSET: u16 = 4100;
+const TS_TRANSFER: u16 = 10100;
 
 pub fn uda_schema() -> SubSchema {
     let types = StandardTypes::with(rgb21_stl());
@@ -109,7 +109,7 @@ pub fn uda_rgb21() -> IfaceImpl {
             NamedField::with(GS_TOKENS, fname!("tokens")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSET, fname!("beneficiary")),
+            NamedField::with(OS_ASSET, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {

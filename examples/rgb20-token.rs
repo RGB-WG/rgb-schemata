@@ -4,7 +4,8 @@ use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation};
+use rgbstd::interface::rgb20::Amount;
+use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, Rgb20};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
@@ -32,6 +33,8 @@ fn main() {
         0
     );
 
+    const ISSUE: u64 = 1_000_000_0000_0000;
+    
     let contract = ContractBuilder::with(
         rgb20(),
         nia_schema(),
@@ -43,12 +46,15 @@ fn main() {
         .expect("invalid nominal")
 
         .add_global_state("created", created)
-        .expect("invalid nominal")
+        .expect("invalid creation date")
 
+        .add_global_state("issuedSupply", Amount::from(ISSUE))
+        .expect("invalid issued supply")
+        
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_fungible_state("beneficiary", beneficiary, 1_000_000_0000_0000)
+        .add_fungible_state("beneficiary", beneficiary, ISSUE)
         .expect("invalid asset amount")
 
         .issue_contract()
@@ -78,11 +84,12 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
-    let nominal = contract.global("spec").unwrap();
-    let allocations = contract.fungible("beneficiary").unwrap();
-    eprintln!("{}", nominal[0]);
+    let contract = Rgb20::from(contract);
+    let allocations = contract.fungible("beneficiary", &None).unwrap();
+    eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
     
     for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("(amount={value}, owner={owner}, witness={witness})");
+        eprintln!("amount={value}, owner={owner}, witness={witness}");
     }
+    eprintln!("totalSupply={}", contract.total_supply());
 }
