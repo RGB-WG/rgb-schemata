@@ -112,7 +112,7 @@ pub fn nia_rgb20() -> IfaceImpl {
             NamedField::with(GS_TIMESTAMP, fname!("created")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSETS, fname!("beneficiary")),
+            NamedField::with(OS_ASSETS, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {

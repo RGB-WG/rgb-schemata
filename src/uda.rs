@@ -109,7 +109,7 @@ pub fn uda_rgb21() -> IfaceImpl {
             NamedField::with(GS_TOKENS, fname!("tokens")),
         },
         assignments: tiny_bset! {
-            NamedField::with(OS_ASSET, fname!("beneficiary")),
+            NamedField::with(OS_ASSET, fname!("assetOwner")),
         },
         valencies: none!(),
         transitions: tiny_bset! {
