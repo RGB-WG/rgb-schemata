@@ -21,7 +21,7 @@
 
 use std::{fs, io};
 
-use rgb_schemata::{nia_rgb20, nia_schema};
+use rgb_schemata::{nia_rgb20, nia_schema, uda_schema, uda_rgb21};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb20, rgb21};
 
@@ -53,13 +53,13 @@ fn nia() -> io::Result<()> {
 }
 
 fn uda() -> io::Result<()> {
-    let schema_bindle = nia_schema().bindle();
+    let schema_bindle = uda_schema().bindle();
     schema_bindle.save("schemata/UniqueDigitalAsset.rgb")?;
     fs::write("schemata/UniqueDigitalAsset.rgba", schema_bindle.to_string())?;
 
-    let iimpl_bindle = nia_rgb20().bindle();
-    iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB20.rgb")?;
-    fs::write("schemata/UniqueDigitalAsset-RGB20.rgba", iimpl_bindle.to_string())?;
+    let iimpl_bindle = uda_rgb21().bindle();
+    iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;
+    fs::write("schemata/UniqueDigitalAsset-RGB21.rgba", iimpl_bindle.to_string())?;
 
     Ok(())
 }
