@@ -85,7 +85,7 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
     let contract = Rgb20::from(contract);
-    let allocations = contract.fungible("beneficiary").unwrap();
+    let allocations = contract.fungible("beneficiary", &None).unwrap();
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
     
     for FungibleAllocation { owner, witness, value } in allocations {
