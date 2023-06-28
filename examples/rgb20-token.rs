@@ -46,7 +46,7 @@ fn main() {
         .expect("invalid nominal")
 
         .add_global_state("created", created)
-        .expect("invalid nominal")
+        .expect("invalid creation date")
 
         .add_global_state("issuedSupply", Amount::from(ISSUE))
         .expect("invalid issued supply")
