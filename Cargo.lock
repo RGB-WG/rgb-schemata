@@ -621,9 +621,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.28"
+version = "1.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b9ab9c7eadfd8df19006f1cf1a4aed13540ed5cbc047010ece5826e10825488"
+checksum = "573015e8ab27661678357f27dc26460738fd2b6c86e46f386fde94cb5d913105"
 dependencies = [
  "proc-macro2",
 ]
@@ -661,7 +661,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.10.4"
-source = "git+https://github.com/RGB-WG/rgb-core#ddcaca71d6c49a8e875a7e4d417ad924f6c925b8"
+source = "git+https://github.com/RGB-WG/rgb-core#54e7cbb905cab23440a00111f1321dc0acf2f03e"
 dependencies = [
  "aluvm",
  "amplify",
@@ -688,6 +688,7 @@ dependencies = [
  "rgb-std",
  "serde",
  "serde_json",
+ "sha2",
  "strict_encoding",
  "strict_types",
 ]
@@ -695,7 +696,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.10.2"
-source = "git+https://github.com/RGB-WG/rgb-wallet#8d6c50c2a4c6a095437c9102872395a0d13b6502"
+source = "git+https://github.com/RGB-WG/rgb-wallet#2679a64b6a706a9e3f51c1e07898ea5f17b88c12"
 dependencies = [
  "amplify",
  "baid58",
@@ -881,9 +882,9 @@ dependencies = [
 
 [[package]]
 name = "strict_encoding"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0be9dd3df80dc083d4e20ac87246a67f42b3a5016375ae5a48f292e85ccfb1bd"
+checksum = "ca43fabd13842577ce6d152047796794e209625ff89d3f2434d99b742eea1c98"
 dependencies = [
  "amplify",
  "half",
@@ -906,9 +907,9 @@ dependencies = [
 
 [[package]]
 name = "strict_types"
-version = "1.3.0"
+version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e611df6ed5752860c760c94509b838cd225e9e9e5de301517db195cf6f1f2cd"
+checksum = "b4b1669bdf556c9a00a6a9aa9bf76d3ebec83aa4aa3e178bdfd2073157564579"
 dependencies = [
  "amplify",
  "baid58",
@@ -1155,9 +1156,9 @@ dependencies = [
 
 [[package]]
 name = "windows-targets"
-version = "0.48.0"
+version = "0.48.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b1eb6f0cd7c80c79759c929114ef071b87354ce476d9d94271031c0497adfd5"
+checksum = "05d4b17490f70499f20b9e791dcf6a299785ce8af4d709018206dc5b4953e95f"
 dependencies = [
  "windows_aarch64_gnullvm",
  "windows_aarch64_msvc",

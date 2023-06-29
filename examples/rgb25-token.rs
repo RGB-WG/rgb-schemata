@@ -2,15 +2,17 @@ use std::convert::Infallible;
 
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
-use rgb_schemata::{nia_rgb20, nia_schema};
+use rgb_schemata::{cfa_rgb25, cfa_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, Rgb20};
+use rgbstd::interface::{rgb25, ContractBuilder, FungibleAllocation};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
-    Amount, ContractData, DivisibleAssetSpec, Precision, RicardianContract, Timestamp,
+    Amount, Attachment, ContractData, Details, MediaType, Name, Precision, RicardianContract,
+    Timestamp,
 };
 use rgbstd::validation::{ResolveTx, TxResolverError};
+use sha2::{Digest, Sha256};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
@@ -26,11 +28,21 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let spec = DivisibleAssetSpec::new("TEST", "Test asset", Precision::CentiMicro);
+    let name = Name::try_from("Test asset").unwrap();
+    let details = Details::try_from("details with ℧nicode characters").unwrap();
+    let precision = Precision::CentiMicro;
     let terms = RicardianContract::default();
+    let file_bytes = std::fs::read("README.md").unwrap();
+    let mut hasher = Sha256::new();
+    hasher.update(file_bytes);
+    let file_hash = hasher.finalize();
+    let media = Some(Attachment {
+        ty: MediaType::with("text/*"),
+        digest: file_hash.into(),
+    });
     let contract_data = ContractData {
         terms,
-        media: None,
+        media,
     };
     let created = Timestamp::default();
     let beneficiary = Outpoint::new(
@@ -41,23 +53,29 @@ fn main() {
     const ISSUE: u64 = 1_000_000_000_000;
 
     let contract = ContractBuilder::with(
-        rgb20(),
-        nia_schema(),
-        nia_rgb20()
-        ).expect("schema fails to implement RGB20 interface")
+        rgb25(),
+        cfa_schema(),
+        cfa_rgb25()
+        ).expect("schema fails to implement RGB25 interface")
 
         .set_chain(Chain::Testnet3)
-        .add_global_state("spec", spec)
-        .expect("invalid nominal")
+        .add_global_state("name", name)
+        .expect("invalid name")
+
+        .add_global_state("details", details)
+        .expect("invalid details")
+
+        .add_global_state("precision", precision)
+        .expect("invalid precision")
 
         .add_global_state("created", created)
-        .expect("invalid creation date")
+        .expect("invalid created")
 
         .add_global_state("issuedSupply", Amount::from(ISSUE))
-        .expect("invalid issued supply")
+        .expect("invalid issuedSupply")
 
         .add_global_state("data", contract_data)
-        .expect("invalid contract text")
+        .expect("invalid contract data")
 
         .add_fungible_state("assetOwner", beneficiary, ISSUE)
         .expect("invalid asset amount")
@@ -70,13 +88,13 @@ fn main() {
 
     let bindle = contract.bindle();
     eprintln!("{bindle}");
-    bindle.save("examples/rgb20-simplest.contract.rgb").expect("unable to save contract");
+    bindle.save("examples/rgb25-simplest.contract.rgb").expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
-    stock.import_iface(rgb20()).unwrap();
-    stock.import_schema(nia_schema()).unwrap();
-    stock.import_iface_impl(nia_rgb20()).unwrap();
+    stock.import_iface(rgb25()).unwrap();
+    stock.import_schema(cfa_schema()).unwrap();
+    stock.import_iface_impl(cfa_rgb25()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
     let verified_contract = match bindle.unbindle().validate(&mut DumbResolver) {
@@ -88,13 +106,12 @@ fn main() {
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
-    let contract = Rgb20::from(contract);
+    let contract = stock.contract_iface(contract_id, rgb25().iface_id()).unwrap();
+    let name = contract.global("name").unwrap();
     let allocations = contract.fungible("assetOwner", &None).unwrap();
-    eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
+    eprintln!("{}", Name::from_strict_val_unchecked(&name[0]));
 
     for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("amount={value}, owner={owner}, witness={witness}");
+        eprintln!("(amount={value}, owner={owner}, witness={witness})");
     }
-    eprintln!("totalSupply={}", contract.total_supply());
 }

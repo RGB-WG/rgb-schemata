@@ -21,9 +21,9 @@
 
 use std::{fs, io};
 
-use rgb_schemata::{nia_rgb20, nia_schema, uda_schema, uda_rgb21};
+use rgb_schemata::{cfa_rgb25, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, rgb21};
+use rgbstd::interface::{rgb20, rgb21, rgb25};
 
 fn main() -> io::Result<()> {
     let rgb20_bindle = rgb20().bindle();
@@ -34,8 +34,13 @@ fn main() -> io::Result<()> {
     rgb21_bindle.save("interfaces/RGB21.rgb")?;
     fs::write("interfaces/RGB21.rgba", rgb21_bindle.to_string())?;
 
+    let rgb25_bindle = rgb25().bindle();
+    rgb25_bindle.save("interfaces/RGB25.rgb")?;
+    fs::write("interfaces/RGB25.rgba", rgb25_bindle.to_string())?;
+
     nia()?;
     uda()?;
+    cfa()?;
 
     Ok(())
 }
@@ -60,6 +65,18 @@ fn uda() -> io::Result<()> {
     let iimpl_bindle = uda_rgb21().bindle();
     iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;
     fs::write("schemata/UniqueDigitalAsset-RGB21.rgba", iimpl_bindle.to_string())?;
+
+    Ok(())
+}
+
+fn cfa() -> io::Result<()> {
+    let schema_bindle = nia_schema().bindle();
+    schema_bindle.save("schemata/CollectibleFungibleAssets.rgb")?;
+    fs::write("schemata/CollectibleFungibleAssets.rgba", schema_bindle.to_string())?;
+
+    let iimpl_bindle = cfa_rgb25().bindle();
+    iimpl_bindle.save("schemata/CollectibleFungibleAssets-RGB25.rgb")?;
+    fs::write("schemata/CollectibleFungibleAssets-RGB25.rgba", iimpl_bindle.to_string())?;
 
     Ok(())
 }
