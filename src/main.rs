@@ -21,7 +21,7 @@
 
 use std::{fs, io};
 
-use rgb_schemata::{cfa_rgb25, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
+use rgb_schemata::{cfa_rgb25, cfa_schema, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb20, rgb21, rgb25};
 
@@ -70,7 +70,7 @@ fn uda() -> io::Result<()> {
 }
 
 fn cfa() -> io::Result<()> {
-    let schema_bindle = nia_schema().bindle();
+    let schema_bindle = cfa_schema().bindle();
     schema_bindle.save("schemata/CollectibleFungibleAssets.rgb")?;
     fs::write("schemata/CollectibleFungibleAssets.rgba", schema_bindle.to_string())?;
 
