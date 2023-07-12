@@ -6,6 +6,7 @@ use amplify::Wrapper;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
+use rgbstd::contract::WitnessOrd;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
 use rgbstd::interface::{rgb21, ContractBuilder};
 use rgbstd::persistence::{Inventory, Stock};
@@ -22,7 +23,9 @@ impl ResolveTx for DumbResolver {
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> { Ok(0) }
+    fn resolve_height(&mut self, _txid: Txid) -> Result<WitnessOrd, Self::Error> {
+        Ok(WitnessOrd::OffChain)
+    }
 }
 
 #[rustfmt::skip]

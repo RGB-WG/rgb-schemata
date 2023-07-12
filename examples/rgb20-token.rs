@@ -4,6 +4,7 @@ use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
+use rgbstd::contract::WitnessOrd;
 use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, Rgb20};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
@@ -21,7 +22,9 @@ impl ResolveTx for DumbResolver {
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_height(&mut self, _txid: Txid) -> Result<u32, Self::Error> { Ok(0) }
+    fn resolve_height(&mut self, _txid: Txid) -> Result<WitnessOrd, Self::Error> {
+        Ok(WitnessOrd::OffChain)
+    }
 }
 
 #[rustfmt::skip]
