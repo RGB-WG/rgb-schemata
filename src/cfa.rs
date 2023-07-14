@@ -107,6 +107,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
+        script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
