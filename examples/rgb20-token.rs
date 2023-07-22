@@ -35,13 +35,13 @@ fn main() {
         terms,
         media: None,
     };
-    let created = Timestamp::default();
+    let created = Timestamp::now();
     let beneficiary = Outpoint::new(
-        Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(),
-        0
+        Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap(),
+        1
     );
 
-    const ISSUE: u64 = 1_000_000_000_000;
+    const ISSUE: u64 = 1_000_000_000_00;
 
     let contract = ContractBuilder::with(
         rgb20(),
@@ -100,4 +100,5 @@ fn main() {
         eprintln!("amount={value}, owner={owner}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_supply());
+    eprintln!("created={}", contract.created().to_local().unwrap());
 }
