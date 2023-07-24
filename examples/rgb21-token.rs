@@ -32,7 +32,7 @@ impl ResolveHeight for DumbResolver {
 fn main() {
     let spec = DivisibleAssetSpec::new("TEST", "Test uda", Precision::Indivisible);
     let terms = RicardianContract::default();
-    let created = Timestamp::default();
+    let created = Timestamp::now();
     let beneficiary = Outpoint::new(
         Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(),
         0
