@@ -17,8 +17,8 @@ amplify = "4.0.0"
 strict_encoding = "2.5.0"
 strict_types = "1.6.0"
 aluvm = "0.10.5"
-bp-core = "0.10.6"
-rgb-std = { version = "0.10.4", features = ["serde", "fs"] }
+bp-core = "0.10.8"
+rgb-std = { version = "0.10.6", features = ["serde", "fs"] }
 serde = "1.0.152"
 serde_json = "1.0.93"
 sha2 = "0.10.7"
