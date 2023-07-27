@@ -1,4 +1,5 @@
 use std::convert::Infallible;
+use std::fs;
 
 use amplify::hex::FromHex;
 use bp::{Chain, Outpoint, Tx, Txid};
@@ -92,6 +93,7 @@ fn main() {
     let bindle = contract.bindle();
     eprintln!("{bindle}");
     bindle.save("examples/rgb25-simplest.contract.rgb").expect("unable to save contract");
+    fs::write("examples/rgb25-simplest.contract.rgba", bindle.to_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
