@@ -695,7 +695,7 @@ dependencies = [
 
 [[package]]
 name = "rgb-schemata"
-version = "0.10.0-rc.3"
+version = "0.10.0"
 dependencies = [
  "aluvm",
  "amplify",
