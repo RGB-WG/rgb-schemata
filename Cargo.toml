@@ -13,14 +13,14 @@ license = "Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-amplify = "4.0.1"
-strict_encoding = "2.5.0"
-strict_types = "1.6.1"
-aluvm = "0.10.5"
-bp-core = "0.10.9"
-rgb-std = { version = "0.10.8", features = ["serde", "fs"] }
-serde = "1.0.152"
-serde_json = "1.0.93"
+amplify = "4.5.0"
+strict_encoding = "2.6.1"
+strict_types = "1.6.3"
+aluvm = "0.10.6"
+bp-core = "0.10.11"
+rgb-std = { version = "0.10.9", features = ["serde", "fs"] }
+serde = "1.0"
+serde_json = "1.0"
 sha2 = "0.10.7"
 
 [dev-dependencies]
