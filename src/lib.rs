@@ -28,13 +28,14 @@ mod cfa;
 mod nia;
 mod uda;
 
-const GS_NOMINAL: u16 = 2000;
-const GS_DATA: u16 = 2001;
-const GS_ISSUED_SUPPLY: u16 = 2002;
-const GS_TIMESTAMP: u16 = 2003;
-const OS_ASSET: u16 = 4000;
-const TS_TRANSFER: u16 = 10000;
+const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
+const GS_DATA: GlobalStateType = GlobalStateType::with(2001);
+const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
+const GS_TIMESTAMP: GlobalStateType = GlobalStateType::with(2003);
+const OS_ASSET: AssignmentType = AssignmentType::with(4000);
+const TS_TRANSFER: TransitionType = TransitionType::with(10000);
 
 pub use cfa::{cfa_rgb25, cfa_schema};
 pub use nia::{nia_rgb20, nia_schema};
+use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
 pub use uda::{uda_rgb21, uda_schema};

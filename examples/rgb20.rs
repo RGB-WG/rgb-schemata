@@ -2,29 +2,31 @@ use std::convert::Infallible;
 use std::fs;
 
 use amplify::hex::FromHex;
-use bp::{Chain, Outpoint, Tx, Txid};
+use bp::{Outpoint, Tx, Txid};
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::contract::WitnessOrd;
-use rgbstd::interface::{rgb20, ContractBuilder, FungibleAllocation, Rgb20};
+use rgbstd::interface::{rgb20, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
     Amount, ContractData, DivisibleAssetSpec, Precision, RicardianContract, Timestamp,
 };
 use rgbstd::validation::{ResolveTx, TxResolverError};
+use rgbstd::{Anchor, Layer1, WitnessAnchor};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
 
 impl ResolveTx for DumbResolver {
-    fn resolve_tx(&self, _txid: Txid) -> Result<Tx, TxResolverError> { Ok(Tx::strict_dumb()) }
+    fn resolve_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
+        Ok(Tx::strict_dumb())
+    }
 }
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_height(&mut self, _txid: Txid) -> Result<WitnessOrd, Self::Error> {
-        Ok(WitnessOrd::OffChain)
+    fn resolve_anchor(&mut self, _: &Anchor) -> Result<WitnessAnchor, Self::Error> {
+        Ok(WitnessAnchor::strict_dumb())
     }
 }
 
@@ -44,13 +46,12 @@ fn main() {
 
     const ISSUE: u64 = 1_000_000_000_00;
 
-    let contract = ContractBuilder::with(
+    let contract = ContractBuilder::testnet(
         rgb20(),
         nia_schema(),
         nia_rgb20()
         ).expect("schema fails to implement RGB20 interface")
 
-        .set_chain(Chain::Testnet3)
         .add_global_state("spec", spec)
         .expect("invalid nominal")
 
@@ -84,7 +85,7 @@ fn main() {
     stock.import_iface_impl(nia_rgb20()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver) {
+    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, true) {
         Ok(consignment) => consignment,
         Err(consignment) => {
             panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
@@ -93,9 +94,9 @@ fn main() {
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface(contract_id, rgb20().iface_id()).unwrap();
+    let contract = stock.contract_iface_id(contract_id, rgb20().iface_id()).unwrap();
     let contract = Rgb20::from(contract);
-    let allocations = contract.fungible("assetOwner", &None).unwrap();
+    let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
     for FungibleAllocation { owner, witness, value } in allocations {

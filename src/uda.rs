@@ -28,15 +28,16 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::AluScript;
+use rgbstd::GlobalStateType;
 use strict_types::{SemId, Ty};
 
 use crate::{GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
 
-const GS_CONTRACT: u16 = 2101;
-const GS_TOKENS: u16 = 2102;
+const GS_CONTRACT: GlobalStateType = GlobalStateType::with(2101);
+const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
 #[allow(dead_code)]
-const GS_ENGRAVINGS: u16 = 2103;
-const GS_ATTACH: u16 = 2104;
+const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
+const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
 pub fn uda_schema() -> SubSchema {
     let types = StandardTypes::with(rgb21_stl());

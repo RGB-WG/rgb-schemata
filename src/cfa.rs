@@ -30,13 +30,14 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
+use rgbstd::GlobalStateType;
 use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
 
-const GS_NAME: u16 = 2000;
-const GS_DETAILS: u16 = 2004;
-const GS_PRECISION: u16 = 2005;
+const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
+const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
+const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
 
 pub fn cfa_schema() -> SubSchema {
     let types = StandardTypes::with(rgb25_stl());
