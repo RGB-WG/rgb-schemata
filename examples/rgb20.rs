@@ -3,16 +3,18 @@ use std::fs;
 
 use amplify::hex::FromHex;
 use bp::{Outpoint, Tx, Txid};
-use rgb_schemata::{nia_rgb20, nia_schema};
+use rgb_schemata::{nia_rgb20, nia_schema, OS_ASSET};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20};
+use rgbstd::interface::{
+    rgb20, AssetTagExt, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20,
+};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
     Amount, ContractData, DivisibleAssetSpec, Precision, RicardianContract, Timestamp,
 };
 use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::{Anchor, Layer1, WitnessAnchor};
+use rgbstd::{Anchor, AssetTag, Layer1, WitnessAnchor};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
@@ -45,12 +47,16 @@ fn main() {
     );
 
     const ISSUE: u64 = 1_000_000_000_00;
+    let asset_tag = AssetTag::new_rgb20("examples.lnp-bp.org", &spec.naming.ticker);
 
     let contract = ContractBuilder::testnet(
         rgb20(),
         nia_schema(),
         nia_rgb20()
         ).expect("schema fails to implement RGB20 interface")
+
+        .add_asset_tag(OS_ASSET, asset_tag)
+        .expect("just one asset tag is used")
 
         .add_global_state("spec", spec)
         .expect("invalid nominal")
@@ -71,12 +77,11 @@ fn main() {
         .expect("contract doesn't fit schema requirements");
 
     let contract_id = contract.contract_id();
-    debug_assert_eq!(contract_id, contract.contract_id());
 
     let bindle = contract.bindle();
     eprintln!("{bindle}");
-    bindle.save("examples/rgb20-simplest.contract.rgb").expect("unable to save contract");
-    fs::write("examples/rgb20-simplest.contract.rgba", bindle.to_string()).expect("unable to save contract");
+    bindle.save("examples/rgb20-simplest.rgb").expect("unable to save contract");
+    fs::write("examples/rgb20-simplest.rgba", bindle.to_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
@@ -85,12 +90,9 @@ fn main() {
     stock.import_iface_impl(nia_rgb20()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, true) {
-        Ok(consignment) => consignment,
-        Err(consignment) => {
-            panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
-        }
-    };
+    let verified_contract = bindle.unbindle().validate(&mut DumbResolver, true).unwrap_or_else(|consignment| {
+        panic!("{}", consignment.validation_status().expect("status always present upon validation"));
+    });
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
