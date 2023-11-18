@@ -22,13 +22,17 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
+use aluvm::data::ByteStr;
+use aluvm::isa::{BytesOp, ControlFlowOp, Instr};
 use aluvm::library::{Lib, LibSite};
+use aluvm::reg::RegS;
 use rgbstd::interface::{rgb20, rgb20_stl, IfaceImpl, NamedField, NamedType, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
+use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use strict_types::{SemId, Ty};
 
@@ -37,9 +41,40 @@ use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TR
 pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::with(rgb20_stl());
 
-    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
-    let alu_lib = Lib::assemble(&code).unwrap();
+    let code: [Instr<RgbIsa>; 5] = [
+        // SUBROUTINE 1: genesis validation
+        // Before doing a check we need to put a string into first string register which will be
+        // used as an error message in case of the check failure.
+        Instr::Bytes(BytesOp::Put(
+            RegS::from(0),
+            Box::new(ByteStr::with(
+                "the issued amounts do not match between the reported global state and \
+                 confidential owned state",
+            )),
+            true,
+        )),
+        // Checking pedersen commitments against reported amount of issued assets present in the
+        // global state.
+        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::PcCs(OS_ASSET, GS_ISSUED_SUPPLY))),
+        // If the check succeeds we need to terminate the subroutine.
+        Instr::ControlFlow(ControlFlowOp::Ret),
+        // SUBROUTINE 2: transfer validation
+        Instr::Bytes(BytesOp::Put(
+            RegS::from(0),
+            Box::new(ByteStr::with(
+                "the sum of input amounts do not match the sum of the output amounts",
+            )),
+            true,
+        )),
+        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
+        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))),
+    ];
+    let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
     let alu_id = alu_lib.id();
+    const FN_GENESIS_OFFSET: u16 = 0;
+    const FN_TRANSFER_OFFSET: u16 = 6 + 5 + 1;
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 6], INSTR_PCCS);
+    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 6], INSTR_PCVS);
 
     Schema {
         ffv: zero!(),
@@ -85,7 +120,8 @@ pub fn nia_schema() -> SubSchema {
         script: Script::AluVM(AluScript {
             libs: confined_bmap! { alu_id => alu_lib },
             entry_points: confined_bmap! {
-                EntryPoint::ValidateOwnedState(OS_ASSET) => LibSite::with(0, alu_id)
+                EntryPoint::ValidateGenesis => LibSite::with(FN_GENESIS_OFFSET, alu_id),
+                EntryPoint::ValidateTransition(TS_TRANSFER) => LibSite::with(FN_TRANSFER_OFFSET, alu_id),
             },
         }),
     }

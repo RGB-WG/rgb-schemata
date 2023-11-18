@@ -5,8 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-alpha.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14a99358b65b74973749140c2bd657e960d54ba3925c5a56afdbf544317f12f6"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#7c43abba6b734d31e5bdf8ac786e2e3702541f94"
 dependencies = [
  "amplify",
  "baid58",
@@ -270,9 +269,9 @@ checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "cc"
-version = "1.0.84"
+version = "1.0.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f8e7c90afad890484a21653d08b6e209ae34770fb5ee298f9c699fcc1e5c856"
+checksum = "f1174fb0b6ec23863f8b971027804a42614e347eafb0a95bf0b12cdae21fc4d0"
 dependencies = [
  "libc",
 ]
@@ -589,8 +588,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e548bc2d50dac8821ceb7fc2b8e8655cb0a41bb9d76f9b1c069d1e4e09f782c"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=v0.11#f009e51734f8f258d75a51aac4cdc68e13732c9d"
 dependencies = [
  "aluvm",
  "amplify",
@@ -626,8 +624,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34ce5c05887c4a445ad747ff38f8eb97aa65a0fcd6d803053715d5c5770087f1"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#8ce111c9c66550d630d31e34be8e4fb2239318d7"
 dependencies = [
  "amplify",
  "baid58",
