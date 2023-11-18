@@ -3,18 +3,16 @@ use std::fs;
 
 use amplify::hex::FromHex;
 use bp::{Outpoint, Tx, Txid};
-use rgb_schemata::{nia_rgb20, nia_schema, OS_ASSET};
+use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{
-    rgb20, AssetTagExt, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20,
-};
+use rgbstd::interface::{rgb20, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
     Amount, ContractData, DivisibleAssetSpec, Precision, RicardianContract, Timestamp,
 };
 use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::{Anchor, AssetTag, Layer1, WitnessAnchor};
+use rgbstd::{Anchor, Layer1, WitnessAnchor};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
@@ -47,7 +45,6 @@ fn main() {
     );
 
     const ISSUE: u64 = 1_000_000_000_00;
-    let asset_tag = AssetTag::new_rgb20("examples.lnp-bp.org", &spec.naming.ticker);
 
     let contract = ContractBuilder::testnet(
         rgb20(),
@@ -67,8 +64,6 @@ fn main() {
         .add_global_state("data", contract_data)
         .expect("invalid contract text")
 
-        .add_asset_tag("assetOwner", asset_tag)
-        .expect("just one asset tag is used")
         .add_fungible_state("assetOwner", beneficiary, ISSUE)
         .expect("invalid asset amount")
 
@@ -98,6 +93,7 @@ fn main() {
     let contract = stock.contract_iface_id(contract_id, rgb20().iface_id()).unwrap();
     let contract = Rgb20::from(contract);
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
+    eprintln!("\nThe issued contract data:");
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
     for FungibleAllocation { owner, witness, value } in allocations {
