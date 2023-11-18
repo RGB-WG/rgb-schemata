@@ -55,9 +55,6 @@ fn main() {
         nia_rgb20()
         ).expect("schema fails to implement RGB20 interface")
 
-        .add_asset_tag(OS_ASSET, asset_tag)
-        .expect("just one asset tag is used")
-
         .add_global_state("spec", spec)
         .expect("invalid nominal")
 
@@ -70,6 +67,8 @@ fn main() {
         .add_global_state("data", contract_data)
         .expect("invalid contract text")
 
+        .add_asset_tag("assetOwner", asset_tag)
+        .expect("just one asset tag is used")
         .add_fungible_state("assetOwner", beneficiary, ISSUE)
         .expect("invalid asset amount")
 
