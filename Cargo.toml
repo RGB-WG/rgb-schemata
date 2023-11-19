@@ -1,6 +1,6 @@
 [package]
 name = "rgb-schemata"
-version = "0.11.0-beta.1"
+version = "0.11.0-beta.2"
 description = "Collection of the official RGB smart contract schemata"
 keywords = ["bitcoin", "lightning", "rgb", "smart-contracts", "lnp-bp"]
 categories = ["cryptography::cryptocurrencies"]
@@ -28,8 +28,3 @@ chrono = "0.4.31"
 
 [features]
 all=[]
-
-[patch.crates-io]
-aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "v0.11" }
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "v0.11" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "v0.11" }
