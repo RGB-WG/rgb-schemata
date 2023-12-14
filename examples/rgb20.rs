@@ -6,11 +6,10 @@ use bp::{Outpoint, Tx, Txid};
 use rgb_schemata::{nia_rgb20, nia_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb20, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20};
+use rgbstd::invoice::{Amount, Precision};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{
-    Amount, ContractData, DivisibleAssetSpec, Precision, RicardianContract, Timestamp,
-};
+use rgbstd::stl::{ContractData, DivisibleAssetSpec, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use rgbstd::{Anchor, Layer1, WitnessAnchor};
 use strict_encoding::StrictDumb;

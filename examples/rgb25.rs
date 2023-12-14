@@ -6,11 +6,11 @@ use bp::{Outpoint, Tx, Txid};
 use rgb_schemata::{cfa_rgb25, cfa_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb25, ContractBuilder, FilterIncludeAll, FungibleAllocation};
+use rgbstd::invoice::{Amount, Precision};
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
-    Amount, Attachment, ContractData, Details, MediaType, Name, Precision, RicardianContract,
-    Timestamp,
+    Attachment, ContractData, Details, MediaType, Name, RicardianContract, Timestamp,
 };
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use rgbstd::{Anchor, Layer1, WitnessAnchor};

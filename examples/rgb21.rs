@@ -9,9 +9,10 @@ use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
 use rgbstd::interface::{rgb21, ContractBuilder};
+use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{self, DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
+use rgbstd::stl::{self, DivisibleAssetSpec, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
 use rgbstd::{Anchor, Layer1, WitnessAnchor};
 use strict_encoding::StrictDumb;
@@ -70,7 +71,7 @@ fn main() {
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_data_state("assetOwner", beneficiary, allocation)
+        .add_data("assetOwner", beneficiary, allocation)
         .expect("invalid asset blob")
 
         .issue_contract()
