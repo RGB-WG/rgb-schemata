@@ -11,20 +11,20 @@ use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{ContractData, DivisibleAssetSpec, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::{Anchor, Layer1, WitnessAnchor};
+use rgbstd::{Layer1, WitnessAnchor, XAnchor};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
 
 impl ResolveTx for DumbResolver {
-    fn resolve_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
+    fn resolve_bp_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
         Ok(Tx::strict_dumb())
     }
 }
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_anchor(&mut self, _: &Anchor) -> Result<WitnessAnchor, Self::Error> {
+    fn resolve_anchor(&mut self, _: &XAnchor) -> Result<WitnessAnchor, Self::Error> {
         Ok(WitnessAnchor::strict_dumb())
     }
 }
