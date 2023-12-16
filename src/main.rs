@@ -19,11 +19,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::io::stdout;
 use std::{fs, io};
 
 use rgb_schemata::{cfa_rgb25, cfa_schema, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb20, rgb21, rgb25};
+use rgbstd::vm::RgbIsa;
 
 fn main() -> io::Result<()> {
     let rgb20_bindle = rgb20().bindle();
@@ -61,6 +63,16 @@ fn uda() -> io::Result<()> {
     let schema_bindle = uda_schema().bindle();
     schema_bindle.save("schemata/UniqueDigitalAsset.rgb")?;
     fs::write("schemata/UniqueDigitalAsset.rgba", schema_bindle.to_string())?;
+
+    let alu_lib = schema_bindle
+        .script
+        .as_alu_script()
+        .libs
+        .values()
+        .next()
+        .unwrap();
+    eprintln!("{alu_lib}");
+    alu_lib.print_disassemble::<RgbIsa>(stdout()).ok();
 
     let iimpl_bindle = uda_rgb21().bindle();
     iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;

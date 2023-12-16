@@ -21,13 +21,19 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
+use aluvm::data::{ByteStr, MaybeNumber};
+use aluvm::isa::opcodes::INSTR_PUTA;
+use aluvm::isa::{BytesOp, CmpOp, ControlFlowOp, Instr, MoveOp, NoneEqFlag, PutOp};
+use aluvm::library::{Lib, LibSite};
+use aluvm::reg::{Reg16, Reg32, RegA, RegR, RegS};
 use rgbstd::interface::{rgb21, rgb21_stl, IfaceImpl, NamedField, NamedType, VerNo};
 use rgbstd::schema::{
     GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, SubSchema,
     TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::AluScript;
+use rgbstd::vm::opcodes::INSTR_LDP;
+use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
 use rgbstd::GlobalStateType;
 use strict_types::{SemId, Ty};
 
@@ -41,6 +47,69 @@ const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
 pub fn uda_schema() -> SubSchema {
     let types = StandardTypes::with(rgb21_stl());
+
+    let reg_index = RegS::from(1);
+    let code: [Instr<RgbIsa>; 20] = [
+        // SUBROUTINE 1: genesis validation
+        // TODO: Use index for global state from register
+        // Read global state into s[1]
+        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdG(GS_TOKENS, 0, reg_index))),
+        // Put 0 to a16[0]
+        Instr::Put(PutOp::PutA(RegA::A16, Reg32::Reg0, Box::new(MaybeNumber::ZERO_U16))),
+        // Extract 128 bits from the beginning of s[1] into r128[1]
+        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        // a32[0] now has token index from global state
+        Instr::Move(MoveOp::SpyAR(RegA::A32, Reg32::Reg0, RegR::R128, Reg32::Reg1)),
+        // Read owned state into s[1]
+        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdS(OS_ASSET, 0, reg_index))),
+        // Extract 128 bits from the beginning of s[1] into r128[1]
+        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        // a32[1] now has token index from allocation
+        Instr::Move(MoveOp::SpyAR(RegA::A32, Reg32::Reg1, RegR::R128, Reg32::Reg1)),
+        // check that token indexes match
+        Instr::Cmp(CmpOp::EqA(NoneEqFlag::NonEqual, RegA::A32, Reg32::Reg0, Reg32::Reg1)),
+        // if they do, jump to the next check
+        Instr::ControlFlow(ControlFlowOp::Jif(39)),
+        // we need to put a string into first string register which will be used as an error
+        // message
+        Instr::Bytes(BytesOp::Put(
+            RegS::from(0),
+            Box::new(ByteStr::with("the allocated token has an invalid index")),
+            true,
+        )),
+        // fail otherwise
+        Instr::ControlFlow(ControlFlowOp::Fail),
+        // offset_0x28:
+        // Put 4 to a16[0]
+        Instr::Put(PutOp::PutA(RegA::A16, Reg32::Reg0, Box::new(MaybeNumber::from(4u16)))),
+        // Extract 128 bits starting from the fifth byte of s[1] into r128[0]
+        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        // a64[1] now has owned fraction
+        Instr::Move(MoveOp::SpyAR(RegA::A64, Reg32::Reg1, RegR::R128, Reg32::Reg1)),
+        // put 1 to a64[0]
+        Instr::Put(PutOp::PutA(RegA::A64, Reg32::Reg0, Box::new(MaybeNumber::ONE_U64))),
+        // check that owned fraction == 1
+        Instr::Cmp(CmpOp::EqA(NoneEqFlag::NonEqual, RegA::A64, Reg32::Reg0, Reg32::Reg1)),
+        Instr::Bytes(BytesOp::Put(
+            RegS::from(0),
+            Box::new(ByteStr::with("owned fraction is not 1")),
+            true,
+        )),
+        // terminate the subroutine
+        Instr::ControlFlow(ControlFlowOp::Ret),
+        // SUBROUTINE 2: transfer validation
+        // offset_0x40:
+        // Read previous state into s[1]
+        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdP(OS_ASSET, 0, reg_index))),
+        Instr::ControlFlow(ControlFlowOp::Jmp(5)),
+    ];
+    let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
+    let alu_id = alu_lib.id();
+    const FN_GENESIS_OFFSET: u16 = 0;
+    const FN_TRANSFER_OFFSET: u16 = 0x40;
+    assert_eq!(alu_lib.code.as_ref()[0x05], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[0x28], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_LDP);
 
     Schema {
         ffv: zero!(),
@@ -86,8 +155,11 @@ pub fn uda_schema() -> SubSchema {
             }
         },
         script: Script::AluVM(AluScript {
-            libs: none!(),
-            entry_points: none!(),
+            libs: confined_bmap! { alu_id => alu_lib },
+            entry_points: confined_bmap! {
+                EntryPoint::ValidateGenesis => LibSite::with(FN_GENESIS_OFFSET, alu_id),
+                EntryPoint::ValidateTransition(TS_TRANSFER) => LibSite::with(FN_TRANSFER_OFFSET, alu_id),
+            },
         }),
     }
 }
