@@ -63,8 +63,8 @@ pub fn uda_schema() -> SubSchema {
                 GS_NOMINAL => Occurrences::Once,
                 GS_CONTRACT => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
-                GS_TOKENS => Occurrences::NoneOrOnce,
-                GS_ATTACH => Occurrences::NoneOrOnce,
+                GS_TOKENS => Occurrences::Once,
+                GS_ATTACH => Occurrences::Once,
             },
             assignments: tiny_bmap! {
                 OS_ASSET => Occurrences::Once,
