@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.1"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#e2a6635762ee29845b4885f106c48b344b63f2ef"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#18e6da598cb1d1cd1eb1a5e3740750b6cac40320"
 dependencies = [
  "amplify",
  "baid58",
@@ -64,11 +64,12 @@ dependencies = [
 
 [[package]]
 name = "amplify_num"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddce3bc63e807ea02065e8d8b702695f3d302ae4158baddff8b0ce5c73947251"
+checksum = "9681187211554ab98f138ba159e90861b136c20afc680dcff2ba82d020721e27"
 dependencies = [
  "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -638,7 +639,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#0f70c01b75915bdf7ffbf9120709a961d034a9a8"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#3a8d8d47521361d702ac6dbf0f8a67c865e16fb9"
 dependencies = [
  "aluvm",
  "amplify",
@@ -684,6 +685,7 @@ dependencies = [
  "rgb-std",
  "serde",
  "serde_json",
+ "serde_yaml",
  "sha2",
  "strict_encoding",
  "strict_types",

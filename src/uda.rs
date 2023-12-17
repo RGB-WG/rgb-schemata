@@ -69,7 +69,7 @@ pub fn uda_schema() -> SubSchema {
         // check that token indexes match
         Instr::Cmp(CmpOp::EqA(NoneEqFlag::NonEqual, RegA::A32, Reg32::Reg0, Reg32::Reg1)),
         // if they do, jump to the next check
-        Instr::ControlFlow(ControlFlowOp::Jif(39)),
+        Instr::ControlFlow(ControlFlowOp::Jif(0x28)),
         // we need to put a string into first string register which will be used as an error
         // message
         Instr::Bytes(BytesOp::Put(
@@ -133,7 +133,7 @@ pub fn uda_schema() -> SubSchema {
                 GS_CONTRACT => Occurrences::Once,
                 GS_TIMESTAMP => Occurrences::Once,
                 GS_TOKENS => Occurrences::Once,
-                GS_ATTACH => Occurrences::Once,
+                GS_ATTACH => Occurrences::NoneOrOnce,
             },
             assignments: tiny_bmap! {
                 OS_ASSET => Occurrences::Once,

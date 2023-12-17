@@ -76,6 +76,7 @@ fn main() {
 
         .issue_contract()
         .expect("contract doesn't fit schema requirements");
+    eprintln!("{}", serde_yaml::to_string(&contract.genesis).unwrap());
 
     let contract_id = contract.contract_id();
     debug_assert_eq!(contract_id, contract.contract_id());

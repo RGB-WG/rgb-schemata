@@ -25,6 +25,7 @@ sha2 = "0.10.8"
 
 [dev-dependencies]
 chrono = "0.4.31"
+serde_yaml = "0.9.27"
 
 [features]
 all=[]
