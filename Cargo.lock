@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.1"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#18e6da598cb1d1cd1eb1a5e3740750b6cac40320"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#34894fe14cbbd3312122a7854072056756798a03"
 dependencies = [
  "amplify",
  "baid58",
@@ -639,7 +639,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#3a8d8d47521361d702ac6dbf0f8a67c865e16fb9"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#2fccbfb9d0ee90bb929f43e994003157dcdc61ce"
 dependencies = [
  "aluvm",
  "amplify",

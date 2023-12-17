@@ -21,11 +21,9 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
-use aluvm::data::{ByteStr, MaybeNumber};
 use aluvm::isa::opcodes::INSTR_PUTA;
-use aluvm::isa::{BytesOp, CmpOp, ControlFlowOp, Instr, MoveOp, NoneEqFlag, PutOp};
+use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use aluvm::reg::{Reg16, Reg32, RegA, RegR, RegS};
 use rgbstd::interface::{rgb21, rgb21_stl, IfaceImpl, NamedField, NamedType, VerNo};
 use rgbstd::schema::{
     GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, SubSchema,
@@ -33,8 +31,8 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::opcodes::INSTR_LDP;
-use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgbstd::GlobalStateType;
+use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
+use rgbstd::{rgbasm, GlobalStateType};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -48,61 +46,53 @@ const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 pub fn uda_schema() -> SubSchema {
     let types = StandardTypes::with(rgb21_stl());
 
-    let reg_index = RegS::from(1);
-    let code: [Instr<RgbIsa>; 20] = [
+    let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
         // TODO: Use index for global state from register
         // Read global state into s[1]
-        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdG(GS_TOKENS, 0, reg_index))),
+        ldg     0x0836,0,s16[1]             ;
         // Put 0 to a16[0]
-        Instr::Put(PutOp::PutA(RegA::A16, Reg32::Reg0, Box::new(MaybeNumber::ZERO_U16))),
+        put     a16[0],0x00                 ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
-        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        extr    s16[1],r128[1],a16[0]       ;
         // a32[0] now has token index from global state
-        Instr::Move(MoveOp::SpyAR(RegA::A32, Reg32::Reg0, RegR::R128, Reg32::Reg1)),
+        spy     a32[0],r128[1]              ;
         // Read owned state into s[1]
-        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdS(OS_ASSET, 0, reg_index))),
+        lds     0x0FA0,0,s16[1]             ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
-        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        extr    s16[1],r128[1],a16[0]       ;
         // a32[1] now has token index from allocation
-        Instr::Move(MoveOp::SpyAR(RegA::A32, Reg32::Reg1, RegR::R128, Reg32::Reg1)),
+        spy     a32[1],r128[1]              ;
         // check that token indexes match
-        Instr::Cmp(CmpOp::EqA(NoneEqFlag::NonEqual, RegA::A32, Reg32::Reg0, Reg32::Reg1)),
+        eq.n    a32[0],a32[1]               ;
         // if they do, jump to the next check
-        Instr::ControlFlow(ControlFlowOp::Jif(0x28)),
+        jif     0x0028                      ;
         // we need to put a string into first string register which will be used as an error
         // message
-        Instr::Bytes(BytesOp::Put(
-            RegS::from(0),
-            Box::new(ByteStr::with("the allocated token has an invalid index")),
-            true,
-        )),
+        put     s16[0],"the allocated token has an invalid index";
         // fail otherwise
-        Instr::ControlFlow(ControlFlowOp::Fail),
+        fail                                ;
         // offset_0x28:
         // Put 4 to a16[0]
-        Instr::Put(PutOp::PutA(RegA::A16, Reg32::Reg0, Box::new(MaybeNumber::from(4u16)))),
+        put     a16[0],4                    ;
         // Extract 128 bits starting from the fifth byte of s[1] into r128[0]
-        Instr::Bytes(BytesOp::Extr(reg_index, RegR::R128, Reg16::Reg1, Reg16::Reg0)),
+        extr    s16[1],r128[1],a16[0]       ;
         // a64[1] now has owned fraction
-        Instr::Move(MoveOp::SpyAR(RegA::A64, Reg32::Reg1, RegR::R128, Reg32::Reg1)),
+        spy     a64[1],r128[1]              ;
         // put 1 to a64[0]
-        Instr::Put(PutOp::PutA(RegA::A64, Reg32::Reg0, Box::new(MaybeNumber::ONE_U64))),
+        put     a64[0],1                    ;
         // check that owned fraction == 1
-        Instr::Cmp(CmpOp::EqA(NoneEqFlag::NonEqual, RegA::A64, Reg32::Reg0, Reg32::Reg1)),
-        Instr::Bytes(BytesOp::Put(
-            RegS::from(0),
-            Box::new(ByteStr::with("owned fraction is not 1")),
-            true,
-        )),
+        eq.n    a64[0],a64[1]               ;
         // terminate the subroutine
-        Instr::ControlFlow(ControlFlowOp::Ret),
+        put     s16[0],"owned fraction is not 1";
+        ret                                 ;
         // SUBROUTINE 2: transfer validation
         // offset_0x40:
         // Read previous state into s[1]
-        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::LdP(OS_ASSET, 0, reg_index))),
-        Instr::ControlFlow(ControlFlowOp::Jmp(5)),
-    ];
+        ldp     0x0FA0,0,s16[1]             ;
+        // jump into SUBROUTINE 1 to reuse the code
+        jmp     0x0005                      ;
+    };
     let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
     let alu_id = alu_lib.id();
     const FN_GENESIS_OFFSET: u16 = 0;
