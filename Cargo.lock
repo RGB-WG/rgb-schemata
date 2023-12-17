@@ -639,7 +639,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#2fccbfb9d0ee90bb929f43e994003157dcdc61ce"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#f12b208ccec4a11de0de1ad0b0cd4048d5fd0e11"
 dependencies = [
  "aluvm",
  "amplify",

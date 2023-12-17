@@ -23,9 +23,10 @@ use std::io::stdout;
 use std::{fs, io};
 
 use rgb_schemata::{cfa_rgb25, cfa_schema, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
-use rgbstd::containers::BindleContent;
+use rgbstd::containers::{Bindle, BindleContent};
 use rgbstd::interface::{rgb20, rgb21, rgb25};
 use rgbstd::vm::RgbIsa;
+use rgbstd::SubSchema;
 
 fn main() -> io::Result<()> {
     let rgb20_bindle = rgb20().bindle();
@@ -51,6 +52,7 @@ fn nia() -> io::Result<()> {
     let schema_bindle = nia_schema().bindle();
     schema_bindle.save("schemata/NonInflatableAssets.rgb")?;
     fs::write("schemata/NonInflatableAssets.rgba", schema_bindle.to_string())?;
+    print_lib(&schema_bindle);
 
     let iimpl_bindle = nia_rgb20().bindle();
     iimpl_bindle.save("schemata/NonInflatableAssets-RGB20.rgb")?;
@@ -63,16 +65,7 @@ fn uda() -> io::Result<()> {
     let schema_bindle = uda_schema().bindle();
     schema_bindle.save("schemata/UniqueDigitalAsset.rgb")?;
     fs::write("schemata/UniqueDigitalAsset.rgba", schema_bindle.to_string())?;
-
-    let alu_lib = schema_bindle
-        .script
-        .as_alu_script()
-        .libs
-        .values()
-        .next()
-        .unwrap();
-    eprintln!("{alu_lib}");
-    alu_lib.print_disassemble::<RgbIsa>(stdout()).ok();
+    print_lib(&schema_bindle);
 
     let iimpl_bindle = uda_rgb21().bindle();
     iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;
@@ -85,10 +78,23 @@ fn cfa() -> io::Result<()> {
     let schema_bindle = cfa_schema().bindle();
     schema_bindle.save("schemata/CollectibleFungibleAssets.rgb")?;
     fs::write("schemata/CollectibleFungibleAssets.rgba", schema_bindle.to_string())?;
+    print_lib(&schema_bindle);
 
     let iimpl_bindle = cfa_rgb25().bindle();
     iimpl_bindle.save("schemata/CollectibleFungibleAssets-RGB25.rgb")?;
     fs::write("schemata/CollectibleFungibleAssets-RGB25.rgba", iimpl_bindle.to_string())?;
 
     Ok(())
+}
+
+fn print_lib(schema_bindle: &Bindle<SubSchema>) {
+    let alu_lib = schema_bindle
+        .script
+        .as_alu_script()
+        .libs
+        .values()
+        .next()
+        .unwrap();
+    eprintln!("{alu_lib}");
+    alu_lib.print_disassemble::<RgbIsa>(stdout()).ok();
 }

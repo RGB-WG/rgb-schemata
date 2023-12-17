@@ -22,18 +22,17 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
-use aluvm::data::ByteStr;
-use aluvm::isa::{BytesOp, ControlFlowOp, Instr};
+use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use aluvm::reg::RegS;
 use rgbstd::interface::{rgb20, rgb20_stl, IfaceImpl, NamedField, NamedType, VerNo};
+use rgbstd::rgbasm;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
-use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
+use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -41,34 +40,21 @@ use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TR
 pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::with(rgb20_stl());
 
-    let code: [Instr<RgbIsa>; 5] = [
+    let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
         // Before doing a check we need to put a string into first string register which will be
         // used as an error message in case of the check failure.
-        Instr::Bytes(BytesOp::Put(
-            RegS::from(0),
-            Box::new(ByteStr::with(
-                "the issued amounts do not match between the reported global state and \
-                 confidential owned state",
-            )),
-            true,
-        )),
+        put     s16[0],"the issued amounts do not match between the reported global state and confidential owned state";
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
-        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::PcCs(OS_ASSET, GS_ISSUED_SUPPLY))),
+        pccs    0x0FA0,0x07D2   ;
         // If the check succeeds we need to terminate the subroutine.
-        Instr::ControlFlow(ControlFlowOp::Ret),
+        ret                     ;
         // SUBROUTINE 2: transfer validation
-        Instr::Bytes(BytesOp::Put(
-            RegS::from(0),
-            Box::new(ByteStr::with(
-                "the sum of input amounts do not match the sum of the output amounts",
-            )),
-            true,
-        )),
+        put     s16[0],"the sum of input amounts do not match the sum of the output amounts";
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        Instr::ExtensionCodes(RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))),
-    ];
+        pcvs    0x0FA0          ;
+    };
     let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
     let alu_id = alu_lib.id();
     const FN_GENESIS_OFFSET: u16 = 0;
