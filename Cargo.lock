@@ -4,8 +4,9 @@ version = 3
 
 [[package]]
 name = "aluvm"
-version = "0.11.0-beta.1"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#34894fe14cbbd3312122a7854072056756798a03"
+version = "0.11.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e10be187b383247e1902aa5a415f76ffc9a04f197829c46b9ccb6da3582e394f"
 dependencies = [
  "amplify",
  "baid58",
@@ -216,8 +217,9 @@ dependencies = [
 
 [[package]]
 name = "bp-consensus"
-version = "0.11.0-beta.2"
-source = "git+https://github.com/BP-WG/bp-core?branch=doubleanchors#d3a57c213f34d9012101b9969cdc8b0d60a6fe60"
+version = "0.11.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "190ac89a2a3c79d5bfb677f48e5393691832c540973341831572edaffdce0881"
 dependencies = [
  "amplify",
  "chrono",
@@ -230,8 +232,9 @@ dependencies = [
 
 [[package]]
 name = "bp-core"
-version = "0.11.0-beta.1"
-source = "git+https://github.com/BP-WG/bp-core?branch=doubleanchors#d3a57c213f34d9012101b9969cdc8b0d60a6fe60"
+version = "0.11.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0143f6c7399cb6d0003407e6de197a03b3b42b34380fab02c8fecaf4431b061"
 dependencies = [
  "amplify",
  "bp-consensus",
@@ -246,8 +249,9 @@ dependencies = [
 
 [[package]]
 name = "bp-dbc"
-version = "0.11.0-beta.1"
-source = "git+https://github.com/BP-WG/bp-core?branch=doubleanchors#d3a57c213f34d9012101b9969cdc8b0d60a6fe60"
+version = "0.11.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3e3e04649c77079cfd1466ba14a62c83585053bb61d294578a39fcfe38f402db"
 dependencies = [
  "amplify",
  "base85",
@@ -260,8 +264,9 @@ dependencies = [
 
 [[package]]
 name = "bp-invoice"
-version = "0.11.0-beta.2"
-source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#4a234b94136613f1f5ef8d409fed2829f0d8e346"
+version = "0.11.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a40b7fb87b58b2371b7b3b010568baa9ba463007707f9af9bb9b77a63d77e8f"
 dependencies = [
  "amplify",
  "bech32",
@@ -271,8 +276,9 @@ dependencies = [
 
 [[package]]
 name = "bp-seals"
-version = "0.11.0-beta.1"
-source = "git+https://github.com/BP-WG/bp-core?branch=doubleanchors#d3a57c213f34d9012101b9969cdc8b0d60a6fe60"
+version = "0.11.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1e4955315fad858472320ee5a7fba8a35c61c3928bdacb581931e23d4f25c7b"
 dependencies = [
  "amplify",
  "baid58",
@@ -329,7 +335,8 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.10.0"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#6b634bccd96d2cb857a44ae48417f8e35ecb3de7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00033f14d67c4169d588f085ea2faeb7b610cf03a74d42ea09eeba31abef2047"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -340,8 +347,9 @@ dependencies = [
 
 [[package]]
 name = "commit_verify"
-version = "0.11.0-beta.1"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#6b634bccd96d2cb857a44ae48417f8e35ecb3de7"
+version = "0.11.0-beta.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5598661b1d90b149f0b944faef8c1d1d131f847678a6c450b9540b629ac11291"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -636,8 +644,9 @@ dependencies = [
 
 [[package]]
 name = "rgb-core"
-version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=canary#f12b208ccec4a11de0de1ad0b0cd4048d5fd0e11"
+version = "0.11.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbd6b8a6d616997c670ea40a5a9badc9744f3e1fa29213affabdd2d2c192ef3b"
 dependencies = [
  "aluvm",
  "amplify",
@@ -656,8 +665,9 @@ dependencies = [
 
 [[package]]
 name = "rgb-invoice"
-version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#6d2f8c0f167ca1bdbcbfc252e2711aa7ae146767"
+version = "0.11.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba62ce12f4677d821ed5877bcc4125248cc3b82c8aeb0bd01a3924ae3c477284"
 dependencies = [
  "amplify",
  "baid58",
@@ -674,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "rgb-schemata"
-version = "0.11.0-beta.2"
+version = "0.11.0-beta.3"
 dependencies = [
  "aluvm",
  "amplify",
@@ -691,8 +701,9 @@ dependencies = [
 
 [[package]]
 name = "rgb-std"
-version = "0.11.0-beta.2"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#6d2f8c0f167ca1bdbcbfc252e2711aa7ae146767"
+version = "0.11.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "138a9d7eea58593bb756e2effd991fcf42fe55503e311abc9b1d22c5088dd71f"
 dependencies = [
  "amplify",
  "baid58",
@@ -805,7 +816,7 @@ checksum = "43576ca501357b9b071ac53cdc7da8ef0cbd9493d8df094cd821777ea6e894d3"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.42",
+ "syn 2.0.43",
 ]
 
 [[package]]
@@ -864,9 +875,9 @@ dependencies = [
 
 [[package]]
 name = "single_use_seals"
-version = "0.11.0-beta.1"
+version = "0.11.0-beta.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a46b0f289450dc06e7b94f048a55ac437177532f2c6c9bed12c1de7ac948f5a5"
+checksum = "c30647a1342641c45ca7c1dcd5ae7db16533b86744e827c84cfed875db2de3fe"
 dependencies = [
  "amplify_derive",
 ]
@@ -938,9 +949,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.42"
+version = "2.0.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b7d0a2c048d661a1a59fcd7355baa232f7ed34e0ee4df2eef3c1c1c0d3852d8"
+checksum = "ee659fb5f3d355364e1f3e5bc10fb82068efbf824a1e9d1c9504244a6469ad53"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -949,22 +960,22 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f11c217e1416d6f036b870f14e0413d480dbf28edbee1f877abaf0206af43bb7"
+checksum = "83a48fd946b02c0a526b2e9481c8e2a17755e47039164a86c4070446e3a4614d"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.51"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01742297787513b79cf8e29d1056ede1313e2420b7b3b15d0a768b4921f549df"
+checksum = "e7fbe9b594d6568a6a1443250a7e67d80b74e1e96f6d1715e1e21cc1888291d3"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.42",
+ "syn 2.0.43",
 ]
 
 [[package]]
@@ -1052,7 +1063,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.42",
+ "syn 2.0.43",
  "wasm-bindgen-shared",
 ]
 
@@ -1074,7 +1085,7 @@ checksum = "f0eb82fcb7930ae6219a7ecfd55b217f5f0893484b7a13022ebb2b2bf20b5283"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.42",
+ "syn 2.0.43",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
