@@ -9,24 +9,25 @@ use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
 use rgbstd::interface::{rgb21, ContractBuilder};
+use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{self, DivisibleAssetSpec, Precision, RicardianContract, Timestamp};
+use rgbstd::stl::{self, DivisibleAssetSpec, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::{Anchor, Layer1, WitnessAnchor};
+use rgbstd::{Layer1, WitnessAnchor, XAnchor};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
 
 impl ResolveTx for DumbResolver {
-    fn resolve_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
+    fn resolve_bp_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
         Ok(Tx::strict_dumb())
     }
 }
 
 impl ResolveHeight for DumbResolver {
     type Error = Infallible;
-    fn resolve_anchor(&mut self, _: &Anchor) -> Result<WitnessAnchor, Self::Error> {
+    fn resolve_anchor(&mut self, _: &XAnchor) -> Result<WitnessAnchor, Self::Error> {
         Ok(WitnessAnchor::strict_dumb())
     }
 }
@@ -70,11 +71,12 @@ fn main() {
         .add_global_state("terms", terms)
         .expect("invalid contract text")
 
-        .add_data_state("assetOwner", beneficiary, allocation)
+        .add_data("assetOwner", beneficiary, allocation)
         .expect("invalid asset blob")
 
         .issue_contract()
         .expect("contract doesn't fit schema requirements");
+    eprintln!("{}", serde_yaml::to_string(&contract.genesis).unwrap());
 
     let contract_id = contract.contract_id();
     debug_assert_eq!(contract_id, contract.contract_id());
@@ -91,7 +93,7 @@ fn main() {
     stock.import_iface_impl(uda_rgb21()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, false) {
+    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, true) {
         Ok(consignment) => consignment,
         Err(consignment) => {
             panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
