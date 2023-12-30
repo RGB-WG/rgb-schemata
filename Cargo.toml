@@ -1,6 +1,6 @@
 [package]
 name = "rgb-schemata"
-version = "0.11.0-beta.3"
+version = "0.11.0-beta.4"
 description = "Collection of the official RGB smart contract schemata"
 keywords = ["bitcoin", "lightning", "rgb", "smart-contracts", "lnp-bp"]
 categories = ["cryptography::cryptocurrencies"]
@@ -14,10 +14,10 @@ readme = "README.md"
 
 [dependencies]
 amplify = "4.5.0"
-strict_encoding = "2.6.1"
+strict_encoding = "2.6.2"
 strict_types = "1.6.3"
 aluvm = "0.11.0-beta.2"
-bp-core = "0.11.0-beta.2"
+bp-core = "0.11.0-beta.3"
 rgb-std = { version = "0.11.0-beta.3", features = ["serde", "fs"] }
 serde = "1.0"
 serde_json = "1.0"

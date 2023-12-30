@@ -2,7 +2,7 @@ use std::convert::Infallible;
 use std::fs;
 
 use amplify::hex::FromHex;
-use bp::{Outpoint, Tx, Txid};
+use bp::Txid;
 use rgb_schemata::{cfa_rgb25, cfa_schema};
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb25, ContractBuilder, FilterIncludeAll, FungibleAllocation};
@@ -12,16 +12,16 @@ use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{
     Attachment, ContractData, Details, MediaType, Name, RicardianContract, Timestamp,
 };
-use rgbstd::validation::{ResolveTx, TxResolverError};
-use rgbstd::{Layer1, WitnessAnchor, XAnchor};
+use rgbstd::validation::{ResolveWitness, WitnessResolverError};
+use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
 use sha2::{Digest, Sha256};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
 
-impl ResolveTx for DumbResolver {
-    fn resolve_bp_tx(&self, _: Layer1, _: Txid) -> Result<Tx, TxResolverError> {
-        Ok(Tx::strict_dumb())
+impl ResolveWitness for DumbResolver {
+    fn resolve_pub_witness(&self, _: WitnessId) -> Result<XPubWitness, WitnessResolverError> {
+        Ok(XPubWitness::strict_dumb())
     }
 }
 
@@ -51,10 +51,9 @@ fn main() {
         media,
     };
     let created = Timestamp::now();
-    let beneficiary = Outpoint::new(
-        Txid::from_hex("623554ac1dcd15496c105a27042c438921f2a82873579be88e74d7ef559a3d91").unwrap(),
-        0
-    );
+    let beneficiary_txid =
+        Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
+    let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
 
     const ISSUE: u64 = 1_000_000_000_000;
 
