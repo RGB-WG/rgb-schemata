@@ -27,6 +27,7 @@ extern crate strict_types;
 mod cfa;
 mod nia;
 mod uda;
+mod udc;
 
 pub const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
 pub const GS_DATA: GlobalStateType = GlobalStateType::with(2001);
@@ -39,3 +40,4 @@ pub use cfa::{cfa_rgb25, cfa_schema};
 pub use nia::{nia_rgb20, nia_schema};
 use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
 pub use uda::{uda_rgb21, uda_schema};
+pub use udc::{udc_rgb21, udc_schema};

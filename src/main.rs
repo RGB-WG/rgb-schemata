@@ -22,7 +22,7 @@
 use std::io::stdout;
 use std::{fs, io};
 
-use rgb_schemata::{cfa_rgb25, cfa_schema, nia_rgb20, nia_schema, uda_rgb21, uda_schema};
+use rgb_schemata::{cfa_rgb25, cfa_schema, nia_rgb20, nia_schema, uda_rgb21, uda_schema, udc_rgb21, udc_schema};
 use rgbstd::containers::{Bindle, BindleContent};
 use rgbstd::interface::{rgb20, rgb21, rgb25};
 use rgbstd::vm::RgbIsa;
@@ -44,6 +44,7 @@ fn main() -> io::Result<()> {
     nia()?;
     uda()?;
     cfa()?;
+    udc()?;
 
     Ok(())
 }
@@ -70,6 +71,19 @@ fn uda() -> io::Result<()> {
     let iimpl_bindle = uda_rgb21().bindle();
     iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;
     fs::write("schemata/UniqueDigitalAsset-RGB21.rgba", iimpl_bindle.to_string())?;
+
+    Ok(())
+}
+
+fn udc() -> io::Result<()> {
+    let schema_bindle = udc_schema().bindle();
+    schema_bindle.save("schemata/UniqueDigitalCollection.rgb")?;
+    fs::write("schemata/UniqueDigitalCollection.rgba", schema_bindle.to_string())?;
+    print_lib(&schema_bindle);
+
+    let iimpl_bindle = udc_rgb21().bindle();
+    iimpl_bindle.save("schemata/UniqueDigitalCollection-RGB21.rgb")?;
+    fs::write("schemata/UniqueDigitalCollection-RGB21.rgba", iimpl_bindle.to_string())?;
 
     Ok(())
 }
