@@ -29,3 +29,10 @@ serde_yaml = "0.9.27"
 
 [features]
 all=[]
+
+
+[patch.crates-io]
+aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "master" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "v0.11" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+rgb-core = { git = "https://github.com/crisdut/rgb-core", branch = "feat/udc" }

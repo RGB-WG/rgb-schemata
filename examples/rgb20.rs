@@ -94,8 +94,8 @@ fn main() {
     eprintln!("\nThe issued contract data:");
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
-    for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("amount={value}, owner={owner}, witness={witness}");
+    for FungibleAllocation { seal, state, witness, .. } in allocations {
+        eprintln!("amount={}, owner={seal}, witness={witness}", state.value());
     }
     eprintln!("totalSupply={}", contract.total_supply());
     eprintln!("created={}", contract.created().to_local().unwrap());
