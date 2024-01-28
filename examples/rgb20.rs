@@ -2,16 +2,16 @@ use std::convert::Infallible;
 use std::fs;
 
 use amplify::hex::FromHex;
-use bp::Txid;
-use rgb_schemata::{nia_rgb20, nia_schema};
+use bp::dbc::Method;
+use bp::{Outpoint, Txid};
+use rgb_schemata::NonInflatibleAsset;
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{rgb20, ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb20};
-use rgbstd::invoice::{Amount, Precision};
+use rgbstd::interface::{ContractClass, FilterIncludeAll, FungibleAllocation, Rgb20};
+use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{ContractData, DivisibleAssetSpec, RicardianContract, Timestamp};
 use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
+use rgbstd::{WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
@@ -31,42 +31,15 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let spec = DivisibleAssetSpec::new("TEST", "Test asset", Precision::CentiMicro);
-    let terms = RicardianContract::default();
-    let contract_data = ContractData {
-        terms,
-        media: None,
-    };
-    let created = Timestamp::now();
     let beneficiary_txid = 
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
-    let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
+    let beneficiary = XChain::Bitcoin(Outpoint::new(beneficiary_txid, 1));
 
-    const ISSUE: u64 = 1_000_000_000_00;
-
-    let contract = ContractBuilder::testnet(
-        rgb20(),
-        nia_schema(),
-        nia_rgb20()
-        ).expect("schema fails to implement RGB20 interface")
-
-        .add_global_state("spec", spec)
-        .expect("invalid nominal")
-
-        .add_global_state("created", created)
-        .expect("invalid creation date")
-
-        .add_global_state("issuedSupply", Amount::from(ISSUE))
-        .expect("invalid issued supply")
-
-        .add_global_state("data", contract_data)
-        .expect("invalid contract text")
-
-        .add_fungible_state("assetOwner", beneficiary, ISSUE)
-        .expect("invalid asset amount")
-
+    let contract = NonInflatibleAsset::testnet("TEST", "Test asset", None, Precision::CentiMicro)
+        .expect("invalid contract data")
+        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
         .issue_contract()
-        .expect("contract doesn't fit schema requirements");
+        .expect("invalid contract data");
 
     let contract_id = contract.contract_id();
 
@@ -77,25 +50,21 @@ fn main() {
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
-    stock.import_iface(rgb20()).unwrap();
-    stock.import_schema(nia_schema()).unwrap();
-    stock.import_iface_impl(nia_rgb20()).unwrap();
+    stock.import_iface(Rgb20::iface()).unwrap();
+    stock.import_schema(NonInflatibleAsset::schema()).unwrap();
+    stock.import_iface_impl(NonInflatibleAsset::main_iface_impl()).unwrap();
 
-    // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = bindle.unbindle().validate(&mut DumbResolver, true).unwrap_or_else(|consignment| {
-        panic!("{}", consignment.validation_status().expect("status always present upon validation"));
-    });
-    stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
+    stock.import_contract(bindle.unbindle(), &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_id(contract_id, rgb20().iface_id()).unwrap();
+    let contract = stock.contract_iface_id(contract_id, Rgb20::iface().iface_id()).unwrap();
     let contract = Rgb20::from(contract);
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
     eprintln!("\nThe issued contract data:");
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
-    for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("amount={value}, owner={owner}, witness={witness}");
+    for FungibleAllocation  { seal, state, witness, .. } in allocations {
+        eprintln!("amount={state}, owner={seal}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_supply());
     eprintln!("created={}", contract.created().to_local().unwrap());

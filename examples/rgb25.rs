@@ -116,7 +116,7 @@ fn main() {
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
     eprintln!("{}", Name::from_strict_val_unchecked(&name[0]));
 
-    for FungibleAllocation { owner, witness, value } in allocations {
-        eprintln!("(amount={value}, owner={owner}, witness={witness})");
+    for FungibleAllocation { seal, state, witness, .. } in allocations {
+        eprintln!("(amount={state}, owner={seal}, witness={witness})");
     }
 }
