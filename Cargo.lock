@@ -642,12 +642,13 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=v0.11#6e0cc2d73fa2527a9f31d4f498973d09400b959e"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=v0.11#3d88aa308674cf464e879a6439fe4f8382596845"
 dependencies = [
  "aluvm",
  "amplify",
  "baid58",
  "bp-core",
+ "chrono",
  "commit_verify",
  "getrandom",
  "mime",
@@ -662,7 +663,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#b86f8c9e85c319b408c2b09ff6cdad9baf3bad2c"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#486ecb0df21941ed31ba1132889eb023ac80aac1"
 dependencies = [
  "amplify",
  "baid58",
@@ -697,7 +698,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#b86f8c9e85c319b408c2b09ff6cdad9baf3bad2c"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#486ecb0df21941ed31ba1132889eb023ac80aac1"
 dependencies = [
  "amplify",
  "baid58",

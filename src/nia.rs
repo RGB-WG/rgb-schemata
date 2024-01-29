@@ -26,8 +26,10 @@ use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use bp::dbc::Method;
 use rgbstd::containers::Contract;
+use rgbstd::interface::rgb20::{AllocationError, PrimaryIssue};
 use rgbstd::interface::{
-    BuilderError, ContractClass, IfaceImpl, NamedField, NamedType, Rgb20, Rgb20Genesis, VerNo,
+    BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, NamedType, Rgb20, TxOutpoint,
+    VerNo,
 };
 use rgbstd::invoice::{Amount, Precision};
 use rgbstd::schema::{
@@ -37,7 +39,7 @@ use rgbstd::schema::{
 use rgbstd::stl::{Attachment, StandardTypes, Timestamp};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
 use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, AssetTag, BlindingFactor, XOutpoint};
+use rgbstd::{rgbasm, AssetTag, BlindingFactor};
 use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
@@ -145,11 +147,13 @@ fn nia_rgb20() -> IfaceImpl {
     }
 }
 
-pub struct NonInflatableAsset(Rgb20Genesis);
+pub struct NonInflatableAsset(PrimaryIssue);
 
-impl ContractClass for NonInflatableAsset {
+impl IssuerClass for NonInflatableAsset {
+    type IssuingIface = Rgb20;
+
     fn schema() -> SubSchema { nia_schema() }
-    fn main_iface_impl() -> IfaceImpl { nia_rgb20() }
+    fn issue_impl() -> IfaceImpl { nia_rgb20() }
 }
 
 impl NonInflatableAsset {
@@ -160,11 +164,11 @@ impl NonInflatableAsset {
         details: Option<&str>,
         precision: Precision,
     ) -> Result<Self, InvalidIdent> {
-        Rgb20Genesis::testnet::<Self>(ticker, name, details, precision).map(Self)
+        PrimaryIssue::testnet::<Self>(ticker, name, details, precision).map(Self)
     }
 
     #[inline]
-    pub fn testnet_det<C: ContractClass>(
+    pub fn testnet_det<C: IssuerClass>(
         ticker: &str,
         name: &str,
         details: Option<&str>,
@@ -172,7 +176,7 @@ impl NonInflatableAsset {
         timestamp: Timestamp,
         asset_tag: AssetTag,
     ) -> Result<Self, InvalidIdent> {
-        Rgb20Genesis::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
+        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
             .map(Self)
     }
 
@@ -187,35 +191,40 @@ impl NonInflatableAsset {
     }
 
     #[inline]
-    pub fn allocate(mut self, method: Method, beneficiary: XOutpoint, amount: Amount) -> Self {
-        self.0 = self.0.allocate(method, beneficiary, amount);
-        self
+    pub fn allocate<O: TxOutpoint>(
+        mut self,
+        method: Method,
+        beneficiary: O,
+        amount: Amount,
+    ) -> Result<Self, AllocationError> {
+        self.0 = self.0.allocate(method, beneficiary, amount)?;
+        Ok(self)
     }
 
     #[inline]
-    pub fn allocate_all(
+    pub fn allocate_all<O: TxOutpoint>(
         mut self,
         method: Method,
-        allocations: impl IntoIterator<Item = (XOutpoint, Amount)>,
-    ) -> Self {
-        self.0 = self.0.allocate_all(method, allocations);
-        self
+        allocations: impl IntoIterator<Item = (O, Amount)>,
+    ) -> Result<Self, AllocationError> {
+        self.0 = self.0.allocate_all(method, allocations)?;
+        Ok(self)
     }
 
     /// Add asset allocation in a deterministic way.
     #[inline]
-    pub fn allocate_det(
+    pub fn allocate_det<O: TxOutpoint>(
         mut self,
         method: Method,
-        beneficiary: XOutpoint,
+        beneficiary: O,
         seal_blinding: u64,
         amount: Amount,
         amount_blinding: BlindingFactor,
-    ) -> Self {
-        self.0 = self
-            .0
-            .allocate_det(method, beneficiary, seal_blinding, amount, amount_blinding);
-        self
+    ) -> Result<Self, AllocationError> {
+        self.0 =
+            self.0
+                .allocate_det(method, beneficiary, seal_blinding, amount, amount_blinding)?;
+        Ok(self)
     }
 
     // TODO: implement when bulletproofs are supported
