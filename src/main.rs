@@ -22,7 +22,7 @@
 use std::io::stdout;
 use std::{fs, io};
 
-use rgb_schemata::{cfa_rgb25, cfa_schema, uda_rgb21, uda_schema, NonInflatibleAsset};
+use rgb_schemata::{cfa_rgb25, cfa_schema, uda_rgb21, uda_schema, NonInflatableAsset};
 use rgbstd::containers::{Bindle, BindleContent};
 use rgbstd::interface::{rgb21, rgb25, ContractClass, Rgb20};
 use rgbstd::vm::RgbIsa;
@@ -49,12 +49,12 @@ fn main() -> io::Result<()> {
 }
 
 fn nia() -> io::Result<()> {
-    let schema_bindle = NonInflatibleAsset::schema().bindle();
+    let schema_bindle = NonInflatableAsset::schema().bindle();
     schema_bindle.save("schemata/NonInflatableAssets.rgb")?;
     fs::write("schemata/NonInflatableAssets.rgba", schema_bindle.to_string())?;
     print_lib(&schema_bindle);
 
-    let iimpl_bindle = NonInflatibleAsset::main_iface_impl().bindle();
+    let iimpl_bindle = NonInflatableAsset::main_iface_impl().bindle();
     iimpl_bindle.save("schemata/NonInflatableAssets-RGB20.rgb")?;
     fs::write("schemata/NonInflatableAssets-RGB20.rgba", iimpl_bindle.to_string())?;
 

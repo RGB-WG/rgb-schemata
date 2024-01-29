@@ -27,7 +27,7 @@ use aluvm::library::{Lib, LibSite};
 use bp::dbc::Method;
 use rgbstd::containers::Contract;
 use rgbstd::interface::{
-    BuilderError, ContractClass, IfaceImpl, NamedField, NamedType, Rgb20, Rgb20Contract, VerNo,
+    BuilderError, ContractClass, IfaceImpl, NamedField, NamedType, Rgb20, Rgb20Genesis, VerNo,
 };
 use rgbstd::invoice::{Amount, Precision};
 use rgbstd::schema::{
@@ -145,14 +145,14 @@ fn nia_rgb20() -> IfaceImpl {
     }
 }
 
-pub struct NonInflatibleAsset(Rgb20Contract);
+pub struct NonInflatableAsset(Rgb20Genesis);
 
-impl ContractClass for NonInflatibleAsset {
+impl ContractClass for NonInflatableAsset {
     fn schema() -> SubSchema { nia_schema() }
     fn main_iface_impl() -> IfaceImpl { nia_rgb20() }
 }
 
-impl NonInflatibleAsset {
+impl NonInflatableAsset {
     #[inline]
     pub fn testnet(
         ticker: &str,
@@ -160,7 +160,7 @@ impl NonInflatibleAsset {
         details: Option<&str>,
         precision: Precision,
     ) -> Result<Self, InvalidIdent> {
-        Rgb20Contract::testnet::<Self>(ticker, name, details, precision).map(Self)
+        Rgb20Genesis::testnet::<Self>(ticker, name, details, precision).map(Self)
     }
 
     #[inline]
@@ -172,7 +172,7 @@ impl NonInflatibleAsset {
         timestamp: Timestamp,
         asset_tag: AssetTag,
     ) -> Result<Self, InvalidIdent> {
-        Rgb20Contract::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
+        Rgb20Genesis::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
             .map(Self)
     }
 

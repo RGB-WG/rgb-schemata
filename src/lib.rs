@@ -29,7 +29,7 @@ mod nia;
 mod uda;
 
 pub use cfa::{cfa_rgb25, cfa_schema};
-pub use nia::NonInflatibleAsset;
+pub use nia::NonInflatableAsset;
 use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
 pub use uda::{uda_rgb21, uda_schema};
 

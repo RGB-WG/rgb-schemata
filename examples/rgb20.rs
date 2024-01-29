@@ -4,7 +4,7 @@ use std::fs;
 use amplify::hex::FromHex;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
-use rgb_schemata::NonInflatibleAsset;
+use rgb_schemata::NonInflatableAsset;
 use rgbstd::containers::BindleContent;
 use rgbstd::interface::{ContractClass, FilterIncludeAll, FungibleAllocation, Rgb20};
 use rgbstd::invoice::Precision;
@@ -35,7 +35,7 @@ fn main() {
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
     let beneficiary = XChain::Bitcoin(Outpoint::new(beneficiary_txid, 1));
 
-    let contract = NonInflatibleAsset::testnet("TEST", "Test asset", None, Precision::CentiMicro)
+    let contract = NonInflatableAsset::testnet("TEST", "Test asset", None, Precision::CentiMicro)
         .expect("invalid contract data")
         .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
         .issue_contract()
@@ -51,8 +51,8 @@ fn main() {
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
     stock.import_iface(Rgb20::iface()).unwrap();
-    stock.import_schema(NonInflatibleAsset::schema()).unwrap();
-    stock.import_iface_impl(NonInflatibleAsset::main_iface_impl()).unwrap();
+    stock.import_schema(NonInflatableAsset::schema()).unwrap();
+    stock.import_iface_impl(NonInflatableAsset::main_iface_impl()).unwrap();
 
     stock.import_contract(bindle.unbindle(), &mut DumbResolver).unwrap();
 
