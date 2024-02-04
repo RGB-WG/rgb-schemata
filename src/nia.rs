@@ -85,7 +85,7 @@ fn nia_schema() -> SubSchema {
         },
         valency_types: none!(),
         genesis: GenesisSchema {
-            metadata: Ty::<SemId>::UNIT.id(None),
+            metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
                 GS_DATA => Occurrences::Once,
@@ -100,7 +100,7 @@ fn nia_schema() -> SubSchema {
         extensions: none!(),
         transitions: tiny_bmap! {
             TS_TRANSFER => TransitionSchema {
-                metadata: Ty::<SemId>::UNIT.id(None),
+                metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
                 globals: none!(),
                 inputs: tiny_bmap! {
                     OS_ASSET => Occurrences::OnceOrMore
