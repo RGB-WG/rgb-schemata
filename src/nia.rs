@@ -24,21 +24,29 @@
 
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{rgb20, rgb20_stl, IfaceImpl, NamedField, NamedType, VerNo};
-use rgbstd::rgbasm;
+use bp::dbc::Method;
+use rgbstd::containers::Contract;
+use rgbstd::interface::rgb20::{AllocationError, PrimaryIssue};
+use rgbstd::interface::{
+    BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, NamedType, Rgb20, TxOutpoint,
+    VerNo,
+};
+use rgbstd::invoice::{Amount, Precision};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
-use rgbstd::stl::StandardTypes;
+use rgbstd::stl::{Attachment, StandardTypes, Timestamp};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
 use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
+use rgbstd::{rgbasm, AssetTag, BlindingFactor};
+use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
 
-pub fn nia_schema() -> SubSchema {
-    let types = StandardTypes::with(rgb20_stl());
+fn nia_schema() -> SubSchema {
+    let types = StandardTypes::with(Rgb20::stl());
 
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
@@ -113,9 +121,9 @@ pub fn nia_schema() -> SubSchema {
     }
 }
 
-pub fn nia_rgb20() -> IfaceImpl {
+fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = rgb20();
+    let iface = Rgb20::iface();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -137,4 +145,96 @@ pub fn nia_rgb20() -> IfaceImpl {
         },
         extensions: none!(),
     }
+}
+
+pub struct NonInflatableAsset(PrimaryIssue);
+
+impl IssuerClass for NonInflatableAsset {
+    type IssuingIface = Rgb20;
+
+    fn schema() -> SubSchema { nia_schema() }
+    fn issue_impl() -> IfaceImpl { nia_rgb20() }
+}
+
+impl NonInflatableAsset {
+    #[inline]
+    pub fn testnet(
+        ticker: &str,
+        name: &str,
+        details: Option<&str>,
+        precision: Precision,
+    ) -> Result<Self, InvalidIdent> {
+        PrimaryIssue::testnet::<Self>(ticker, name, details, precision).map(Self)
+    }
+
+    #[inline]
+    pub fn testnet_det<C: IssuerClass>(
+        ticker: &str,
+        name: &str,
+        details: Option<&str>,
+        precision: Precision,
+        timestamp: Timestamp,
+        asset_tag: AssetTag,
+    ) -> Result<Self, InvalidIdent> {
+        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
+            .map(Self)
+    }
+
+    #[inline]
+    pub fn add_terms(
+        mut self,
+        contract: &str,
+        media: Option<Attachment>,
+    ) -> Result<Self, InvalidIdent> {
+        self.0 = self.0.add_terms(contract, media)?;
+        Ok(self)
+    }
+
+    #[inline]
+    pub fn allocate<O: TxOutpoint>(
+        mut self,
+        method: Method,
+        beneficiary: O,
+        amount: Amount,
+    ) -> Result<Self, AllocationError> {
+        self.0 = self.0.allocate(method, beneficiary, amount)?;
+        Ok(self)
+    }
+
+    #[inline]
+    pub fn allocate_all<O: TxOutpoint>(
+        mut self,
+        method: Method,
+        allocations: impl IntoIterator<Item = (O, Amount)>,
+    ) -> Result<Self, AllocationError> {
+        self.0 = self.0.allocate_all(method, allocations)?;
+        Ok(self)
+    }
+
+    /// Add asset allocation in a deterministic way.
+    #[inline]
+    pub fn allocate_det<O: TxOutpoint>(
+        mut self,
+        method: Method,
+        beneficiary: O,
+        seal_blinding: u64,
+        amount: Amount,
+        amount_blinding: BlindingFactor,
+    ) -> Result<Self, AllocationError> {
+        self.0 =
+            self.0
+                .allocate_det(method, beneficiary, seal_blinding, amount, amount_blinding)?;
+        Ok(self)
+    }
+
+    // TODO: implement when bulletproofs are supported
+    /*
+    #[inline]
+    pub fn conceal_allocations(mut self) -> Self {
+
+    }
+     */
+
+    #[inline]
+    pub fn issue_contract(self) -> Result<Contract, BuilderError> { self.0.issue_contract() }
 }

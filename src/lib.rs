@@ -28,14 +28,14 @@ mod cfa;
 mod nia;
 mod uda;
 
+pub use cfa::{cfa_rgb25, cfa_schema};
+pub use nia::NonInflatableAsset;
+use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
+pub use uda::{uda_rgb21, uda_schema};
+
 pub const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
 pub const GS_DATA: GlobalStateType = GlobalStateType::with(2001);
 pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
 pub const GS_TIMESTAMP: GlobalStateType = GlobalStateType::with(2003);
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);
-
-pub use cfa::{cfa_rgb25, cfa_schema};
-pub use nia::{nia_rgb20, nia_schema};
-use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
-pub use uda::{uda_rgb21, uda_schema};
