@@ -45,7 +45,7 @@ use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
 
-fn nia_schema() -> SubSchema {
+pub fn nia_schema() -> SubSchema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let code = rgbasm! {
@@ -121,7 +121,7 @@ fn nia_schema() -> SubSchema {
     }
 }
 
-fn nia_rgb20() -> IfaceImpl {
+pub fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
     let iface = Rgb20::iface();
 
