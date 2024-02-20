@@ -330,7 +330,7 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.11.0-beta.3"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#5359d8437f5e63289ad0a63ecb66a3bd7d42f816"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=layouts#d81288a7df7d52e5dfc4b2a17ad43780d6107cc4"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -342,7 +342,7 @@ dependencies = [
 [[package]]
 name = "commit_verify"
 version = "0.11.0-beta.3"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#5359d8437f5e63289ad0a63ecb66a3bd7d42f816"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=layouts#d81288a7df7d52e5dfc4b2a17ad43780d6107cc4"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -352,6 +352,7 @@ dependencies = [
  "sha2",
  "strict_encoding",
  "strict_types",
+ "vesper-lang",
 ]
 
 [[package]]
@@ -638,7 +639,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=disclose#452930248f5c0144f22a74f73f40df703fdcdaca"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=disclose#cb66775f3a586adc124503fb3ea89b34fbcceadb"
 dependencies = [
  "aluvm",
  "amplify",
@@ -659,7 +660,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#5817be7600c38fcfc5e4499ca165dbfe3444aea1"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#9a425d944071316ad70eb0e435a014e789e38387"
 dependencies = [
  "amplify",
  "baid58",
@@ -694,7 +695,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.4"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#5817be7600c38fcfc5e4499ca165dbfe3444aea1"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#9a425d944071316ad70eb0e435a014e789e38387"
 dependencies = [
  "amplify",
  "baid58",
@@ -724,9 +725,9 @@ dependencies = [
 
 [[package]]
 name = "ryu"
-version = "1.0.16"
+version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f98d2aa92eebf49b69786be48e4477826b256916e84a57ff2a4f21923b48eb4c"
+checksum = "e86697c916019a8588c99b5fac3cead74ec0b4b819707a682fd4d23fa0ce1ba1"
 
 [[package]]
 name = "secp256k1"
@@ -773,29 +774,29 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.196"
+version = "1.0.197"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "870026e60fa08c69f064aa766c10f10b1d62db9ccd4d0abb206472bee0ce3b32"
+checksum = "3fb1c873e1b9b056a4dc4c0c198b24c3ffa059243875552b2bd0933b1aee4ce2"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.196"
+version = "1.0.197"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33c85360c95e7d137454dc81d9a4ed2b8efd8fbe19cee57357b32b9771fccb67"
+checksum = "7eb0b34b42edc17f6b7cac84a52a1c5f0e1bb2227e997ca9011ea3dd34e8610b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.49",
+ "syn 2.0.50",
 ]
 
 [[package]]
 name = "serde_json"
-version = "1.0.113"
+version = "1.0.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69801b70b1c3dac963ecb03a364ba0ceda9cf60c71cfe475e99864759c8b8a79"
+checksum = "c5f09b1bd632ef549eaa9f60a1f8de742bdbc698e6cee2095fc84dde5f549ae0"
 dependencies = [
  "itoa",
  "ryu",
@@ -823,9 +824,9 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.9.31"
+version = "0.9.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adf8a49373e98a4c5f0ceb5d05aa7c648d75f63774981ed95b7c7443bbd50c6e"
+checksum = "8fd075d994154d4a774f95b51fb96bdc2832b0ea48425c92546073816cda1f2f"
 dependencies = [
  "indexmap",
  "itoa",
@@ -882,8 +883,7 @@ dependencies = [
 [[package]]
 name = "strict_types"
 version = "2.7.0-beta.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d66de5cdf197b68e13fcac9fad7ed288f44052a319a3df3abbaba9c6e52f735b"
+source = "git+https://github.com/strict-types/strict-types?branch=vesper#266f2d8b6e015522e9e7e72af663af9c9d3c7d2c"
 dependencies = [
  "amplify",
  "baid58",
@@ -922,9 +922,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.49"
+version = "2.0.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "915aea9e586f80826ee59f8453c1101f9d1c4b3964cd2460185ee8e299ada496"
+checksum = "74f1bdc9872430ce9b75da68329d1c1746faf50ffac5f19e02b71e37ff881ffb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -948,7 +948,7 @@ checksum = "a953cb265bef375dae3de6663da4d3804eee9682ea80d8e2542529b73c531c81"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.49",
+ "syn 2.0.50",
 ]
 
 [[package]]
@@ -1046,7 +1046,7 @@ dependencies = [
  "once_cell",
  "proc-macro2",
  "quote",
- "syn 2.0.49",
+ "syn 2.0.50",
  "wasm-bindgen-shared",
 ]
 
@@ -1068,7 +1068,7 @@ checksum = "642f325be6301eb8107a83d12a8ac6c1e1c54345a7ef1a9261962dfefda09e66"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.49",
+ "syn 2.0.50",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -1147,9 +1147,9 @@ checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
 name = "winnow"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d90f4e0f530c4c69f62b80d839e9ef3855edc9cba471a160c4d692deed62b401"
+checksum = "7a4191c47f15cc3ec71fcb4913cb83d58def65dd3787610213c649283b5ce178"
 dependencies = [
  "memchr",
 ]
