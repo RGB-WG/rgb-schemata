@@ -32,4 +32,4 @@ all=[]
 
 [patch.crates-io]
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "master" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "v0.11" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "master" }
