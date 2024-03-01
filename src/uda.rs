@@ -30,7 +30,6 @@ use rgbstd::schema::{
     TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::opcodes::INSTR_LDP;
 use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
 use rgbstd::{rgbasm, GlobalStateType};
 use strict_types::{SemId, Ty};
@@ -48,17 +47,18 @@ pub fn uda_schema() -> SubSchema {
 
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
-        // TODO: Use index for global state from register
-        // Read global state into s[1]
-        ldg     0x0836,0,s16[1]             ;
-        // Put 0 to a16[0]
+        // Initialize registers value
+        put     a8[0] ,0x00                 ;
         put     a16[0],0x00                 ;
+        put     a16[1],0x00                 ;
+        // Read global state into s[1]
+        ldg     0x0836,a8[0],s16[1]         ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
         extr    s16[1],r128[1],a16[0]       ;
         // a32[0] now has token index from global state
         spy     a32[0],r128[1]              ;
         // Read owned state into s[1]
-        lds     0x0FA0,0,s16[1]             ;
+        lds     0x0FA0,a16[1],s16[1]        ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
         extr    s16[1],r128[1],a16[0]       ;
         // a32[1] now has token index from allocation
@@ -66,13 +66,13 @@ pub fn uda_schema() -> SubSchema {
         // check that token indexes match
         eq.n    a32[0],a32[1]               ;
         // if they do, jump to the next check
-        jif     0x0028                      ;
+        jif     0x002D                      ;
         // we need to put a string into first string register which will be used as an error
         // message
         put     s16[0],"the allocated token has an invalid index";
         // fail otherwise
         fail                                ;
-        // offset_0x28:
+        // offset_0x2D (pos 45):
         // Put 4 to a16[0]
         put     a16[0],4                    ;
         // Extract 128 bits starting from the fifth byte of s[1] into r128[0]
@@ -87,19 +87,21 @@ pub fn uda_schema() -> SubSchema {
         put     s16[0],"owned fraction is not 1";
         ret                                 ;
         // SUBROUTINE 2: transfer validation
-        // offset_0x40:
+        // offset_0x45 (pos 69):
+        // Put 0 to a16[0]
+        put     a16[0],0                    ;
         // Read previous state into s[1]
-        ldp     0x0FA0,0,s16[1]             ;
+        ldp     0x0FA0,a16[0],s16[1]        ;
         // jump into SUBROUTINE 1 to reuse the code
         jmp     0x0005                      ;
     };
     let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
     let alu_id = alu_lib.id();
-    const FN_GENESIS_OFFSET: u16 = 0;
-    const FN_TRANSFER_OFFSET: u16 = 0x40;
-    assert_eq!(alu_lib.code.as_ref()[0x05], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[0x28], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_LDP);
+    const FN_GENESIS_OFFSET: u16 = 0x00;
+    const FN_TRANSFER_OFFSET: u16 = 0x45;
+    assert_eq!(alu_lib.code.as_ref()[0x00], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[0x2D], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),
