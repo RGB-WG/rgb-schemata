@@ -6,7 +6,7 @@ use bp::dbc::Method;
 use bp::{Outpoint, Txid};
 use rgb_schemata::NonInflatableAsset;
 use rgbstd::containers::BindleContent;
-use rgbstd::interface::{ContractClass, FilterIncludeAll, FungibleAllocation, Rgb20};
+use rgbstd::interface::{FilterIncludeAll, FungibleAllocation, IfaceClass, IssuerClass, Rgb20};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
@@ -53,7 +53,7 @@ fn main() {
     let mut stock = Stock::default();
     stock.import_iface(Rgb20::iface()).unwrap();
     stock.import_schema(NonInflatableAsset::schema()).unwrap();
-    stock.import_iface_impl(NonInflatableAsset::main_iface_impl()).unwrap();
+    stock.import_iface_impl(NonInflatableAsset::issue_impl()).unwrap();
 
     stock.import_contract(bindle.unbindle(), &mut DumbResolver).unwrap();
 
