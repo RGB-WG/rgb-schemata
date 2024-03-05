@@ -31,7 +31,7 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, GlobalStateType};
+use rgbstd::{rgbasm, GlobalStateType, ReservedBytes};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -105,6 +105,7 @@ pub fn uda_schema() -> SubSchema {
 
     Schema {
         ffv: zero!(),
+        flags: ReservedBytes::default(),
         subset_of: None,
         type_system: types.type_system(),
         global_types: tiny_bmap! {

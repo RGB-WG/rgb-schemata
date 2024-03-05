@@ -39,7 +39,7 @@ use rgbstd::schema::{
 use rgbstd::stl::{Attachment, StandardTypes, Timestamp};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
 use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, AssetTag, BlindingFactor};
+use rgbstd::{rgbasm, AssetTag, BlindingFactor, ReservedBytes};
 use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
@@ -72,6 +72,7 @@ fn nia_schema() -> SubSchema {
 
     Schema {
         ffv: zero!(),
+        flags: ReservedBytes::default(),
         subset_of: None,
         type_system: types.type_system(),
         global_types: tiny_bmap! {

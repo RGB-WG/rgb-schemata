@@ -30,7 +30,7 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgbstd::GlobalStateType;
+use rgbstd::{GlobalStateType, ReservedBytes};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -48,6 +48,7 @@ pub fn cfa_schema() -> SubSchema {
 
     Schema {
         ffv: zero!(),
+        flags: ReservedBytes::default(),
         subset_of: None,
         type_system: types.type_system(),
         global_types: tiny_bmap! {
