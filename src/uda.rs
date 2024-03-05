@@ -30,8 +30,8 @@ use rgbstd::schema::{
     TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, GlobalStateType};
+use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
+use rgbstd::{rgbasm, GlobalStateType, Types};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -95,7 +95,7 @@ pub fn uda_schema() -> SubSchema {
         // jump into SUBROUTINE 1 to reuse the code
         jmp     0x0005                      ;
     };
-    let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
+    let alu_lib = AluLib(Lib::assemble::<Instr<RgbIsa>>(&code).unwrap());
     let alu_id = alu_lib.id();
     const FN_GENESIS_OFFSET: u16 = 0x00;
     const FN_TRANSFER_OFFSET: u16 = 0x45;
@@ -105,8 +105,9 @@ pub fn uda_schema() -> SubSchema {
 
     Schema {
         ffv: zero!(),
+        flags: none!(),
         subset_of: None,
-        type_system: types.type_system(),
+        types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
             GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),

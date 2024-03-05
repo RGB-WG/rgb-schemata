@@ -38,8 +38,8 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::{Attachment, StandardTypes, Timestamp};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
-use rgbstd::vm::{AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, AssetTag, BlindingFactor};
+use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
+use rgbstd::{rgbasm, AssetTag, BlindingFactor, Types};
 use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
@@ -63,7 +63,7 @@ fn nia_schema() -> SubSchema {
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
         pcvs    0x0FA0          ;
     };
-    let alu_lib = Lib::assemble::<Instr<RgbIsa>>(&code).unwrap();
+    let alu_lib = AluLib(Lib::assemble::<Instr<RgbIsa>>(&code).unwrap());
     let alu_id = alu_lib.id();
     const FN_GENESIS_OFFSET: u16 = 0;
     const FN_TRANSFER_OFFSET: u16 = 6 + 5 + 1;
@@ -72,8 +72,9 @@ fn nia_schema() -> SubSchema {
 
     Schema {
         ffv: zero!(),
+        flags: none!(),
         subset_of: None,
-        type_system: types.type_system(),
+        types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
             GS_DATA => GlobalStateSchema::once(types.get("RGBContract.ContractData")),

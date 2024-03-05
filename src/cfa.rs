@@ -29,8 +29,8 @@ use rgbstd::schema::{
     SubSchema, TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::{AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgbstd::GlobalStateType;
+use rgbstd::vm::{AluLib, AluScript, ContractOp, EntryPoint, RgbIsa};
+use rgbstd::{GlobalStateType, Types};
 use strict_types::{SemId, Ty};
 
 use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
@@ -43,13 +43,14 @@ pub fn cfa_schema() -> SubSchema {
     let types = StandardTypes::with(rgb25_stl());
 
     let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
-    let alu_lib = Lib::assemble(&code).unwrap();
+    let alu_lib = AluLib(Lib::assemble(&code).unwrap());
     let alu_id = alu_lib.id();
 
     Schema {
         ffv: zero!(),
+        flags: none!(),
         subset_of: None,
-        type_system: types.type_system(),
+        types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
