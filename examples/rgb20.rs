@@ -2,10 +2,11 @@ use std::convert::Infallible;
 use std::fs;
 
 use amplify::hex::FromHex;
+use armor::AsciiArmor;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
 use rgb_schemata::NonInflatableAsset;
-use rgbstd::containers::BindleContent;
+use rgbstd::containers::FileContent;
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation, IfaceClass, IssuerClass, Rgb20};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
@@ -44,10 +45,9 @@ fn main() {
 
     let contract_id = contract.contract_id();
 
-    let bindle = contract.bindle();
-    eprintln!("{bindle}");
-    bindle.save("examples/rgb20-simplest.rgb").expect("unable to save contract");
-    fs::write("examples/rgb20-simplest.rgba", bindle.to_string()).expect("unable to save contract");
+    eprintln!("{contract}");
+    contract.save_file("examples/rgb20-simplest.rgb").expect("unable to save contract");
+    fs::write("examples/rgb20-simplest.rgba", contract.to_ascii_armored_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
@@ -55,7 +55,7 @@ fn main() {
     stock.import_schema(NonInflatableAsset::schema()).unwrap();
     stock.import_iface_impl(NonInflatableAsset::issue_impl()).unwrap();
 
-    stock.import_contract(bindle.unbindle(), &mut DumbResolver).unwrap();
+    stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_id(contract_id, Rgb20::iface().iface_id()).unwrap();

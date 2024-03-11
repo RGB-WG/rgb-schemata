@@ -14,6 +14,7 @@ readme = "README.md"
 
 [dependencies]
 amplify = "4.6.0"
+ascii-armor = "0.2.0"
 strict_encoding = "2.7.0-beta.1"
 strict_types = "2.7.0-beta.1"
 aluvm = { version = "0.11.0-beta.4", features = ["log"] }
@@ -31,5 +32,12 @@ serde_yaml = "0.9.27"
 all = []
 
 [patch.crates-io]
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "canary" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "master" }
+strict_types = { git = "https://github.com/strict-types/strict-types", branch = "armor" }
+aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "armor" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "armor" }
+bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "armor" }
+bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "armor" }
+bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "armor" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "armor" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "armor" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "armor" }
