@@ -14,8 +14,9 @@ readme = "README.md"
 
 [dependencies]
 amplify = "4.6.0"
+ascii-armor = "0.2.0"
 strict_encoding = "2.7.0-beta.1"
-strict_types = "2.7.0-beta.1"
+strict_types = "2.7.0-beta.2"
 aluvm = { version = "0.11.0-beta.4", features = ["log"] }
 bp-core = "0.11.0-beta.4"
 rgb-std = { version = "0.11.0-beta.4", features = ["serde", "fs"] }
@@ -31,5 +32,10 @@ serde_yaml = "0.9.27"
 all = []
 
 [patch.crates-io]
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "canary" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "master" }
+bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "master" }
+bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "master" }
+bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "master" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "master" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "master" }
 rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "master" }

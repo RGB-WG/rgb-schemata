@@ -4,9 +4,10 @@ use std::fs;
 use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
 use amplify::Wrapper;
+use armor::AsciiArmor;
 use bp::Txid;
 use rgb_schemata::{uda_rgb21, uda_schema};
-use rgbstd::containers::BindleContent;
+use rgbstd::containers::FileContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
 use rgbstd::interface::{rgb21, ContractBuilder};
 use rgbstd::invoice::Precision;
@@ -80,10 +81,9 @@ fn main() {
     let contract_id = contract.contract_id();
     debug_assert_eq!(contract_id, contract.contract_id());
 
-    let bindle = contract.bindle();
-    eprintln!("{bindle}");
-    bindle.save("examples/rgb21-simplest.contract.rgb").expect("unable to save contract");
-    fs::write("examples/rgb21-simplest.contract.rgba", bindle.to_string()).expect("unable to save contract");
+    eprintln!("{contract}");
+    contract.save_file("examples/rgb21-simplest.contract.rgb").expect("unable to save contract");
+    fs::write("examples/rgb21-simplest.contract.rgba", contract.to_ascii_armored_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
@@ -92,7 +92,7 @@ fn main() {
     stock.import_iface_impl(uda_rgb21()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, true) {
+    let verified_contract = match contract.validate(&mut DumbResolver, true) {
         Ok(consignment) => consignment,
         Err(consignment) => {
             panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));

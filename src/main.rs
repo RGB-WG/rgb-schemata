@@ -22,24 +22,25 @@
 use std::io::stdout;
 use std::{fs, io};
 
+use armor::AsciiArmor;
 use rgb_schemata::{cfa_rgb25, cfa_schema, uda_rgb21, uda_schema, NonInflatableAsset};
-use rgbstd::containers::{Bindle, BindleContent};
+use rgbstd::containers::FileContent;
 use rgbstd::interface::{rgb21, rgb25, IfaceClass, IssuerClass, Rgb20};
 use rgbstd::vm::RgbIsa;
 use rgbstd::SubSchema;
 
 fn main() -> io::Result<()> {
-    let rgb20_bindle = Rgb20::iface().bindle();
-    rgb20_bindle.save("interfaces/RGB20.rgb")?;
-    fs::write("interfaces/RGB20.rgba", rgb20_bindle.to_string())?;
+    let rgb20 = Rgb20::iface();
+    rgb20.save_file("interfaces/RGB20.rgb")?;
+    fs::write("interfaces/RGB20.rgba", rgb20.to_ascii_armored_string())?;
 
-    let rgb21_bindle = rgb21().bindle();
-    rgb21_bindle.save("interfaces/RGB21.rgb")?;
-    fs::write("interfaces/RGB21.rgba", rgb21_bindle.to_string())?;
+    let rgb21 = rgb21();
+    rgb21.save_file("interfaces/RGB21.rgb")?;
+    fs::write("interfaces/RGB21.rgba", rgb21.to_ascii_armored_string())?;
 
-    let rgb25_bindle = rgb25().bindle();
-    rgb25_bindle.save("interfaces/RGB25.rgb")?;
-    fs::write("interfaces/RGB25.rgba", rgb25_bindle.to_string())?;
+    let rgb25 = rgb25();
+    rgb25.save_file("interfaces/RGB25.rgb")?;
+    fs::write("interfaces/RGB25.rgba", rgb25.to_ascii_armored_string())?;
 
     nia()?;
     uda()?;
@@ -49,52 +50,46 @@ fn main() -> io::Result<()> {
 }
 
 fn nia() -> io::Result<()> {
-    let schema_bindle = NonInflatableAsset::schema().bindle();
-    schema_bindle.save("schemata/NonInflatableAssets.rgb")?;
-    fs::write("schemata/NonInflatableAssets.rgba", schema_bindle.to_string())?;
-    print_lib(&schema_bindle);
+    let schema = NonInflatableAsset::schema();
+    schema.save_file("schemata/NonInflatableAssets.rgb")?;
+    fs::write("schemata/NonInflatableAssets.rgba", schema.to_ascii_armored_string())?;
+    print_lib(&schema);
 
-    let iimpl_bindle = NonInflatableAsset::issue_impl().bindle();
-    iimpl_bindle.save("schemata/NonInflatableAssets-RGB20.rgb")?;
-    fs::write("schemata/NonInflatableAssets-RGB20.rgba", iimpl_bindle.to_string())?;
+    let iimpl = NonInflatableAsset::issue_impl();
+    iimpl.save_file("schemata/NonInflatableAssets-RGB20.rgb")?;
+    fs::write("schemata/NonInflatableAssets-RGB20.rgba", iimpl.to_ascii_armored_string())?;
 
     Ok(())
 }
 
 fn uda() -> io::Result<()> {
-    let schema_bindle = uda_schema().bindle();
-    schema_bindle.save("schemata/UniqueDigitalAsset.rgb")?;
-    fs::write("schemata/UniqueDigitalAsset.rgba", schema_bindle.to_string())?;
-    print_lib(&schema_bindle);
+    let schema = uda_schema();
+    schema.save_file("schemata/UniqueDigitalAsset.rgb")?;
+    fs::write("schemata/UniqueDigitalAsset.rgba", schema.to_ascii_armored_string())?;
+    print_lib(&schema);
 
-    let iimpl_bindle = uda_rgb21().bindle();
-    iimpl_bindle.save("schemata/UniqueDigitalAsset-RGB21.rgb")?;
-    fs::write("schemata/UniqueDigitalAsset-RGB21.rgba", iimpl_bindle.to_string())?;
+    let iimpl = uda_rgb21();
+    iimpl.save_file("schemata/UniqueDigitalAsset-RGB21.rgb")?;
+    fs::write("schemata/UniqueDigitalAsset-RGB21.rgba", iimpl.to_ascii_armored_string())?;
 
     Ok(())
 }
 
 fn cfa() -> io::Result<()> {
-    let schema_bindle = cfa_schema().bindle();
-    schema_bindle.save("schemata/CollectibleFungibleAssets.rgb")?;
-    fs::write("schemata/CollectibleFungibleAssets.rgba", schema_bindle.to_string())?;
-    print_lib(&schema_bindle);
+    let schema = cfa_schema();
+    schema.save_file("schemata/CollectibleFungibleAssets.rgb")?;
+    fs::write("schemata/CollectibleFungibleAssets.rgba", schema.to_ascii_armored_string())?;
+    print_lib(&schema);
 
-    let iimpl_bindle = cfa_rgb25().bindle();
-    iimpl_bindle.save("schemata/CollectibleFungibleAssets-RGB25.rgb")?;
-    fs::write("schemata/CollectibleFungibleAssets-RGB25.rgba", iimpl_bindle.to_string())?;
+    let iimpl = cfa_rgb25();
+    iimpl.save_file("schemata/CollectibleFungibleAssets-RGB25.rgb")?;
+    fs::write("schemata/CollectibleFungibleAssets-RGB25.rgba", iimpl.to_ascii_armored_string())?;
 
     Ok(())
 }
 
-fn print_lib(schema_bindle: &Bindle<SubSchema>) {
-    let alu_lib = schema_bindle
-        .script
-        .as_alu_script()
-        .libs
-        .values()
-        .next()
-        .unwrap();
+fn print_lib(schema: &SubSchema) {
+    let alu_lib = schema.script.as_alu_script().libs.values().next().unwrap();
     eprintln!("{alu_lib}");
     alu_lib.print_disassemble::<RgbIsa>(stdout()).ok();
 }
