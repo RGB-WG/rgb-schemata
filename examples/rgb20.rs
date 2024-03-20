@@ -38,7 +38,7 @@ fn main() {
 
     let contract = NonInflatableAsset::testnet("TEST", "Test asset", None, Precision::CentiMicro)
         .expect("invalid contract data")
-        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
+        .allocate(Method::TapretFirst, beneficiary, 100_000_000_000_u64.into())
         .expect("invalid allocations")
         .issue_contract()
         .expect("invalid contract data");

@@ -34,8 +34,8 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let name = Name::try_from("Test asset").unwrap();
-    let details = Details::try_from("details with ℧nicode characters").unwrap();
+    let name = Name::from("Test asset");
+    let details = Details::from("details with ℧nicode characters");
     let precision = Precision::CentiMicro;
     let terms = RicardianContract::default();
     let file_bytes = std::fs::read("README.md").unwrap();

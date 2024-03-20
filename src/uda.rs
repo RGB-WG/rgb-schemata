@@ -42,6 +42,7 @@ const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
 const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
 const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
+#[allow(clippy::diverging_sub_expression)]
 pub fn uda_schema() -> SubSchema {
     let types = StandardTypes::with(rgb21_stl());
 
