@@ -4,7 +4,6 @@ use std::fs;
 use amplify::hex::FromHex;
 use bp::Txid;
 use rgb_schemata::{cfa_rgb25, cfa_schema};
-use rgbstd::containers::BindleContent;
 use rgbstd::interface::{rgb25, ContractBuilder, FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::{Amount, Precision};
 use rgbstd::persistence::{Inventory, Stock};
@@ -14,6 +13,7 @@ use rgbstd::stl::{
 };
 use rgbstd::validation::{ResolveWitness, WitnessResolverError};
 use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
+use rgbstd::containers::FileContent;
 use sha2::{Digest, Sha256};
 use strict_encoding::StrictDumb;
 
@@ -90,10 +90,9 @@ fn main() {
     let contract_id = contract.contract_id();
     debug_assert_eq!(contract_id, contract.contract_id());
 
-    let bindle = contract.bindle();
-    eprintln!("{bindle}");
-    bindle.save("examples/rgb25-simplest.contract.rgb").expect("unable to save contract");
-    fs::write("examples/rgb25-simplest.contract.rgba", bindle.to_string()).expect("unable to save contract");
+    eprintln!("{contract}");
+    contract.save_file("examples/rgb25-simplest.contract.rgb").expect("unable to save contract");
+    fs::write("examples/rgb25-simplest.contract.rgba", contract.to_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
@@ -102,7 +101,7 @@ fn main() {
     stock.import_iface_impl(cfa_rgb25()).unwrap();
 
     // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match bindle.unbindle().validate(&mut DumbResolver, true) {
+    let verified_contract = match contract.validate(&mut DumbResolver, true) {
         Ok(consignment) => consignment,
         Err(consignment) => {
             panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
