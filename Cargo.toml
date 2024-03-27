@@ -33,4 +33,4 @@ all = ["log"]
 log = ["aluvm/log"]
 
 [patch.crates-io]
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "master" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "iface" }
