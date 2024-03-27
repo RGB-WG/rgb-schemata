@@ -34,8 +34,7 @@ use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
 pub use uda::{uda_rgb21, uda_schema};
 
 pub const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
-pub const GS_DATA: GlobalStateType = GlobalStateType::with(2001);
+pub const GS_TERMS: GlobalStateType = GlobalStateType::with(2001);
 pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
-pub const GS_TIMESTAMP: GlobalStateType = GlobalStateType::with(2003);
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);

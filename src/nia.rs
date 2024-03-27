@@ -28,7 +28,7 @@ use bp::dbc::Method;
 use rgbstd::containers::Contract;
 use rgbstd::interface::rgb20::{AllocationError, PrimaryIssue};
 use rgbstd::interface::{
-    BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, NamedType, Rgb20, TxOutpoint,
+    BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, Rgb20, TxOutpoint,
     VerNo,
 };
 use rgbstd::invoice::{Amount, Precision};
@@ -36,14 +36,14 @@ use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
 };
-use rgbstd::stl::{Attachment, StandardTypes, Timestamp};
+use rgbstd::stl::{Attachment, StandardTypes};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
 use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
 use rgbstd::{rgbasm, AssetTag, BlindingFactor, Types};
 use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
-use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
+use crate::{GS_TERMS, GS_ISSUED_SUPPLY, GS_NOMINAL, OS_ASSET, TS_TRANSFER};
 
 fn nia_schema() -> SubSchema {
     let types = StandardTypes::with(Rgb20::stl());
@@ -76,9 +76,8 @@ fn nia_schema() -> SubSchema {
         subset_of: None,
         types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
-            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
-            GS_DATA => GlobalStateSchema::once(types.get("RGBContract.ContractData")),
-            GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
+            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -89,8 +88,7 @@ fn nia_schema() -> SubSchema {
             metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
-                GS_DATA => Occurrences::Once,
-                GS_TIMESTAMP => Occurrences::Once,
+                GS_TERMS => Occurrences::Once,
                 GS_ISSUED_SUPPLY => Occurrences::Once,
             },
             assignments: tiny_bmap! {
@@ -133,8 +131,7 @@ fn nia_rgb20() -> IfaceImpl {
         script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
-            NamedField::with(GS_DATA, fname!("data")),
-            NamedField::with(GS_TIMESTAMP, fname!("created")),
+            NamedField::with(GS_TERMS, fname!("terms")),
             NamedField::with(GS_ISSUED_SUPPLY, fname!("issuedSupply")),
         },
         assignments: tiny_bset! {
@@ -142,7 +139,7 @@ fn nia_rgb20() -> IfaceImpl {
         },
         valencies: none!(),
         transitions: tiny_bset! {
-            NamedType::with(TS_TRANSFER, tn!("Transfer")),
+            NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
     }
@@ -174,10 +171,9 @@ impl NonInflatableAsset {
         name: &str,
         details: Option<&str>,
         precision: Precision,
-        timestamp: Timestamp,
         asset_tag: AssetTag,
     ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, timestamp, asset_tag)
+        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, asset_tag)
             .map(Self)
     }
 
@@ -238,4 +234,6 @@ impl NonInflatableAsset {
 
     #[inline]
     pub fn issue_contract(self) -> Result<Contract, BuilderError> { self.0.issue_contract() }
+
+    pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> { self.0.issue_contract_det(timestamp) }
 }

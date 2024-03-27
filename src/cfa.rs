@@ -23,7 +23,7 @@
 //! interface.
 
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{rgb25, rgb25_stl, IfaceImpl, NamedField, NamedType, VerNo};
+use rgbstd::interface::{ IfaceImpl, NamedField, VerNo, Rgb25, IfaceClass};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
     SubSchema, TransitionSchema,
@@ -33,14 +33,14 @@ use rgbstd::vm::{AluLib, AluScript, ContractOp, EntryPoint, RgbIsa};
 use rgbstd::{GlobalStateType, Types};
 use strict_types::{SemId, Ty};
 
-use crate::{GS_DATA, GS_ISSUED_SUPPLY, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
+use crate::{GS_TERMS, GS_ISSUED_SUPPLY, OS_ASSET, TS_TRANSFER};
 
 const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
 const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
 const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
 
 pub fn cfa_schema() -> SubSchema {
-    let types = StandardTypes::with(rgb25_stl());
+    let types = StandardTypes::with(Rgb25::stl());
 
     let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
     let alu_lib = AluLib(Lib::assemble(&code).unwrap());
@@ -55,8 +55,7 @@ pub fn cfa_schema() -> SubSchema {
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
             GS_PRECISION => GlobalStateSchema::once(types.get("RGBContract.Precision")),
-            GS_DATA => GlobalStateSchema::once(types.get("RGBContract.ContractData")),
-            GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -69,8 +68,7 @@ pub fn cfa_schema() -> SubSchema {
                 GS_NAME => Occurrences::Once,
                 GS_DETAILS => Occurrences::NoneOrOnce,
                 GS_PRECISION => Occurrences::Once,
-                GS_DATA => Occurrences::Once,
-                GS_TIMESTAMP => Occurrences::Once,
+                GS_TERMS => Occurrences::Once,
                 GS_ISSUED_SUPPLY => Occurrences::Once,
             },
             assignments: tiny_bmap! {
@@ -103,7 +101,7 @@ pub fn cfa_schema() -> SubSchema {
 
 pub fn cfa_rgb25() -> IfaceImpl {
     let schema = cfa_schema();
-    let iface = rgb25();
+    let iface = Rgb25::iface();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -114,8 +112,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
             NamedField::with(GS_PRECISION, fname!("precision")),
-            NamedField::with(GS_DATA, fname!("data")),
-            NamedField::with(GS_TIMESTAMP, fname!("created")),
+            NamedField::with(GS_TERMS, fname!("terms")),
             NamedField::with(GS_ISSUED_SUPPLY, fname!("issuedSupply")),
         },
         assignments: tiny_bset! {
@@ -123,7 +120,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
         },
         valencies: none!(),
         transitions: tiny_bset! {
-            NamedType::with(TS_TRANSFER, tn!("Transfer")),
+            NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
     }

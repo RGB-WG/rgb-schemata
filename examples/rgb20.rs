@@ -68,5 +68,4 @@ fn main() {
         eprintln!("amount={state}, owner={seal}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_supply());
-    eprintln!("created={}", contract.created().to_local().unwrap());
 }

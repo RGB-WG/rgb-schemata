@@ -24,7 +24,7 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{rgb21, rgb21_stl, IfaceImpl, NamedField, NamedType, VerNo};
+use rgbstd::interface::{IfaceImpl, NamedField, VerNo, Rgb21, IfaceClass};
 use rgbstd::schema::{
     GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, SubSchema,
     TransitionSchema,
@@ -34,16 +34,15 @@ use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
 use rgbstd::{rgbasm, GlobalStateType, Types};
 use strict_types::{SemId, Ty};
 
-use crate::{GS_NOMINAL, GS_TIMESTAMP, OS_ASSET, TS_TRANSFER};
+use crate::{GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
-const GS_CONTRACT: GlobalStateType = GlobalStateType::with(2101);
 const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
 #[allow(dead_code)]
 const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
 const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
 pub fn uda_schema() -> SubSchema {
-    let types = StandardTypes::with(rgb21_stl());
+    let types = StandardTypes::with(Rgb21::stl());
 
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
@@ -109,9 +108,8 @@ pub fn uda_schema() -> SubSchema {
         subset_of: None,
         types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
-            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.DivisibleAssetSpec")),
-            GS_CONTRACT => GlobalStateSchema::once(types.get("RGBContract.RicardianContract")),
-            GS_TIMESTAMP => GlobalStateSchema::once(types.get("RGBContract.Timestamp")),
+            GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
             GS_TOKENS => GlobalStateSchema::once(types.get("RGB21.TokenData")),
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
@@ -123,8 +121,7 @@ pub fn uda_schema() -> SubSchema {
             metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
-                GS_CONTRACT => Occurrences::Once,
-                GS_TIMESTAMP => Occurrences::Once,
+                GS_TERMS => Occurrences::Once,
                 GS_TOKENS => Occurrences::Once,
                 GS_ATTACH => Occurrences::NoneOrOnce,
             },
@@ -159,7 +156,7 @@ pub fn uda_schema() -> SubSchema {
 
 pub fn uda_rgb21() -> IfaceImpl {
     let schema = uda_schema();
-    let iface = rgb21();
+    let iface = Rgb21::iface();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -168,8 +165,7 @@ pub fn uda_rgb21() -> IfaceImpl {
         script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
-            NamedField::with(GS_CONTRACT, fname!("terms")),
-            NamedField::with(GS_TIMESTAMP, fname!("created")),
+            NamedField::with(GS_TERMS, fname!("terms")),
             NamedField::with(GS_TOKENS, fname!("tokens")),
         },
         assignments: tiny_bset! {
@@ -177,7 +173,7 @@ pub fn uda_rgb21() -> IfaceImpl {
         },
         valencies: none!(),
         transitions: tiny_bset! {
-            NamedType::with(TS_TRANSFER, tn!("Transfer")),
+            NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
     }
