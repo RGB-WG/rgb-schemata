@@ -9,13 +9,14 @@ use bp::Txid;
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::FileContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
-use rgbstd::interface::{rgb21, ContractBuilder};
+use rgbstd::interface::{ContractBuilder, Rgb21, IfaceClass, IfaceWrapper};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{self, DivisibleAssetSpec, RicardianContract, Timestamp};
+use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
 use rgbstd::validation::{ResolveWitness, WitnessResolverError};
 use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
+use sha2::{Digest, Sha256};
 use strict_encoding::StrictDumb;
 
 struct DumbResolver;
@@ -35,9 +36,7 @@ impl ResolveHeight for DumbResolver {
 
 #[rustfmt::skip]
 fn main() {
-    let spec = DivisibleAssetSpec::new("TEST", "Test uda", Precision::Indivisible);
-    let terms = RicardianContract::default();
-    let created = Timestamp::now();
+    let spec = AssetSpec::new("TEST", "Test uda", Precision::Indivisible);
     let beneficiary_txid =
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
     let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
@@ -45,8 +44,19 @@ fn main() {
     let fraction = OwnedFraction::from_inner(1);
     let index = TokenIndex::from_inner(2);
 
+    let file_bytes = std::fs::read("README.md").unwrap();
+    let mut hasher = Sha256::new();
+    hasher.update(file_bytes);
+    let file_hash = hasher.finalize();
+    let terms = AssetTerms {
+        text: RicardianContract::default(),
+        media: Some(Attachment {
+            ty: MediaType::with("text/*"),
+            digest: file_hash.into(),
+        }),
+    };
     let preview = EmbeddedMedia {
-        ty: stl::MediaType::with("text/*"),
+        ty: MediaType::with("image/*"),
         data: SmallBlob::try_from_iter(vec![0, 0]).expect("invalid data"),
     };
 
@@ -54,7 +64,7 @@ fn main() {
 
     let allocation = Allocation::with(index, fraction);
     let contract = ContractBuilder::testnet(
-        rgb21(),
+        Rgb21::iface(),
         uda_schema(),
         uda_rgb21(),
         ).expect("schema fails to implement RGB21 interface")
@@ -64,9 +74,6 @@ fn main() {
 
         .add_global_state("spec", spec)
         .expect("invalid nominal")
-
-        .add_global_state("created", created)
-        .expect("invalid creation date")
 
         .add_global_state("terms", terms)
         .expect("invalid contract text")
@@ -82,12 +89,12 @@ fn main() {
     debug_assert_eq!(contract_id, contract.contract_id());
 
     eprintln!("{contract}");
-    contract.save_file("examples/rgb21-simplest.contract.rgb").expect("unable to save contract");
-    fs::write("examples/rgb21-simplest.contract.rgba", contract.to_ascii_armored_string()).expect("unable to save contract");
+    contract.save_file("examples/rgb21-simplest.rgb").expect("unable to save contract");
+    fs::write("examples/rgb21-simplest.rgba", contract.to_ascii_armored_string()).expect("unable to save contract");
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
-    stock.import_iface(rgb21()).unwrap();
+    stock.import_iface(Rgb21::iface()).unwrap();
     stock.import_schema(uda_schema()).unwrap();
     stock.import_iface_impl(uda_rgb21()).unwrap();
 
@@ -101,7 +108,7 @@ fn main() {
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_id(contract_id, rgb21().iface_id()).unwrap();
+    let contract = stock.contract_iface_id(contract_id, Rgb21::IFACE_ID).unwrap();
     let nominal = contract.global("spec").unwrap();
     eprintln!("{}", nominal[0]);
 }
