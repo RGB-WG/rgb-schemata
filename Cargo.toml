@@ -1,6 +1,6 @@
 [package]
 name = "rgb-schemata"
-version = "0.11.0-beta.4"
+version = "0.11.0-beta.5"
 description = "Collection of the official RGB smart contract schemata"
 keywords = ["bitcoin", "lightning", "rgb", "smart-contracts", "lnp-bp"]
 categories = ["cryptography::cryptocurrencies"]
@@ -19,7 +19,7 @@ strict_encoding = "2.7.0-beta.1"
 strict_types = "2.7.0-beta.2"
 aluvm = "0.11.0-beta.5"
 bp-core = "0.11.0-beta.5"
-rgb-std = { version = "0.11.0-beta.4", features = ["serde", "fs"] }
+rgb-std = { version = "0.11.0-beta.5", features = ["serde", "fs"] }
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.10.8"
@@ -31,6 +31,3 @@ serde_yaml = "0.9.27"
 [features]
 all = ["log"]
 log = ["aluvm/log"]
-
-[patch.crates-io]
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "iface" }
