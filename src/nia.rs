@@ -25,16 +25,16 @@
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use bp::dbc::Method;
+use chrono::Utc;
 use rgbstd::containers::Contract;
 use rgbstd::interface::rgb20::{AllocationError, PrimaryIssue};
 use rgbstd::interface::{
-    BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, Rgb20, TxOutpoint,
-    VerNo,
+    rgb20, BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, Rgb20, TxOutpoint, VerNo,
 };
 use rgbstd::invoice::{Amount, Precision};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
-    SubSchema, TransitionSchema,
+    TransitionSchema,
 };
 use rgbstd::stl::{Attachment, StandardTypes};
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
@@ -43,9 +43,9 @@ use rgbstd::{rgbasm, AssetTag, BlindingFactor, Types};
 use strict_encoding::InvalidIdent;
 use strict_types::{SemId, Ty};
 
-use crate::{GS_TERMS, GS_ISSUED_SUPPLY, GS_NOMINAL, OS_ASSET, TS_TRANSFER};
+use crate::{GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
-fn nia_schema() -> SubSchema {
+fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let code = rgbasm! {
@@ -73,7 +73,6 @@ fn nia_schema() -> SubSchema {
     Schema {
         ffv: zero!(),
         flags: none!(),
-        subset_of: None,
         types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
@@ -122,12 +121,14 @@ fn nia_schema() -> SubSchema {
 
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = Rgb20::iface();
+    let iface = Rgb20::iface(rgb20::Features::none());
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
+        timestamp: Utc::now().timestamp(),
+        developer: none!(), // TODO: Provide issuer information
         script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
@@ -150,7 +151,7 @@ pub struct NonInflatableAsset(PrimaryIssue);
 impl IssuerClass for NonInflatableAsset {
     type IssuingIface = Rgb20;
 
-    fn schema() -> SubSchema { nia_schema() }
+    fn schema() -> Schema { nia_schema() }
     fn issue_impl() -> IfaceImpl { nia_rgb20() }
 }
 
@@ -162,7 +163,8 @@ impl NonInflatableAsset {
         details: Option<&str>,
         precision: Precision,
     ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet::<Self>(ticker, name, details, precision).map(Self)
+        PrimaryIssue::testnet::<Self>(ticker, name, details, precision, rgb20::Features::none())
+            .map(Self)
     }
 
     #[inline]
@@ -173,8 +175,15 @@ impl NonInflatableAsset {
         precision: Precision,
         asset_tag: AssetTag,
     ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, asset_tag)
-            .map(Self)
+        PrimaryIssue::testnet_det::<Self>(
+            ticker,
+            name,
+            details,
+            precision,
+            rgb20::Features::none(),
+            asset_tag,
+        )
+        .map(Self)
     }
 
     #[inline]
@@ -235,5 +244,7 @@ impl NonInflatableAsset {
     #[inline]
     pub fn issue_contract(self) -> Result<Contract, BuilderError> { self.0.issue_contract() }
 
-    pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> { self.0.issue_contract_det(timestamp) }
+    pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> {
+        self.0.issue_contract_det(timestamp)
+    }
 }

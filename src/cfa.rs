@@ -23,23 +23,24 @@
 //! interface.
 
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{ IfaceImpl, NamedField, VerNo, Rgb25, IfaceClass};
+use chrono::Utc;
+use rgbstd::interface::{rgb25, IfaceClass, IfaceImpl, NamedField, Rgb25, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
-    SubSchema, TransitionSchema,
+    TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluLib, AluScript, ContractOp, EntryPoint, RgbIsa};
 use rgbstd::{GlobalStateType, Types};
 use strict_types::{SemId, Ty};
 
-use crate::{GS_TERMS, GS_ISSUED_SUPPLY, OS_ASSET, TS_TRANSFER};
+use crate::{GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
 const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
 const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
 const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
 
-pub fn cfa_schema() -> SubSchema {
+pub fn cfa_schema() -> Schema {
     let types = StandardTypes::with(Rgb25::stl());
 
     let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
@@ -49,7 +50,6 @@ pub fn cfa_schema() -> SubSchema {
     Schema {
         ffv: zero!(),
         flags: none!(),
-        subset_of: None,
         types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
@@ -101,12 +101,14 @@ pub fn cfa_schema() -> SubSchema {
 
 pub fn cfa_rgb25() -> IfaceImpl {
     let schema = cfa_schema();
-    let iface = Rgb25::iface();
+    let iface = Rgb25::iface(rgb25::Features::none());
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
+        timestamp: Utc::now().timestamp(),
+        developer: none!(), // TODO: Provide issuer information
         script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NAME, fname!("name")),

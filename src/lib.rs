@@ -38,3 +38,27 @@ pub const GS_TERMS: GlobalStateType = GlobalStateType::with(2001);
 pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);
+
+pub mod dumb {
+    use std::convert::Infallible;
+
+    use rgbstd::resolvers::ResolveHeight;
+    use rgbstd::validation::{ResolveWitness, WitnessResolverError};
+    use rgbstd::{WitnessAnchor, XWitnessId, XWitnessTx};
+    use strict_encoding::StrictDumb;
+
+    pub struct DumbResolver;
+
+    impl ResolveWitness for DumbResolver {
+        fn resolve_pub_witness(&self, _: XWitnessId) -> Result<XWitnessTx, WitnessResolverError> {
+            Ok(XWitnessTx::strict_dumb())
+        }
+    }
+
+    impl ResolveHeight for DumbResolver {
+        type Error = Infallible;
+        fn resolve_height(&mut self, _: &XWitnessId) -> Result<WitnessAnchor, Self::Error> {
+            Ok(WitnessAnchor::strict_dumb())
+        }
+    }
+}

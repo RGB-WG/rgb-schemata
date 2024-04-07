@@ -25,20 +25,20 @@ use std::{fs, io};
 use armor::AsciiArmor;
 use rgb_schemata::{cfa_rgb25, cfa_schema, uda_rgb21, uda_schema, NonInflatableAsset};
 use rgbstd::containers::FileContent;
-use rgbstd::interface::{IfaceClass, IssuerClass, Rgb20, Rgb21, Rgb25};
+use rgbstd::interface::{rgb20, rgb21, rgb25, IfaceClass, IssuerClass, Rgb20, Rgb21, Rgb25};
 use rgbstd::vm::RgbIsa;
-use rgbstd::SubSchema;
+use rgbstd::Schema;
 
 fn main() -> io::Result<()> {
-    let rgb20 = Rgb20::iface();
+    let rgb20 = Rgb20::iface(rgb20::Features::all());
     rgb20.save_file("interfaces/RGB20.rgb")?;
     fs::write("interfaces/RGB20.rgba", rgb20.to_ascii_armored_string())?;
 
-    let rgb21 = Rgb21::iface();
+    let rgb21 = Rgb21::iface(rgb21::Features::all());
     rgb21.save_file("interfaces/RGB21.rgb")?;
     fs::write("interfaces/RGB21.rgba", rgb21.to_ascii_armored_string())?;
 
-    let rgb25 = Rgb25::iface();
+    let rgb25 = Rgb25::iface(rgb25::Features::all());
     rgb25.save_file("interfaces/RGB25.rgb")?;
     fs::write("interfaces/RGB25.rgba", rgb25.to_ascii_armored_string())?;
 
@@ -88,7 +88,7 @@ fn cfa() -> io::Result<()> {
     Ok(())
 }
 
-fn print_lib(schema: &SubSchema) {
+fn print_lib(schema: &Schema) {
     let alu_lib = schema.script.as_alu_script().libs.values().next().unwrap();
     eprintln!("{alu_lib}");
     alu_lib.print_disassemble::<RgbIsa>(stdout()).ok();

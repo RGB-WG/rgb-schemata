@@ -24,10 +24,10 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo, Rgb21, IfaceClass};
+use chrono::Utc;
+use rgbstd::interface::{rgb21, IfaceClass, IfaceImpl, NamedField, Rgb21, VerNo};
 use rgbstd::schema::{
-    GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, SubSchema,
-    TransitionSchema,
+    GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
@@ -41,7 +41,7 @@ const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
 const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
 const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
-pub fn uda_schema() -> SubSchema {
+pub fn uda_schema() -> Schema {
     let types = StandardTypes::with(Rgb21::stl());
 
     let code = rgbasm! {
@@ -105,7 +105,6 @@ pub fn uda_schema() -> SubSchema {
     Schema {
         ffv: zero!(),
         flags: none!(),
-        subset_of: None,
         types: Types::Strict(types.type_system()),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
@@ -156,12 +155,14 @@ pub fn uda_schema() -> SubSchema {
 
 pub fn uda_rgb21() -> IfaceImpl {
     let schema = uda_schema();
-    let iface = Rgb21::iface();
+    let iface = Rgb21::iface(rgb21::Features::none());
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
+        timestamp: Utc::now().timestamp(),
+        developer: none!(), // TODO: Provide issuer information
         script: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),

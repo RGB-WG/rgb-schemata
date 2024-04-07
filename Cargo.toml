@@ -20,6 +20,7 @@ strict_types = "2.7.0-beta.2"
 aluvm = "0.11.0-beta.5"
 bp-core = "0.11.0-beta.5"
 rgb-std = { version = "0.11.0-beta.5", features = ["serde", "fs"] }
+chrono = "0.4.37"
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.10.8"
@@ -31,3 +32,13 @@ serde_yaml = "0.9.27"
 [features]
 all = ["log"]
 log = ["aluvm/log"]
+
+[patch.crates-io]
+strict_types = { git = "https://github.com/strict-types/strict-types", branch = "master" }
+bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "v0.11" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "v0.11" }
+rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "v0.11" }

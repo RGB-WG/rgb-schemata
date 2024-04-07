@@ -1,34 +1,18 @@
-use std::convert::Infallible;
 use std::fs;
 
 use amplify::hex::FromHex;
 use bp::Txid;
+use rgb_schemata::dumb::DumbResolver;
 use rgb_schemata::{cfa_rgb25, cfa_schema};
-use rgbstd::interface::{ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb25, IfaceClass, IfaceWrapper};
+use rgbstd::containers::FileContent;
+use rgbstd::interface::{
+    rgb25, ContractBuilder, FilterIncludeAll, FungibleAllocation, IfaceClass, IfaceWrapper, Rgb25,
+};
 use rgbstd::invoice::{Amount, Precision};
 use rgbstd::persistence::{Inventory, Stock};
-use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{AssetTerms, Attachment, Details, MediaType, Name, RicardianContract};
-use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
-use rgbstd::containers::FileContent;
+use rgbstd::{GenesisSeal, XChain};
 use sha2::{Digest, Sha256};
-use strict_encoding::StrictDumb;
-
-struct DumbResolver;
-
-impl ResolveWitness for DumbResolver {
-    fn resolve_pub_witness(&self, _: WitnessId) -> Result<XPubWitness, WitnessResolverError> {
-        Ok(XPubWitness::strict_dumb())
-    }
-}
-
-impl ResolveHeight for DumbResolver {
-    type Error = Infallible;
-    fn resolve_anchor(&mut self, _: &XAnchor) -> Result<WitnessAnchor, Self::Error> {
-        Ok(WitnessAnchor::strict_dumb())
-    }
-}
 
 #[rustfmt::skip]
 fn main() {
@@ -54,7 +38,7 @@ fn main() {
     const ISSUE: u64 = 1_000_000_000_000;
 
     let contract = ContractBuilder::testnet(
-        Rgb25::iface(),
+        Rgb25::iface(rgb25::Features::none()),
         cfa_schema(),
         cfa_rgb25()
         ).expect("schema fails to implement RGB25 interface")
@@ -89,7 +73,8 @@ fn main() {
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
-    stock.import_iface(Rgb25::iface()).unwrap();
+    stock.import_iface(Rgb25::iface(rgb25::Features::all())).unwrap();
+    stock.import_iface(Rgb25::iface(rgb25::Features::none())).unwrap();
     stock.import_schema(cfa_schema()).unwrap();
     stock.import_iface_impl(cfa_rgb25()).unwrap();
 

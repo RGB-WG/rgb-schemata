@@ -1,4 +1,3 @@
-use std::convert::Infallible;
 use std::fs;
 
 use amplify::confinement::SmallBlob;
@@ -6,33 +5,16 @@ use amplify::hex::FromHex;
 use amplify::Wrapper;
 use armor::AsciiArmor;
 use bp::Txid;
+use rgb_schemata::dumb::DumbResolver;
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::FileContent;
 use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
-use rgbstd::interface::{ContractBuilder, Rgb21, IfaceClass, IfaceWrapper};
+use rgbstd::interface::{rgb21, ContractBuilder, IfaceClass, IfaceWrapper, Rgb21};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
-use rgbstd::resolvers::ResolveHeight;
 use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
-use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
+use rgbstd::{GenesisSeal, XChain};
 use sha2::{Digest, Sha256};
-use strict_encoding::StrictDumb;
-
-struct DumbResolver;
-
-impl ResolveWitness for DumbResolver {
-    fn resolve_pub_witness(&self, _: WitnessId) -> Result<XPubWitness, WitnessResolverError> {
-        Ok(XPubWitness::strict_dumb())
-    }
-}
-
-impl ResolveHeight for DumbResolver {
-    type Error = Infallible;
-    fn resolve_anchor(&mut self, _: &XAnchor) -> Result<WitnessAnchor, Self::Error> {
-        Ok(WitnessAnchor::strict_dumb())
-    }
-}
 
 #[rustfmt::skip]
 fn main() {
@@ -44,7 +26,7 @@ fn main() {
     let fraction = OwnedFraction::from_inner(1);
     let index = TokenIndex::from_inner(2);
 
-    let file_bytes = std::fs::read("README.md").unwrap();
+    let file_bytes = fs::read("README.md").unwrap();
     let mut hasher = Sha256::new();
     hasher.update(file_bytes);
     let file_hash = hasher.finalize();
@@ -64,7 +46,7 @@ fn main() {
 
     let allocation = Allocation::with(index, fraction);
     let contract = ContractBuilder::testnet(
-        Rgb21::iface(),
+        Rgb21::iface(rgb21::Features::none()),
         uda_schema(),
         uda_rgb21(),
         ).expect("schema fails to implement RGB21 interface")
@@ -94,7 +76,8 @@ fn main() {
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::default();
-    stock.import_iface(Rgb21::iface()).unwrap();
+    stock.import_iface(Rgb21::iface(rgb21::Features::none())).unwrap();
+    stock.import_iface(Rgb21::iface(rgb21::Features::all())).unwrap();
     stock.import_schema(uda_schema()).unwrap();
     stock.import_iface_impl(uda_rgb21()).unwrap();
 
