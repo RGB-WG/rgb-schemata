@@ -233,6 +233,7 @@ impl NonInflatableAsset {
      */
 
     #[inline]
+    #[allow(clippy::result_large_err)]
     pub fn issue_contract(self) -> Result<Contract, BuilderError> { self.0.issue_contract() }
 
     pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> { self.0.issue_contract_det(timestamp) }
