@@ -8,8 +8,10 @@ use bp::Txid;
 use rgb_schemata::dumb::DumbResolver;
 use rgb_schemata::{uda_rgb21, uda_schema};
 use rgbstd::containers::FileContent;
-use rgbstd::interface::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
-use rgbstd::interface::{rgb21, ContractBuilder, IfaceClass, IfaceWrapper, Rgb21};
+use rgbstd::interface::rgb21::{
+    Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex, RGB21_UNIQUE_IFACE_ID,
+};
+use rgbstd::interface::{rgb21, ContractBuilder, IfaceClass, Rgb21};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
 use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
@@ -91,7 +93,7 @@ fn main() {
     stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_id(contract_id, Rgb21::IFACE_ID).unwrap();
+    let contract = stock.contract_iface_id(contract_id, RGB21_UNIQUE_IFACE_ID).unwrap();
     let nominal = contract.global("spec").unwrap();
     eprintln!("{}", nominal[0]);
 }

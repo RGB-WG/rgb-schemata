@@ -7,8 +7,9 @@ use bp::{Outpoint, Txid};
 use rgb_schemata::dumb::DumbResolver;
 use rgb_schemata::NonInflatableAsset;
 use rgbstd::containers::FileContent;
+use rgbstd::interface::rgb20::RGB20_SIMPLE_IFACE_ID;
 use rgbstd::interface::{
-    rgb20, FilterIncludeAll, FungibleAllocation, IfaceClass, IfaceWrapper, IssuerClass, Rgb20,
+    rgb20, FilterIncludeAll, FungibleAllocation, IfaceClass, IssuerClass, Rgb20,
 };
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{Inventory, Stock};
@@ -42,7 +43,7 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_id(contract_id, Rgb20::IFACE_ID).unwrap();
+    let contract = stock.contract_iface_id(contract_id, RGB20_SIMPLE_IFACE_ID).unwrap();
     let contract = Rgb20::from(contract);
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
     eprintln!("\nThe issued contract data:");
