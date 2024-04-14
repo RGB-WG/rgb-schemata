@@ -1,15 +1,15 @@
 -----BEGIN RGB KIT-----
-Id: urn:lnp-bp:kit:7nfoSA-3DiDAV7W-GTpRNBkw-3khh8Ddi-CTvqg99c-hyjevF#junior-stone-absorb
+Id: urn:lnp-bp:kit:6oBV28-wH4m62pe-FxJ2LweJ-E1ejB9Cz-gcbGoGkV-RDuMM3#nadia-police-golf
 Version: v2
 Interface: RGB21Unique;
 id=urn:lnp-bp:if:3zdEb4-1mTFPbYA-LRimrioX-zGNCQZuk-U9EvTZPL-MeurJ4#cricket-karma-actor
-Implementation: urn:lnp-bp:im:Bu3Y4w-Kxn2dy9x-KL1cNTCo-RkPNbScp-bsCvGpgY-e8kbrg#lotus-dialog-logic;
+Implementation: urn:lnp-bp:im:3Q6nKw-bBBrsTLd-Yon9Pc7U-pgLWf9iT-fPKqaxD7-JE7YTw#crater-amazon-cowboy;
 of=urn:lnp-bp:if:9SjKsB-K8yb8vUv-PRZ87VE8-hYiLv5Jr-aWy2aky5-UDms3g#martin-index-copper;
 for=urn:lnp-bp:sc:8DLtoM-wbPTNNdx-6TspvrEX-anSwtxcg-KAsfe2KY-wMyQfc#elvis-climax-chris
 Schema: urn:lnp-bp:sc:8DLtoM-wbPTNNdx-6TspvrEX-anSwtxcg-KAsfe2KY-wMyQfc#elvis-climax-chris
 Type-System: urn:ubideco:sts:4iuCkZ2mLezL3dXt1EBQ4dpjNVvePYUKXrF9W6tb9iMZ#menu-except-orlando
 Alu-Lib: urn:ubideco:alu:GV2Vf4Jgc6vRDFhvNMKXLf7h5MmkREdmkpsNyQntVLQs#sigma-window-panda
-Checksum-SHA256: 6dba2f944a77da4f9e0e2e867f3f952ebc7364e05257bf357b7e2077ad70f648
+Checksum-SHA256: e4d475fba0c69a79d10da41bada590290b941b519921b0cc5e299ca0d81929c0
 
 0s#RFQb$5EF;#A9adl+^PpUH=i|+S(Z^HUnfjQ<cq9FC2ml52+F&L{W_%|q1TZMC
 o)-G>v-L;b>E|aoRU5XA|UXckHaX95=&yH;Ng!utx000001P@_!bYWv?ZDnqBRC#
@@ -36,7 +36,7 @@ n^F!mAeRLol5%ecA&%UCtOO8MBUm^hj0iX{72mk;D&<6nk0RYhl0RRC2(gy(m0RY
 qo00031)dv9p0RRD@4*>xG{{R8z4MBp#>(J;y0sL;4=a9;3BboZ2p(g1Ib|Bt}ja
 !5O0003HCjbBepbr56|NjA?4*>xG{{R8z4MBp#>(J;y0sL;4=a9;3BboZ2p(g1Ib
 |Bt}ja!5a015zXZg4GPa4v6hX8{3gD@A#1?06+5R_w^VC7b!%x4KnCfFUC(-bte4
-hTeO9bl-Y?s_c^Qx!6ehYr2cF*?>I^fkkOyvuQRwc#|Ul3>;<v00005&<6x=VQpm
+hTeO9bl-Y?s_c^Qx!6ehYr2cF*?>I^fkkOyvuQRwc#|Wm92{l<00005&<6x=VQpm
 q0002d2L*Ixa&2<}0002e2MlR*b9H58Q+04~Y<U0x007hn2V`Y*VQFl000000)dv
 Z1a%E#_b7^mG000000iX{GVRLh3bWe9~WpV%j000015GM$9a$#<BW@T~!000003I
 J?wa4lkRE^l&Y089V?0U2$DDaiKPL`@Y=jhu|Vo)3+Q0$Mw;ks-!CQm`I}1p%ec`

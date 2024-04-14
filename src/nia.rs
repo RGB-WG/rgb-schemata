@@ -43,36 +43,32 @@ use crate::{GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
-        // Before doing a check we need to put a string into first string register which will be
-        // used as an error message in case of the check failure.
-        put     s16[0],"the issued amounts do not match between the reported global state and confidential owned state";
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
         pccs    0x0FA0,0x07D2   ;
         // If the check succeeds we need to terminate the subroutine.
         ret                     ;
         // SUBROUTINE 2: transfer validation
-        put     s16[0],"the sum of input amounts do not match the sum of the output amounts";
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
         pcvs    0x0FA0          ;
     };
-    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatible asset script")
+    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
 pub(crate) const FN_GENESIS_OFFSET: u16 = 0;
-pub(crate) const FN_TRANSFER_OFFSET: u16 = 6 + 5 + 1;
+pub(crate) const FN_TRANSFER_OFFSET: u16 = 5 + 1;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 6], INSTR_PCCS);
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 6], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize], INSTR_PCCS);
+    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_PCVS);
 
     Schema {
         ffv: zero!(),
         flags: none!(),
-        name: tn!("NonInflatibleAsset"),
+        name: tn!("NonInflatableAsset"),
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
