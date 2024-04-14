@@ -23,7 +23,7 @@ use std::io;
 use std::io::stdout;
 
 use ifaces::rgb21::Rgb21;
-use ifaces::{rgb20, rgb21, IfaceWrapper, IssuerWrapper, Rgb20};
+use ifaces::{rgb20, rgb21, rgb25, IfaceWrapper, IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::vm::RgbIsa;
 use schemata::{CollectibleFungibleAsset, NonInflatableAsset, UniqueDigitalAsset};
@@ -89,14 +89,14 @@ fn cfa() -> io::Result<()> {
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb21::iface(rgb21::Features::NONE))
+        .push(Rgb25::iface(rgb25::Features::NONE))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
     kit.types = types;
 
-    kit.save_file("schemata/CollectibleFungibleAssets.rgb")?;
-    kit.save_armored("schemata/CollectibleFungibleAssets.rgba")?;
+    kit.save_file("schemata/CollectibleFungibleAsset.rgb")?;
+    kit.save_armored("schemata/CollectibleFungibleAsset.rgba")?;
     print_lib(&kit);
 
     Ok(())
