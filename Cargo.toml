@@ -23,7 +23,7 @@ strict_types = "2.7.0-beta.2"
 aluvm = "0.11.0-beta.5"
 bp-core = "0.11.0-beta.5"
 rgb-std = { version = "0.11.0-beta.5", features = ["serde", "fs"] }
-rgb-interfaces = { path = "../rgb-interfaces" }
+rgb-interfaces = "0.11.0-beta.5"
 chrono = "0.4.37"
 serde = "1.0"
 serde_json = "1.0"
@@ -52,3 +52,4 @@ aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "v0.11" }
 rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "script-refactor" }
 rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
 rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
+rgb-interfaces = { git = "https://github.com/RGB-WG/rgb-interfaces", branch = "master" }

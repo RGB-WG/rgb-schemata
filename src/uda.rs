@@ -164,6 +164,7 @@ fn uda_rgb21() -> IfaceImpl {
         iface_id: iface.iface_id(),
         timestamp: Utc::now().timestamp(),
         developer: Identity::from(LNPBP_IDENTITY),
+        metadata: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_TERMS, fname!("terms")),
@@ -177,6 +178,7 @@ fn uda_rgb21() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
+        errors: none!(), // TODO: Encode errors
     }
 }
 

@@ -585,9 +585,9 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.79"
+version = "1.0.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e835ff2298f5721608eb1a980ecaee1aef2c132bf95ecc026a11b7bf3c01c02e"
+checksum = "a56dea16b0a29e94408b9aa5e2940a4eedbd128a1ba20e8f7ae60fd3d465af0e"
 dependencies = [
  "unicode-ident",
 ]
@@ -656,6 +656,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=master#ce4740638e1c370c0d1e527b359eede5cb8c3f62"
 dependencies = [
  "aluvm",
  "amplify",
@@ -671,7 +672,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#287db58f177aa0b601b2212d2a6619bca4bccf4b"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#10af221e89336de02ad71c699a3a23f2bb5e4947"
 dependencies = [
  "amplify",
  "baid58",
@@ -708,7 +709,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#287db58f177aa0b601b2212d2a6619bca4bccf4b"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#10af221e89336de02ad71c699a3a23f2bb5e4947"
 dependencies = [
  "aluvm",
  "amplify",

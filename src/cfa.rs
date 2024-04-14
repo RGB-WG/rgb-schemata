@@ -108,6 +108,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
         iface_id: iface.iface_id(),
         timestamp: Utc::now().timestamp(),
         developer: Identity::from(LNPBP_IDENTITY),
+        metadata: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
@@ -123,6 +124,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
+        errors: none!(), // TODO: Encode errors
     }
 }
 
