@@ -34,13 +34,25 @@ fn main() -> io::Result<()> {
     rgb20.save_file("interfaces/RGB20.rgb")?;
     fs::write("interfaces/RGB20.rgba", rgb20.to_ascii_armored_string())?;
 
+    let rgb20 = Rgb20::iface(rgb20::Features::none());
+    rgb20.save_file("interfaces/RGB20Fixed.rgb")?;
+    fs::write("interfaces/RGB20Fixed.rgba", rgb20.to_ascii_armored_string())?;
+
     let rgb21 = Rgb21::iface(rgb21::Features::all());
     rgb21.save_file("interfaces/RGB21.rgb")?;
     fs::write("interfaces/RGB21.rgba", rgb21.to_ascii_armored_string())?;
 
+    let rgb21 = Rgb21::iface(rgb21::Features::none());
+    rgb21.save_file("interfaces/RGB21Unique.rgb")?;
+    fs::write("interfaces/RGB21Unique.rgba", rgb21.to_ascii_armored_string())?;
+
     let rgb25 = Rgb25::iface(rgb25::Features::all());
     rgb25.save_file("interfaces/RGB25.rgb")?;
     fs::write("interfaces/RGB25.rgba", rgb25.to_ascii_armored_string())?;
+
+    let rgb25 = Rgb25::iface(rgb25::Features::none());
+    rgb25.save_file("interfaces/RGB25Base.rgb")?;
+    fs::write("interfaces/RGB25Base.rgba", rgb25.to_ascii_armored_string())?;
 
     nia()?;
     uda()?;
