@@ -5,12 +5,12 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2032d213fd6b80b26217efb9846b273671acff3f696ada7e0314c6af2b4c3275"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#a08387f744f6679b6ee308e70f99099c318824db"
 dependencies = [
  "amplify",
  "ascii-armor",
  "baid58",
+ "blake3",
  "getrandom",
  "half",
  "paste",
@@ -276,8 +276,7 @@ dependencies = [
 [[package]]
 name = "bp-invoice"
 version = "0.11.0-beta.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48ee0387fa924bd002b51713c42daf3cb7c3b669509523607445a99c90491788"
+source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#5cd19126c7acbe96586573fd8d00baf2273887df"
 dependencies = [
  "amplify",
  "bech32",
@@ -336,8 +335,7 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.11.0-beta.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d660fdac917fb67edd1707bc9481e51ed9062ab4ba1c4e56ed7856977fff9f3"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#503e5da35642f52b090f7e232a8aeaccb05463cc"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -349,8 +347,7 @@ dependencies = [
 [[package]]
 name = "commit_verify"
 version = "0.11.0-beta.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77b78d8453b82136eb9743a8da9a94e265146e5c48668f0e0e71859aa726fa67"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#503e5da35642f52b090f7e232a8aeaccb05463cc"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -637,7 +634,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=v0.11#967f833d261e87913f7addc7cc2cdcced611be0e"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=script-refactor#2135079e66fedd460563025d46ffd0efce8b1377"
 dependencies = [
  "aluvm",
  "amplify",
@@ -657,9 +654,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "rgb-interfaces"
+version = "0.11.0-beta.6"
+dependencies = [
+ "aluvm",
+ "amplify",
+ "bp-core",
+ "chrono",
+ "rgb-std",
+ "serde_json",
+ "sha2",
+ "strict_encoding",
+ "strict_types",
+]
+
+[[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#f9d909a99c266d9a538fd9d981c15390bf2fbe04"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#2e4f284e9f66c52d7bfdba6555b27aa2c6179be8"
 dependencies = [
  "amplify",
  "baid58",
@@ -683,6 +695,7 @@ dependencies = [
  "ascii-armor",
  "bp-core",
  "chrono",
+ "rgb-interfaces",
  "rgb-std",
  "serde",
  "serde_json",
@@ -695,8 +708,9 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#f9d909a99c266d9a538fd9d981c15390bf2fbe04"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=script-refactor#2e4f284e9f66c52d7bfdba6555b27aa2c6179be8"
 dependencies = [
+ "aluvm",
  "amplify",
  "ascii-armor",
  "baid58",
@@ -870,8 +884,7 @@ dependencies = [
 [[package]]
 name = "single_use_seals"
 version = "0.11.0-beta.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8893da91eab5290895bb7913a786e26b2e170c568542451c12bf00cf1812035a"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#503e5da35642f52b090f7e232a8aeaccb05463cc"
 dependencies = [
  "amplify_derive",
 ]
@@ -879,8 +892,7 @@ dependencies = [
 [[package]]
 name = "strict_encoding"
 version = "2.7.0-beta.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12eaa6985afa31deacc86cdc4935a36960ae09131a1f4e1db430127ebc4f05d"
+source = "git+https://github.com/strict-types/strict-encoding?branch=rstring#89ea1c2f02402cbda8bbe78ae9a629446f84e474"
 dependencies = [
  "amplify",
  "half",
@@ -891,8 +903,7 @@ dependencies = [
 [[package]]
 name = "strict_encoding_derive"
 version = "2.7.0-beta.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b1b064a62618a785e6d8f4df13d905dc335b56400d48f9b4f8b12dcba82b260"
+source = "git+https://github.com/strict-types/strict-encoding?branch=rstring#89ea1c2f02402cbda8bbe78ae9a629446f84e474"
 dependencies = [
  "amplify_syn",
  "heck",
@@ -904,7 +915,7 @@ dependencies = [
 [[package]]
 name = "strict_types"
 version = "2.7.0-beta.2"
-source = "git+https://github.com/strict-types/strict-types?branch=master#d3b9ed11301ff78d0c05f73e44aa0a2de05789da"
+source = "git+https://github.com/strict-types/strict-types?branch=develop#2e6b57b7b46efe9b6db430b56ba4a83f2c7776be"
 dependencies = [
  "amplify",
  "ascii-armor",

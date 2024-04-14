@@ -4,15 +4,13 @@ use amplify::hex::FromHex;
 use armor::AsciiArmor;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
-use rgb_schemata::dumb::DumbResolver;
-use rgb_schemata::NonInflatableAsset;
+use ifaces::{rgb20, IfaceWrapper, IssuerWrapper, Rgb20};
 use rgbstd::containers::FileContent;
-use rgbstd::interface::rgb20::RGB20_SIMPLE_IFACE_ID;
-use rgbstd::interface::{
-    rgb20, FilterIncludeAll, FungibleAllocation, IfaceClass, IssuerClass, Rgb20,
-};
+use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
-use rgbstd::persistence::{Inventory, Stock};
+use rgbstd::persistence::Stock;
+use schemata::dumb::DumbResolver;
+use schemata::NonInflatableAsset;
 
 #[rustfmt::skip]
 fn main() {

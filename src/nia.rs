@@ -24,30 +24,23 @@
 
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use bp::dbc::Method;
 use chrono::Utc;
-use rgbstd::containers::Contract;
-use rgbstd::interface::rgb20::{AllocationError, PrimaryIssue};
-use rgbstd::interface::{
-    rgb20, BuilderError, IfaceClass, IfaceImpl, IssuerClass, NamedField, Rgb20, TxOutpoint, VerNo,
-};
-use rgbstd::invoice::{Amount, Precision};
+use ifaces::{rgb20, IfaceWrapper, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
 use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
+    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
 };
-use rgbstd::stl::{Attachment, StandardTypes};
+use rgbstd::stl::StandardTypes;
+use rgbstd::validation::Scripts;
 use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
-use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, AssetTag, BlindingFactor, Types};
-use strict_encoding::InvalidIdent;
-use strict_types::{SemId, Ty};
+use rgbstd::vm::RgbIsa;
+use rgbstd::{rgbasm, Identity};
+use strict_types::TypeSystem;
 
 use crate::{GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
-fn nia_schema() -> Schema {
-    let types = StandardTypes::with(Rgb20::stl());
-
+pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
         // Before doing a check we need to put a string into first string register which will be
@@ -63,28 +56,36 @@ fn nia_schema() -> Schema {
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
         pcvs    0x0FA0          ;
     };
-    let alu_lib = AluLib(Lib::assemble::<Instr<RgbIsa>>(&code).unwrap());
+    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatible asset script")
+}
+pub(crate) const FN_GENESIS_OFFSET: u16 = 0;
+pub(crate) const FN_TRANSFER_OFFSET: u16 = 6 + 5 + 1;
+
+fn nia_schema() -> Schema {
+    let types = StandardTypes::with(Rgb20::stl());
+
+    let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    const FN_GENESIS_OFFSET: u16 = 0;
-    const FN_TRANSFER_OFFSET: u16 = 6 + 5 + 1;
     assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 6], INSTR_PCCS);
     assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 6], INSTR_PCVS);
 
     Schema {
         ffv: zero!(),
         flags: none!(),
-        types: Types::Strict(types.type_system()),
+        name: tn!("NonInflatibleAsset"),
+        developer: Identity::from(LNPBP_IDENTITY),
+        meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
             GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => StateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
-            metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+            metadata: none!(),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
                 GS_TERMS => Occurrences::Once,
@@ -94,11 +95,12 @@ fn nia_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
+            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
             TS_TRANSFER => TransitionSchema {
-                metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+            metadata: none!(),
                 globals: none!(),
                 inputs: tiny_bmap! {
                     OS_ASSET => Occurrences::OnceOrMore
@@ -107,29 +109,22 @@ fn nia_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
+                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
             }
         },
-        script: Script::AluVM(AluScript {
-            libs: confined_bmap! { alu_id => alu_lib },
-            entry_points: confined_bmap! {
-                EntryPoint::ValidateGenesis => LibSite::with(FN_GENESIS_OFFSET, alu_id),
-                EntryPoint::ValidateTransition(TS_TRANSFER) => LibSite::with(FN_TRANSFER_OFFSET, alu_id),
-            },
-        }),
     }
 }
 
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = Rgb20::iface(rgb20::Features::none());
+    let iface = Rgb20::iface(rgb20::Features::NONE);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
         timestamp: Utc::now().timestamp(),
-        developer: none!(), // TODO: Provide issuer information
-        script: none!(),
+        developer: Identity::from(LNPBP_IDENTITY),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_TERMS, fname!("terms")),
@@ -146,105 +141,19 @@ fn nia_rgb20() -> IfaceImpl {
     }
 }
 
-pub struct NonInflatableAsset(PrimaryIssue);
+pub struct NonInflatableAsset;
 
-impl IssuerClass for NonInflatableAsset {
+impl IssuerWrapper for NonInflatableAsset {
+    const FEATURES: rgb20::Features = rgb20::Features::NONE;
     type IssuingIface = Rgb20;
 
     fn schema() -> Schema { nia_schema() }
     fn issue_impl() -> IfaceImpl { nia_rgb20() }
-}
 
-impl NonInflatableAsset {
-    #[inline]
-    pub fn testnet(
-        ticker: &str,
-        name: &str,
-        details: Option<&str>,
-        precision: Precision,
-    ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet::<Self>(ticker, name, details, precision, rgb20::Features::none())
-            .map(Self)
-    }
+    fn types() -> TypeSystem { StandardTypes::with(Rgb20::stl()).type_system() }
 
-    #[inline]
-    pub fn testnet_det<C: IssuerClass>(
-        ticker: &str,
-        name: &str,
-        details: Option<&str>,
-        precision: Precision,
-        asset_tag: AssetTag,
-    ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet_det::<Self>(
-            ticker,
-            name,
-            details,
-            precision,
-            rgb20::Features::none(),
-            asset_tag,
-        )
-        .map(Self)
-    }
-
-    #[inline]
-    pub fn add_terms(
-        mut self,
-        contract: &str,
-        media: Option<Attachment>,
-    ) -> Result<Self, InvalidIdent> {
-        self.0 = self.0.add_terms(contract, media)?;
-        Ok(self)
-    }
-
-    #[inline]
-    pub fn allocate<O: TxOutpoint>(
-        mut self,
-        method: Method,
-        beneficiary: O,
-        amount: Amount,
-    ) -> Result<Self, AllocationError> {
-        self.0 = self.0.allocate(method, beneficiary, amount)?;
-        Ok(self)
-    }
-
-    #[inline]
-    pub fn allocate_all<O: TxOutpoint>(
-        mut self,
-        method: Method,
-        allocations: impl IntoIterator<Item = (O, Amount)>,
-    ) -> Result<Self, AllocationError> {
-        self.0 = self.0.allocate_all(method, allocations)?;
-        Ok(self)
-    }
-
-    /// Add asset allocation in a deterministic way.
-    #[inline]
-    pub fn allocate_det<O: TxOutpoint>(
-        mut self,
-        method: Method,
-        beneficiary: O,
-        seal_blinding: u64,
-        amount: Amount,
-        amount_blinding: BlindingFactor,
-    ) -> Result<Self, AllocationError> {
-        self.0 =
-            self.0
-                .allocate_det(method, beneficiary, seal_blinding, amount, amount_blinding)?;
-        Ok(self)
-    }
-
-    // TODO: implement when bulletproofs are supported
-    /*
-    #[inline]
-    pub fn conceal_allocations(mut self) -> Self {
-
-    }
-     */
-
-    #[inline]
-    pub fn issue_contract(self) -> Result<Contract, BuilderError> { self.0.issue_contract() }
-
-    pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> {
-        self.0.issue_contract_det(timestamp)
+    fn scripts() -> Scripts {
+        let lib = nia_lib();
+        confined_bmap! { lib.id() => lib }
     }
 }
