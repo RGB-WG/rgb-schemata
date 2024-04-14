@@ -25,8 +25,7 @@ use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use chrono::Utc;
-use ifaces::rgb21::Rgb21;
-use ifaces::{rgb20, rgb21, IfaceWrapper, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
+use ifaces::{rgb21, IfaceWrapper, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::stl::StandardTypes;
@@ -184,8 +183,8 @@ fn uda_rgb21() -> IfaceImpl {
 pub struct UniqueDigitalAsset;
 
 impl IssuerWrapper for UniqueDigitalAsset {
-    const FEATURES: rgb20::Features = rgb20::Features::NONE;
-    type IssuingIface = Rgb20;
+    const FEATURES: rgb21::Features = rgb21::Features::NONE;
+    type IssuingIface = Rgb21;
 
     fn schema() -> Schema { uda_schema() }
     fn issue_impl() -> IfaceImpl { uda_rgb21() }
