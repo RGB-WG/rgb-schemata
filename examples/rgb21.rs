@@ -4,13 +4,13 @@ use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
 use amplify::Wrapper;
 use bp::Txid;
-use ifaces::rgb21::{Allocation, EmbeddedMedia, OwnedFraction, TokenData, TokenIndex};
+use ifaces::rgb21::{EmbeddedMedia, TokenData};
 use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
 use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
-use rgbstd::{GenesisSeal, XChain};
+use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
 use schemata::dumb::DumbResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
@@ -22,7 +22,6 @@ fn main() {
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
     let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
 
-    let fraction = OwnedFraction::from_inner(1);
     let index = TokenIndex::from_inner(2);
 
     let file_bytes = fs::read("README.md").unwrap();
@@ -42,7 +41,7 @@ fn main() {
     };
 
     let token_data = TokenData { index, preview: Some(preview), ..Default::default() };
-    let allocation = Allocation::with(index, fraction);
+    let allocation = Allocation::with(index, 1);
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let kit = Kit::load_file("schemata/UniqueDigitalAsset.rgb").unwrap().validate().unwrap();

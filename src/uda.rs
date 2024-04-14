@@ -119,7 +119,7 @@ fn uda_schema() -> Schema {
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => OwnedStateSchema::Structured(types.get("RGB21.Allocation")),
+            OS_ASSET => OwnedStateSchema::Structured(types.get("RGBContract.Allocation")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
