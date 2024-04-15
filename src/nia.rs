@@ -26,7 +26,7 @@ use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use chrono::Utc;
 use ifaces::{rgb20, IfaceWrapper, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
+use rgbstd::interface::{IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
@@ -38,32 +38,34 @@ use rgbstd::vm::RgbIsa;
 use rgbstd::{rgbasm, Identity};
 use strict_types::TypeSystem;
 
-use crate::{GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::{ERRNO_INFLATION, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
 pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
+        put     a8[0],0         ;
         pccs    0x0FA0,0x07D2   ;
         // If the check succeeds we need to terminate the subroutine.
         ret                     ;
         // SUBROUTINE 2: transfer validation
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
+        put     a8[0],0         ;
         pcvs    0x0FA0          ;
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
 pub(crate) const FN_GENESIS_OFFSET: u16 = 0;
-pub(crate) const FN_TRANSFER_OFFSET: u16 = 5 + 1;
+pub(crate) const FN_TRANSFER_OFFSET: u16 = 4 + 5 + 1;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize], INSTR_PCCS);
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 4], INSTR_PCCS);
+    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
 
     Schema {
         ffv: zero!(),
@@ -135,7 +137,7 @@ fn nia_rgb20() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: none!(), // TODO: Encode errors
+        errors: tiny_bset![NamedVariant::with(ERRNO_INFLATION, vname!("nonEqualAmounts")),],
     }
 }
 

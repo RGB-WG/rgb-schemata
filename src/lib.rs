@@ -38,6 +38,7 @@ pub const GS_TERMS: GlobalStateType = GlobalStateType::with(2001);
 pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);
+pub const ERRNO_INFLATION: u8 = 0;
 
 pub mod dumb {
     use std::convert::Infallible;
