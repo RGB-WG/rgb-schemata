@@ -49,7 +49,7 @@ bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
 bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
 bp-invoice = { git = "https://github.com/BP-WG/bp-std", branch = "v0.11" }
 aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "v0.11" }
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "script-refactor" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
-rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "schema-timestamp" }
+rgb-std = { path = "../rgb-std" }
+rgb-invoice = { path = "../rgb-std/invoice" }
 rgb-interfaces = { git = "https://github.com/RGB-WG/rgb-interfaces", branch = "master" }

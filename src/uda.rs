@@ -110,6 +110,7 @@ fn uda_schema() -> Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("UniqueDigitalAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
@@ -151,6 +152,7 @@ fn uda_schema() -> Schema {
                 validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id)),
             }
         },
+        reserved: none!(),
     }
 }
 
