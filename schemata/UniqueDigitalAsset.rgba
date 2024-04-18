@@ -1,15 +1,15 @@
 -----BEGIN RGB KIT-----
-Id: urn:lnp-bp:kit:e4KzRS-CRKxsC7V-x1LHfvzg-fjipmQco-rAXVrGUE-aaVgE#austin-prague-element
+Id: urn:lnp-bp:kit:8pW74f-8evxXpTG-BxbDqdRk-4mcR5hZG-YyNtaoMK-JMTbqD#jungle-juliet-archer
 Version: v2
 Interface: RGB21Unique;
 id=urn:lnp-bp:if:GnNtB9-E4VJZ8mj-UQmtezaq-5V7aFqrM-Vc2ikx5k-zqPjxj#compact-regard-rudolf
-Implementation: urn:lnp-bp:im:pbuHq9-pPUiiusG-v14eEEsp-whk6WLPt-pyJX7RSz-XqPKz#virtual-italian-ceramic;
+Implementation: urn:lnp-bp:im:B6KvDD-aHFb9ZUB-KHjsmovV-CS5nA856-cnVtjWQk-m9SFeJ#budget-austin-mike;
 of=urn:lnp-bp:if:GnNtB9-E4VJZ8mj-UQmtezaq-5V7aFqrM-Vc2ikx5k-zqPjxj#compact-regard-rudolf;
 for=urn:lnp-bp:sc:HbSMbx-5Xax6jbv-mSe95E5V-X2oTfCmy-wLwMsNaz-TZUjT8#metro-ingrid-milan
 Schema: urn:lnp-bp:sc:HbSMbx-5Xax6jbv-mSe95E5V-X2oTfCmy-wLwMsNaz-TZUjT8#metro-ingrid-milan
 Type-System: urn:ubideco:sts:5swXAeYFaRevri47zZygU5ctDFwNmVSHquyULG9UCNP8#happy-provide-pizza
 Alu-Lib: urn:ubideco:alu:mpDzLtPACQJycCvYFBwcmUybAvjTofhn3zMFyAD38FX#opera-oliver-formula
-Checksum-SHA256: 78229299cfce1a6335f191be652ff12e9503564899aad428a38aa38e0dc79b82
+Checksum-SHA256: f90a7f8613d2112f3b120a6d4dc741036bd8bbb81606c786e9f222b45c41080b
 
 0s#RFQb$5EF;#A9adl+^Kk-H4fgOU4li+46-a;$q6l&IyXTTN0ADIgmG*{iuncoL
 0W^{rS)fJV&xZ~`cQ1Y23=2FE`??E?SDkp6dg!utx0000000a+VbaY{3Xl-R~bX0
@@ -36,7 +36,7 @@ Pke+}2J>gQ=Omp&uURQ&=-B|zt1keWo0098e2LS*905%8#0096v2mk;900E#60RR
 C2009en^R9pw>heKOCY!@pPVx8%Bv}LUBd+d!l(hgp(e?lU009su0004?4*>uH00
 E#60RRC2009en^R9pw>heKOCY!@pPVx8%Bv}LUBd+d!l(hgp(e_0E3IJ?wa4lkRE
 ^l&Y0Ri@nXjU_aO<Dm<LQ_2u-*qAsqV>bY3EQxOi?#E2Tnp-dF2_7dm)G^KR@<!a
-p!*BWX`<bJSlO|b2P?jl-&liN9A*Fj00003&<6x_aAjiv0002d2L*Ixa&2<}0000
+p!*BWX`<bJSlO|b2P?jl-&ju@A!Yyo00003&<6x_aAjiv0002d2L*Ixa&2<}0000
 s2nKX-Yh`Y8000000iX{GVRLh3bWe9~WpV%j000015GM$9a$#<BW@T~!00000015
 zXZg4GPa4v6hX8>RT009|og(=AP+C)tiPK}(5y`B$^i2_<Xu#q9gJyNh9hXnzp&-
 *fU69;}zAIV^Hl7d8_9-)kE+Vz;)3s*I)2VU0%=2(9$_ISU8S>%Xzy^d7vHg1k5H
