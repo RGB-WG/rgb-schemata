@@ -230,7 +230,7 @@ dependencies = [
 [[package]]
 name = "bp-consensus"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#27a4b711613f88276b5b7da0c2a3b27164b431e8"
+source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
 dependencies = [
  "amplify",
  "chrono",
@@ -244,7 +244,7 @@ dependencies = [
 [[package]]
 name = "bp-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#27a4b711613f88276b5b7da0c2a3b27164b431e8"
+source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
 dependencies = [
  "amplify",
  "bp-consensus",
@@ -262,7 +262,7 @@ dependencies = [
 [[package]]
 name = "bp-dbc"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#27a4b711613f88276b5b7da0c2a3b27164b431e8"
+source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
 dependencies = [
  "amplify",
  "base85",
@@ -287,7 +287,7 @@ dependencies = [
 [[package]]
 name = "bp-seals"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#27a4b711613f88276b5b7da0c2a3b27164b431e8"
+source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
 dependencies = [
  "amplify",
  "baid58",
@@ -335,7 +335,7 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#d32e1af11a599643b235706efd51d0097347f082"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -347,7 +347,7 @@ dependencies = [
 [[package]]
 name = "commit_verify"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#d32e1af11a599643b235706efd51d0097347f082"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -634,7 +634,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=v0.11#551d6d6fc3c7bf10119b20145ddae852fba6446d"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#177c908bc7b097fd640a7cd30afe0b624bca3580"
 dependencies = [
  "aluvm",
  "amplify",
@@ -656,7 +656,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=master#f1beaf698844af588d09d905dd6b692d46986ce3"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#2f7ea0638d3285920eddfe722e05316b63e146b7"
 dependencies = [
  "aluvm",
  "amplify",
@@ -672,7 +672,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#58fbbc417835a829f5f9325bfed35e5a18310d13"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#c980d2c1cdd316587e5a0c45ce0b3eccc6108354"
 dependencies = [
  "amplify",
  "baid58",
@@ -709,7 +709,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=v0.11#58fbbc417835a829f5f9325bfed35e5a18310d13"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#c980d2c1cdd316587e5a0c45ce0b3eccc6108354"
 dependencies = [
  "aluvm",
  "amplify",
@@ -885,7 +885,7 @@ dependencies = [
 [[package]]
 name = "single_use_seals"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#d32e1af11a599643b235706efd51d0097347f082"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
 dependencies = [
  "amplify_derive",
 ]

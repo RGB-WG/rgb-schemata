@@ -5,8 +5,8 @@ Interface: RGB21Unique;
 id=urn:lnp-bp:if:GnNtB9-E4VJZ8mj-UQmtezaq-5V7aFqrM-Vc2ikx5k-zqPjxj#compact-regard-rudolf
 Implementation: urn:lnp-bp:im:B6KvDD-aHFb9ZUB-KHjsmovV-CS5nA856-cnVtjWQk-m9SFeJ#budget-austin-mike;
 of=urn:lnp-bp:if:GnNtB9-E4VJZ8mj-UQmtezaq-5V7aFqrM-Vc2ikx5k-zqPjxj#compact-regard-rudolf;
-for=urn:lnp-bp:sc:HbSMbx-5Xax6jbv-mSe95E5V-X2oTfCmy-wLwMsNaz-TZUjT8#metro-ingrid-milan
-Schema: urn:lnp-bp:sc:HbSMbx-5Xax6jbv-mSe95E5V-X2oTfCmy-wLwMsNaz-TZUjT8#metro-ingrid-milan
+for=urn:lnp-bp:sc:65UKii-3EMH951J-RFTs1QdS-fiJkD9Xk-RzVS3ro4-fd4gCo#south-premium-nickel
+Schema: urn:lnp-bp:sc:65UKii-3EMH951J-RFTs1QdS-fiJkD9Xk-RzVS3ro4-fd4gCo#south-premium-nickel
 Type-System: urn:ubideco:sts:5swXAeYFaRevri47zZygU5ctDFwNmVSHquyULG9UCNP8#happy-provide-pizza
 Alu-Lib: urn:ubideco:alu:mpDzLtPACQJycCvYFBwcmUybAvjTofhn3zMFyAD38FX#opera-oliver-formula
 Checksum-SHA256: f90a7f8613d2112f3b120a6d4dc741036bd8bbb81606c786e9f222b45c41080b

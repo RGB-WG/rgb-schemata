@@ -25,8 +25,8 @@
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use chrono::Utc;
-use ifaces::{rgb20, IfaceWrapper, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, NamedVariant, VerNo};
+use ifaces::{rgb20, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
@@ -71,6 +71,7 @@ fn nia_schema() -> Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("NonInflatableAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
@@ -110,6 +111,7 @@ fn nia_schema() -> Schema {
                 validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
             }
         },
+        reserved: none!(),
     }
 }
 

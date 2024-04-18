@@ -25,8 +25,8 @@ use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use chrono::Utc;
-use ifaces::{rgb21, IfaceWrapper, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
+use ifaces::{rgb21, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, VerNo};
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
@@ -110,6 +110,7 @@ fn uda_schema() -> Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("UniqueDigitalAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
@@ -151,6 +152,7 @@ fn uda_schema() -> Schema {
                 validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id)),
             }
         },
+        reserved: none!(),
     }
 }
 
