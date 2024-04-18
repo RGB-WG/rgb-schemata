@@ -22,18 +22,20 @@
 //! Collectible Fungible Assets (CFA) schema implementing RGB25 fungible assets
 //! interface.
 
-use aluvm::library::{Lib, LibSite};
+use aluvm::library::LibSite;
 use chrono::Utc;
-use rgbstd::interface::{rgb25, IfaceClass, IfaceImpl, NamedField, Rgb25, VerNo};
+use ifaces::rgb25::Rgb25;
+use ifaces::{rgb25, IfaceWrapper, IssuerWrapper, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
 use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema,
-    TransitionSchema,
+    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::{AluLib, AluScript, ContractOp, EntryPoint, RgbIsa};
-use rgbstd::{GlobalStateType, Types};
-use strict_types::{SemId, Ty};
+use rgbstd::validation::Scripts;
+use rgbstd::{GlobalStateType, Identity, OwnedStateSchema};
+use strict_types::TypeSystem;
 
+use crate::nia::{nia_lib, FN_GENESIS_OFFSET, FN_TRANSFER_OFFSET};
 use crate::{GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
 const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
@@ -43,14 +45,15 @@ const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
 pub fn cfa_schema() -> Schema {
     let types = StandardTypes::with(Rgb25::stl());
 
-    let code = [RgbIsa::Contract(ContractOp::PcVs(OS_ASSET))];
-    let alu_lib = AluLib(Lib::assemble(&code).unwrap());
+    let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
 
     Schema {
         ffv: zero!(),
         flags: none!(),
-        types: Types::Strict(types.type_system()),
+        name: tn!("CollectibleFungibleAsset"),
+        developer: Identity::from(LNPBP_IDENTITY),
+        meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
@@ -59,11 +62,11 @@ pub fn cfa_schema() -> Schema {
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => StateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
-            metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+            metadata: none!(),
             globals: tiny_bmap! {
                 GS_NAME => Occurrences::Once,
                 GS_DETAILS => Occurrences::NoneOrOnce,
@@ -75,11 +78,12 @@ pub fn cfa_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
+            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
             TS_TRANSFER => TransitionSchema {
-                metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+                metadata: none!(),
                 globals: none!(),
                 inputs: tiny_bmap! {
                     OS_ASSET => Occurrences::OnceOrMore
@@ -88,28 +92,23 @@ pub fn cfa_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
+                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
             }
         },
-        script: Script::AluVM(AluScript {
-            libs: confined_bmap! { alu_id => alu_lib },
-            entry_points: confined_bmap! {
-                EntryPoint::ValidateOwnedState(OS_ASSET) => LibSite::with(0, alu_id)
-            },
-        }),
     }
 }
 
 pub fn cfa_rgb25() -> IfaceImpl {
     let schema = cfa_schema();
-    let iface = Rgb25::iface(rgb25::Features::none());
+    let iface = Rgb25::iface(rgb25::Features::NONE);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
         timestamp: Utc::now().timestamp(),
-        developer: none!(), // TODO: Provide issuer information
-        script: none!(),
+        developer: Identity::from(LNPBP_IDENTITY),
+        metadata: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
@@ -125,5 +124,23 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
+        errors: none!(), // TODO: Encode errors
+    }
+}
+
+pub struct CollectibleFungibleAsset;
+
+impl IssuerWrapper for CollectibleFungibleAsset {
+    const FEATURES: rgb25::Features = rgb25::Features::NONE;
+    type IssuingIface = Rgb25;
+
+    fn schema() -> Schema { cfa_schema() }
+    fn issue_impl() -> IfaceImpl { cfa_rgb25() }
+
+    fn types() -> TypeSystem { StandardTypes::with(Rgb25::stl()).type_system() }
+
+    fn scripts() -> Scripts {
+        let lib = nia_lib();
+        confined_bmap! { lib.id() => lib }
     }
 }
