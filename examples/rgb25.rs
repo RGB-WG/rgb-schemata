@@ -1,114 +1,50 @@
-use std::convert::Infallible;
-use std::fs;
-
 use amplify::hex::FromHex;
-use bp::Txid;
-use rgb_schemata::{cfa_rgb25, cfa_schema};
-use rgbstd::interface::{ContractBuilder, FilterIncludeAll, FungibleAllocation, Rgb25, IfaceClass, IfaceWrapper};
-use rgbstd::invoice::{Amount, Precision};
-use rgbstd::persistence::{Inventory, Stock};
-use rgbstd::resolvers::ResolveHeight;
-use rgbstd::stl::{AssetTerms, Attachment, Details, MediaType, Name, RicardianContract};
-use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-use rgbstd::{GenesisSeal, WitnessAnchor, WitnessId, XAnchor, XChain, XPubWitness};
-use rgbstd::containers::FileContent;
-use sha2::{Digest, Sha256};
-use strict_encoding::StrictDumb;
-
-struct DumbResolver;
-
-impl ResolveWitness for DumbResolver {
-    fn resolve_pub_witness(&self, _: WitnessId) -> Result<XPubWitness, WitnessResolverError> {
-        Ok(XPubWitness::strict_dumb())
-    }
-}
-
-impl ResolveHeight for DumbResolver {
-    type Error = Infallible;
-    fn resolve_anchor(&mut self, _: &XAnchor) -> Result<WitnessAnchor, Self::Error> {
-        Ok(WitnessAnchor::strict_dumb())
-    }
-}
+use bp::dbc::Method;
+use bp::{Outpoint, Txid};
+use ifaces::{IssuerWrapper, Rgb25};
+use rgbstd::containers::{FileContent, Kit};
+use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
+use rgbstd::invoice::Precision;
+use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
+use schemata::dumb::DumbResolver;
+use schemata::CollectibleFungibleAsset;
 
 #[rustfmt::skip]
 fn main() {
-    let name = Name::try_from("Test asset").unwrap();
-    let details = Details::try_from("details with ℧nicode characters").unwrap();
-    let precision = Precision::CentiMicro;
-
-    let file_bytes = std::fs::read("README.md").unwrap();
-    let mut hasher = Sha256::new();
-    hasher.update(file_bytes);
-    let file_hash = hasher.finalize();
-    let terms = AssetTerms {
-        text: RicardianContract::default(),
-        media: Some(Attachment {
-            ty: MediaType::with("text/*"),
-            digest: file_hash.into(),
-        }),
-    };
     let beneficiary_txid =
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
-    let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
+    let beneficiary = Outpoint::new(beneficiary_txid, 1);
 
-    const ISSUE: u64 = 1_000_000_000_000;
-
-    let contract = ContractBuilder::testnet(
-        Rgb25::iface(),
-        cfa_schema(),
-        cfa_rgb25()
-        ).expect("schema fails to implement RGB25 interface")
-
-        .add_global_state("name", name)
-        .expect("invalid name")
-
-        .add_global_state("details", details)
-        .expect("invalid details")
-
-        .add_global_state("precision", precision)
-        .expect("invalid precision")
-
-        .add_global_state("issuedSupply", Amount::from(ISSUE))
-        .expect("invalid issuedSupply")
-
-        .add_global_state("terms", terms)
-        .expect("invalid contract data")
-
-        .add_fungible_state("assetOwner", beneficiary, ISSUE)
-        .expect("invalid asset amount")
-
-        .issue_contract()
-        .expect("contract doesn't fit schema requirements");
-
-    let contract_id = contract.contract_id();
-    debug_assert_eq!(contract_id, contract.contract_id());
-
-    eprintln!("{contract}");
-    contract.save_file("examples/rgb25-simplest.rgb").expect("unable to save contract");
-    fs::write("examples/rgb25-simplest.rgba", contract.to_string()).expect("unable to save contract");
+    let kit = Kit::load_file("schemata/CollectibleFungibleAsset.rgb").unwrap().validate().unwrap();
 
     // Let's create some stock - an in-memory stash and inventory around it:
-    let mut stock = Stock::default();
-    stock.import_iface(Rgb25::iface()).unwrap();
-    stock.import_schema(cfa_schema()).unwrap();
-    stock.import_iface_impl(cfa_rgb25()).unwrap();
+    let mut stock = Stock::<MemStash, MemState, MemIndex>::default();
+    stock.import_kit(kit).expect("invalid issuer kit");
 
-    // Noe we verify our contract consignment and add it to the stock
-    let verified_contract = match contract.validate(&mut DumbResolver, true) {
-        Ok(consignment) => consignment,
-        Err(consignment) => {
-            panic!("can't produce valid consignment. Report: {}", consignment.validation_status().expect("status always present upon validation"));
-        }
-    };
-    stock.import_contract(verified_contract, &mut DumbResolver).unwrap();
+    let contract = Rgb25::testnet::<CollectibleFungibleAsset>("Test asset", Precision::CentiMicro)
+        .expect("invalid contract data")
+        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
+        .expect("invalid allocations")
+        .issue_contract()
+        .expect("invalid contract data");
+
+    let contract_id = contract.contract_id();
+
+    eprintln!("{contract}");
+    contract.save_file("test/rgb25-example.rgb").expect("unable to save contract");
+    contract.save_armored("test/rgb25-example.rgba").expect("unable to save armored contract");
+
+    stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_id(contract_id, Rgb25::IFACE_ID).unwrap();
-    let name = contract.global("name").unwrap();
+    let contract = stock.contract_iface(contract_id, CollectibleFungibleAsset::issue_impl().iface_id).unwrap();
+    let contract = Rgb25::from(contract);
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
-    eprintln!("{}", Name::from_strict_val_unchecked(&name[0]));
+    eprintln!("\nThe issued contract data:");
+    eprintln!("{}", contract.name());
 
-    for FungibleAllocation { seal, state, witness, .. } in allocations {
-        eprintln!("(amount={state}, owner={seal}, witness={witness})");
+    for FungibleAllocation  { seal, state, witness, .. } in allocations {
+        eprintln!("amount={state}, owner={seal}, witness={witness}");
     }
+    eprintln!("totalSupply={}", contract.total_issued_supply());
 }

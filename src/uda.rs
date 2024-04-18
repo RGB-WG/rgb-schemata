@@ -24,15 +24,15 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo, Rgb21, IfaceClass};
-use rgbstd::schema::{
-    GenesisSchema, GlobalStateSchema, Occurrences, Schema, Script, StateSchema, SubSchema,
-    TransitionSchema,
-};
+use chrono::Utc;
+use ifaces::{rgb21, IfaceWrapper, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
+use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::stl::StandardTypes;
-use rgbstd::vm::{AluLib, AluScript, EntryPoint, RgbIsa};
-use rgbstd::{rgbasm, GlobalStateType, Types};
-use strict_types::{SemId, Ty};
+use rgbstd::validation::Scripts;
+use rgbstd::vm::RgbIsa;
+use rgbstd::{rgbasm, GlobalStateType, Identity, OwnedStateSchema};
+use strict_types::TypeSystem;
 
 use crate::{GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
@@ -41,9 +41,7 @@ const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
 const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
 const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
-pub fn uda_schema() -> SubSchema {
-    let types = StandardTypes::with(Rgb21::stl());
-
+fn uda_lib() -> Lib {
     let code = rgbasm! {
         // SUBROUTINE 1: genesis validation
         // Initialize registers value
@@ -94,7 +92,13 @@ pub fn uda_schema() -> SubSchema {
         // jump into SUBROUTINE 1 to reuse the code
         jmp     0x0005                      ;
     };
-    let alu_lib = AluLib(Lib::assemble::<Instr<RgbIsa>>(&code).unwrap());
+    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong unique digital asset script")
+}
+
+fn uda_schema() -> Schema {
+    let types = StandardTypes::with(Rgb21::stl());
+
+    let alu_lib = uda_lib();
     let alu_id = alu_lib.id();
     const FN_GENESIS_OFFSET: u16 = 0x00;
     const FN_TRANSFER_OFFSET: u16 = 0x45;
@@ -105,8 +109,9 @@ pub fn uda_schema() -> SubSchema {
     Schema {
         ffv: zero!(),
         flags: none!(),
-        subset_of: None,
-        types: Types::Strict(types.type_system()),
+        name: tn!("UniqueDigitalAsset"),
+        developer: Identity::from(LNPBP_IDENTITY),
+        meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
             GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
@@ -114,11 +119,11 @@ pub fn uda_schema() -> SubSchema {
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => StateSchema::Structured(types.get("RGB21.Allocation")),
+            OS_ASSET => OwnedStateSchema::Structured(types.get("RGBContract.Allocation")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
-            metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+            metadata: none!(),
             globals: tiny_bmap! {
                 GS_NOMINAL => Occurrences::Once,
                 GS_TERMS => Occurrences::Once,
@@ -129,11 +134,12 @@ pub fn uda_schema() -> SubSchema {
                 OS_ASSET => Occurrences::Once,
             },
             valencies: none!(),
+            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
             TS_TRANSFER => TransitionSchema {
-                metadata: Ty::<SemId>::UNIT.sem_id_unnamed(),
+                metadata: none!(),
                 globals: none!(),
                 inputs: tiny_bmap! {
                     OS_ASSET => Occurrences::Once
@@ -142,27 +148,23 @@ pub fn uda_schema() -> SubSchema {
                     OS_ASSET => Occurrences::Once
                 },
                 valencies: none!(),
+                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id)),
             }
         },
-        script: Script::AluVM(AluScript {
-            libs: confined_bmap! { alu_id => alu_lib },
-            entry_points: confined_bmap! {
-                EntryPoint::ValidateGenesis => LibSite::with(FN_GENESIS_OFFSET, alu_id),
-                EntryPoint::ValidateTransition(TS_TRANSFER) => LibSite::with(FN_TRANSFER_OFFSET, alu_id),
-            },
-        }),
     }
 }
 
-pub fn uda_rgb21() -> IfaceImpl {
+fn uda_rgb21() -> IfaceImpl {
     let schema = uda_schema();
-    let iface = Rgb21::iface();
+    let iface = Rgb21::iface(rgb21::Features::NONE);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
-        script: none!(),
+        timestamp: Utc::now().timestamp(),
+        developer: Identity::from(LNPBP_IDENTITY),
+        metadata: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_TERMS, fname!("terms")),
@@ -176,5 +178,23 @@ pub fn uda_rgb21() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
+        errors: none!(), // TODO: Encode errors
+    }
+}
+
+pub struct UniqueDigitalAsset;
+
+impl IssuerWrapper for UniqueDigitalAsset {
+    const FEATURES: rgb21::Features = rgb21::Features::NONE;
+    type IssuingIface = Rgb21;
+
+    fn schema() -> Schema { uda_schema() }
+    fn issue_impl() -> IfaceImpl { uda_rgb21() }
+
+    fn types() -> TypeSystem { StandardTypes::with(Rgb21::stl()).type_system() }
+
+    fn scripts() -> Scripts {
+        let lib = uda_lib();
+        confined_bmap! { lib.id() => lib }
     }
 }

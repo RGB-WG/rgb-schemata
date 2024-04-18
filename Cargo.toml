@@ -12,6 +12,9 @@ edition = "2021"
 license = "Apache-2.0"
 readme = "README.md"
 
+[lib]
+name = "schemata"
+
 [dependencies]
 amplify = "4.6.0"
 ascii-armor = "0.2.0"
@@ -20,6 +23,8 @@ strict_types = "2.7.0-beta.2"
 aluvm = "0.11.0-beta.5"
 bp-core = "0.11.0-beta.5"
 rgb-std = { version = "0.11.0-beta.5", features = ["serde", "fs"] }
+rgb-interfaces = "0.11.0-beta.5"
+chrono = "0.4.37"
 serde = "1.0"
 serde_json = "1.0"
 sha2 = "0.10.8"
@@ -31,3 +36,20 @@ serde_yaml = "0.9.27"
 [features]
 all = ["log"]
 log = ["aluvm/log"]
+
+[patch.crates-io]
+strict_encoding_derive = { git = "https://github.com/strict-types/strict-encoding", branch = "rstring" }
+strict_encoding = { git = "https://github.com/strict-types/strict-encoding", branch = "rstring" }
+strict_types = { git = "https://github.com/strict-types/strict-types", branch = "develop" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
+single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
+bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "v0.11" }
+bp-invoice = { git = "https://github.com/BP-WG/bp-std", branch = "v0.11" }
+aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "v0.11" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "script-refactor" }
+rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
+rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "script-refactor" }
+rgb-interfaces = { git = "https://github.com/RGB-WG/rgb-interfaces", branch = "master" }
