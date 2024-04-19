@@ -35,7 +35,7 @@ use rgbstd::validation::Scripts;
 use rgbstd::{GlobalStateType, Identity, OwnedStateSchema};
 use strict_types::TypeSystem;
 
-use crate::nia::{nia_lib, FN_GENESIS_OFFSET, FN_TRANSFER_OFFSET};
+use crate::nia::{nia_lib, FN_NIA_GENESIS_OFFSET, FN_NIA_TRANSFER_OFFSET};
 use crate::{GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET, TS_TRANSFER};
 
 const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
@@ -59,7 +59,7 @@ pub fn cfa_schema() -> Schema {
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
             GS_PRECISION => GlobalStateSchema::once(types.get("RGBContract.Precision")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -79,7 +79,7 @@ pub fn cfa_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
-            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
+            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
@@ -93,7 +93,7 @@ pub fn cfa_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
-                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
+                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, alu_id))
             }
         },
         reserved: none!(),

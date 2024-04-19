@@ -67,18 +67,18 @@ pub(crate) fn nia_lib() -> Lib {
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
-pub(crate) const FN_GENESIS_OFFSET: u16 = 4 + 3 + 1;
-pub(crate) const FN_TRANSFER_OFFSET: u16 = 0;
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 1;
+pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),
@@ -89,7 +89,7 @@ fn nia_schema() -> Schema {
         meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -107,7 +107,7 @@ fn nia_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
-            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
+            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
@@ -121,7 +121,7 @@ fn nia_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
-                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
+                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, alu_id))
             }
         },
         reserved: none!(),

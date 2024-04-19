@@ -9,7 +9,7 @@ use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
-use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
+use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
 use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
 use schemata::dumb::DumbResolver;
 use schemata::UniqueDigitalAsset;
@@ -28,7 +28,7 @@ fn main() {
     let mut hasher = Sha256::new();
     hasher.update(file_bytes);
     let file_hash = hasher.finalize();
-    let terms = AssetTerms {
+    let terms = ContractTerms {
         text: RicardianContract::default(),
         media: Some(Attachment {
             ty: MediaType::with("text/*"),

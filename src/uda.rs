@@ -115,7 +115,7 @@ fn uda_schema() -> Schema {
         meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_TOKENS => GlobalStateSchema::once(types.get("RGB21.TokenData")),
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
