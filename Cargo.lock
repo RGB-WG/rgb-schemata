@@ -122,8 +122,7 @@ dependencies = [
 [[package]]
 name = "ascii-armor"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "743d90b41a39d6e3920eef64a70f6411097cbb47141606a45b2a96533ec7111c"
+source = "git+https://github.com/UBIDECO/ascii-armor?branch=master#9e8f66717290907eeb753a5885ed29064c6f7598"
 dependencies = [
  "amplify",
  "baid58",

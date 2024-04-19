@@ -38,6 +38,7 @@ all = ["log"]
 log = ["aluvm/log"]
 
 [patch.crates-io]
+ascii-armor = { git = "https://github.com/UBIDECO/ascii-armor", branch = "master" }
 commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
 single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
 bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
