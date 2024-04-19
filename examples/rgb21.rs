@@ -2,7 +2,7 @@ use std::fs;
 
 use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
-use amplify::Wrapper;
+use amplify::{Bytes, Wrapper};
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
 use ifaces::{IssuerWrapper, Rgb21};
@@ -32,7 +32,7 @@ fn main() {
         text: RicardianContract::default(),
         media: Some(Attachment {
             ty: MediaType::with("text/*"),
-            digest: file_hash.into(),
+            digest: Bytes::from_byte_array(file_hash),
         }),
     };
     let preview = EmbeddedMedia {
@@ -77,7 +77,7 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface(contract_id, UniqueDigitalAsset::issue_impl().iface_id).unwrap();
+    let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
     let contract = Rgb21::from(contract);
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 }

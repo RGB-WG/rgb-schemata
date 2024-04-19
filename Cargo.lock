@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=v0.11#d18ea84836a8a96f3dfe61c99b94f2eab1417819"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#fafec9e124b10d4653cec7ef7804e1a9bda97844"
 dependencies = [
  "amplify",
  "ascii-armor",
@@ -230,7 +230,7 @@ dependencies = [
 [[package]]
 name = "bp-consensus"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
 dependencies = [
  "amplify",
  "chrono",
@@ -244,7 +244,7 @@ dependencies = [
 [[package]]
 name = "bp-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
 dependencies = [
  "amplify",
  "bp-consensus",
@@ -262,7 +262,7 @@ dependencies = [
 [[package]]
 name = "bp-dbc"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
 dependencies = [
  "amplify",
  "base85",
@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "bp-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#7dd16a84edc8c308856155d990d9df4311c35bfc"
+source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#95ff22306108188729a0646838154efe8b7d715d"
 dependencies = [
  "amplify",
  "bech32",
@@ -287,7 +287,7 @@ dependencies = [
 [[package]]
 name = "bp-seals"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=v0.11#3e373d2926f5519bae39055fbe2864e3fcce2677"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
 dependencies = [
  "amplify",
  "baid58",
@@ -335,7 +335,7 @@ dependencies = [
 [[package]]
 name = "commit_encoding_derive"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#f51e1e0d010b1531acc939d2443af552e8755bb7"
 dependencies = [
  "amplify",
  "amplify_syn",
@@ -347,7 +347,7 @@ dependencies = [
 [[package]]
 name = "commit_verify"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#f51e1e0d010b1531acc939d2443af552e8755bb7"
 dependencies = [
  "amplify",
  "commit_encoding_derive",
@@ -634,7 +634,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#177c908bc7b097fd640a7cd30afe0b624bca3580"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#bc8243c61de9eac0f8c1cbf2f92922efb216efc3"
 dependencies = [
  "aluvm",
  "amplify",
@@ -656,7 +656,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#2f7ea0638d3285920eddfe722e05316b63e146b7"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#a37ff049e03caafd1a0f5d99d618484184f946bf"
 dependencies = [
  "aluvm",
  "amplify",
@@ -672,7 +672,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#c980d2c1cdd316587e5a0c45ce0b3eccc6108354"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#99cb520b8fdac5f8e39dfa11f795a58382cc055c"
 dependencies = [
  "amplify",
  "baid58",
@@ -709,7 +709,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#c980d2c1cdd316587e5a0c45ce0b3eccc6108354"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#99cb520b8fdac5f8e39dfa11f795a58382cc055c"
 dependencies = [
  "aluvm",
  "amplify",
@@ -885,7 +885,7 @@ dependencies = [
 [[package]]
 name = "single_use_seals"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#4ca5963fbf6d57138f5b81ebe70aa095a79d0d9d"
+source = "git+https://github.com/LNP-BP/client_side_validation?branch=v0.11#f51e1e0d010b1531acc939d2443af552e8755bb7"
 dependencies = [
  "amplify_derive",
 ]
@@ -1010,9 +1010,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.9"
+version = "0.22.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8e40bb779c5187258fd7aad0eb68cb8706a0a81fa712fbea808ab43c4b8374c4"
+checksum = "d3328d4f68a705b2a4498da1d580585d39a6510f98318a2cec3018a7ec61ddef"
 dependencies = [
  "indexmap",
  "serde",

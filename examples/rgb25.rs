@@ -1,7 +1,7 @@
 use amplify::hex::FromHex;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
-use ifaces::{IssuerWrapper, Rgb25};
+use ifaces::Rgb25;
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
@@ -37,7 +37,7 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface(contract_id, CollectibleFungibleAsset::issue_impl().iface_id).unwrap();
+    let contract = stock.contract_iface_class::<Rgb25>(contract_id).unwrap();
     let contract = Rgb25::from(contract);
     let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
     eprintln!("\nThe issued contract data:");

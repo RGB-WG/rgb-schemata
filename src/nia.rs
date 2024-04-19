@@ -22,6 +22,7 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
+use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use chrono::Utc;
@@ -33,7 +34,7 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
+use rgbstd::vm::opcodes::INSTR_PCVS;
 use rgbstd::vm::RgbIsa;
 use rgbstd::{rgbasm, Identity};
 use strict_types::TypeSystem;
@@ -42,30 +43,42 @@ use crate::{ERRNO_INFLATION, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, T
 
 pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
+        // SUBROUTINE 2: transfer validation
+        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
+        put     a8[0],0;
+        pcvs    0x0FA0;
+        // If the check succeeds we need to terminate the subroutine.
+        ret;
+
         // SUBROUTINE 1: genesis validation
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
-        put     a8[0],0         ;
-        pccs    0x0FA0,0x07D2   ;
-        // If the check succeeds we need to terminate the subroutine.
-        ret                     ;
-        // SUBROUTINE 2: transfer validation
-        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        put     a8[0],0         ;
-        pcvs    0x0FA0          ;
+        put     a8[0],0;
+        put     a8[1],0;
+        put     a16[0],0;
+        // Read global state into s16[0]
+        ldg     0x07D2,a8[1],s16[0];
+        // Extract 64 bits from the beginning of s[1] into r128[1]
+        extr    s16[0],r128[0],a16[0];
+        // a64[0] now has token index from global state
+        spy     a64[0],r128[0];
+        // verify sum of pedersen commitments for assignments against a64[0] value
+        pcas    0x0FA0;
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
-pub(crate) const FN_GENESIS_OFFSET: u16 = 0;
-pub(crate) const FN_TRANSFER_OFFSET: u16 = 4 + 5 + 1;
+pub(crate) const FN_GENESIS_OFFSET: u16 = 4 + 3 + 1;
+pub(crate) const FN_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 4], INSTR_PCCS);
     assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),

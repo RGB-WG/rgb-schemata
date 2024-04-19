@@ -23,8 +23,9 @@ use std::io;
 use std::io::stdout;
 
 use ifaces::rgb21::Rgb21;
-use ifaces::{rgb20, rgb21, rgb25, IfaceWrapper, IssuerWrapper, Rgb20, Rgb25};
+use ifaces::{rgb20, rgb21, rgb25, IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
+use rgbstd::interface::IfaceClass;
 use rgbstd::vm::RgbIsa;
 use schemata::{CollectibleFungibleAsset, NonInflatableAsset, UniqueDigitalAsset};
 
