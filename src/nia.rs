@@ -46,7 +46,7 @@ pub(crate) fn nia_lib() -> Lib {
         // SUBROUTINE 2: transfer validation
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
         put     a8[0],0;
-        pcvs    0x0FA0;
+        pcvs    OS_ASSET;
         // If the check succeeds we need to terminate the subroutine.
         ret;
 
@@ -57,13 +57,15 @@ pub(crate) fn nia_lib() -> Lib {
         put     a8[1],0;
         put     a16[0],0;
         // Read global state into s16[0]
-        ldg     0x07D2,a8[1],s16[0];
+        ldg     GS_ISSUED_SUPPLY,a8[1],s16[0];
         // Extract 64 bits from the beginning of s[1] into r128[1]
         extr    s16[0],r128[0],a16[0];
-        // a64[0] now has token index from global state
+        // a64[0] now issued supply from global state
         spy     a64[0],r128[0];
         // verify sum of pedersen commitments for assignments against a64[0] value
-        pcas    0x0FA0;
+        pcas    OS_ASSET;
+        // No need to fail here since we test `st0` value on program termination
+        // verify sum of pedersen commitments from inputs against a64[0] value
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }

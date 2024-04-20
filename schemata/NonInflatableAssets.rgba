@@ -1,15 +1,16 @@
 -----BEGIN RGB KIT-----
-Id: FMc5rs-ZcvVUk5N-SLMhCm1h-fjCTm8ei-vRSJTEK8-WYeJf3#titanic-serpent-square
+Id: 6g5RWp-RgLPwYPG-DqyUxCy2-qYittpC2-w7oTJ5FK-UqSh1p#copper-tripod-pioneer
 Version: v2
 Interface: RGB20Fixed;
 	id=9on8bb-wHsWJxHB-JZJ5tg1g-Mu5vdUqL-GzEE7rod-mVjdPG#pulse-alibi-garage
-Implementation: 9s8N77-Zb2P2tfj-eoDycxvC-SAowFJyF-J8tqhCss-hA86Rk#olga-malta-rapid;
-	of=9on8bb-wHsWJxHB-JZJ5tg1g-Mu5vdUqL-GzEE7rod-mVjdPG#pulse-alibi-garage;
-	for=EtVNdw-zwVff3iv-CBmwB5LQ-WSoGn7Eg-qVK8mXnm-KcUWCW#lithium-secure-lava
-Schema: EtVNdw-zwVff3iv-CBmwB5LQ-WSoGn7Eg-qVK8mXnm-KcUWCW#lithium-secure-lava
+Implementation: 2ExZT4-ZXnu1jNV-PdT8vzy5-Lojd4Ay7-4UGPyAWx-DAR2mU#flame-olympic-ticket;
+	interface=9on8bb-wHsWJxHB-JZJ5tg1g-Mu5vdUqL-GzEE7rod-mVjdPG#pulse-alibi-garage;
+	schema=EtVNdw-zwVff3iv-CBmwB5LQ-WSoGn7Eg-qVK8mXnm-KcUWCW#lithium-secure-lava
+Schema: NonInflatableAsset;
+	id=EtVNdw-zwVff3iv-CBmwB5LQ-WSoGn7Eg-qVK8mXnm-KcUWCW#lithium-secure-lava
 Type-System: urn:ubideco:sts:AQMd29FRcdxgUWox2KGHYnbrNdPjzzZ9iuNXYjctkJid#formula-between-vital
-Alu-Lib: urn:ubideco:alu:7azwEUJFKjUoit7LsXQL7fqjmYXTACfpYpbBNQTitiXP#permit-consul-raymond
-Checksum-SHA256: 6af7f82038c11836ba5dda6637976e309fb459dadae800d2c0eeb2e50cfcefbe
+Alu-Lib: 7azwEU-JFKjUoit-7LsXQL7f-qjmYXTAC-fpYpbBNQ-TitiXP#permit-consul-raymond
+Checksum-SHA256: 8363bad4800998a0f157a7aeb367430d7ad7f33367bbbeb6b2399fc7e6e3430b
 
 0s#REQb$5EFh*&3Wn=;xNwglob2B`8Db2)BBD0VKnVnPMr1<QMgagN%+4np8aWyY
 9^XI?qyU!Wbnz%Cjd?PoRocw|I=AJ1r(L$<(`2l7C000000}N?%b9H58Q+04~Y<U
@@ -29,7 +30,7 @@ XPZ1F{`S9wjBWg(gy&Dj96u3I`KP|x6K-jit^gQ+!PC!a#7jT+VjUz9FBwm00E#6
 0SEv91JDNn0098e2LS*90MZ8m00962pbr56|Nj61VcW~CY7{GcZH8}l-zqq_mz~<
 U1Sp{TY;0Ev-}djW2mk;95GMct0iX{70RR61pbr56|Nj61VcW~CY7{GcZH8}l-zq
 q_mz~<U1Sp{TY;0Ev-}djW000000000000032&RC)VT*82uC2XGpkTlRD7z<-6eB
-p3vylVj!{(1e^g4sR{^$HibuBhFE3l@?G8I-#m2xKgE;@JINLBq=HJp3YN000000
+p3vylVj!{(1e^g4sR{^$HibuBhFE3l@?G8I-#m2xKgE;@JINLBq=HLWm<~000000
 0Ynm1aoj@V*mgE0MQ2pbY*gFa{vGU0MZ8xX>)URWn@!zaBysS000000iX{GVRLh3
 bWe9~WpV%j000015GM$9a$#<BW@T~!000000RRtfZ*E0#bzy8lZEtmMbaMaz000U
 AY;JHZVsI{Ra%TWk0003QZG|bw_S!^E6;6$ujJ=)@jfnzUJFt-<#ywK79)|@1rO*

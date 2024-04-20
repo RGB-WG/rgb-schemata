@@ -1,15 +1,16 @@
 -----BEGIN RGB KIT-----
-Id: DMqoWS-KLNDF7jz-j2t2P7ky-qtweWjyQ-nBacGzCU-MvJNjU#limbo-money-palma
+Id: 6LR5sS-g7qmv8ga-XbPDkumH-N27ah8HZ-WPuRGdYv-2JH2Km#farmer-king-susan
 Version: v2
 Interface: RGB25Base;
 	id=9qiFWF-P3jbHUzf-KYwhxmXe-CyPBCuQN-sEX5hgLn-NLdu81#shampoo-peace-canvas
-Implementation: 2KHXx3-PpeW826i-Af31qBPF-CDMbgH9X-Sbb76B23-nhEXUY#bundle-fluid-yoyo;
-	of=9qiFWF-P3jbHUzf-KYwhxmXe-CyPBCuQN-sEX5hgLn-NLdu81#shampoo-peace-canvas;
-	for=BPBPBe-gALSneci-nbjn4eXx-eQ4CV5A6-9DjPkC7x-zH4jcw#evening-serial-peru
-Schema: BPBPBe-gALSneci-nbjn4eXx-eQ4CV5A6-9DjPkC7x-zH4jcw#evening-serial-peru
+Implementation: EyoTvB-NRNLdfZz-vQ1cWEuY-xUkKWA8B-RBSrzhGL-1AAp6m#opus-enigma-soviet;
+	interface=9qiFWF-P3jbHUzf-KYwhxmXe-CyPBCuQN-sEX5hgLn-NLdu81#shampoo-peace-canvas;
+	schema=BPBPBe-gALSneci-nbjn4eXx-eQ4CV5A6-9DjPkC7x-zH4jcw#evening-serial-peru
+Schema: CollectibleFungibleAsset;
+	id=BPBPBe-gALSneci-nbjn4eXx-eQ4CV5A6-9DjPkC7x-zH4jcw#evening-serial-peru
 Type-System: urn:ubideco:sts:AQMd29FRcdxgUWox2KGHYnbrNdPjzzZ9iuNXYjctkJid#formula-between-vital
-Alu-Lib: urn:ubideco:alu:7azwEUJFKjUoit7LsXQL7fqjmYXTACfpYpbBNQTitiXP#permit-consul-raymond
-Checksum-SHA256: 1797eec7655336c2f7bff7442305f8f0e015b6a4b409e3416bc63447cad97493
+Alu-Lib: 7azwEU-JFKjUoit-7LsXQL7f-qjmYXTAC-fpYpbBNQ-TitiXP#permit-consul-raymond
+Checksum-SHA256: ae295ed45bbc40737fa8cfe4264571c49c2529c7363cef7f5717f4f533f19691
 
 0s#RDQb$5EH9}!?WdWu!i0-90vN>qYg|-HW+yip!S`s<$WTQL!x|rf0#LI;F0cHR
 I000033~6(7b!B8zb#QQOc>#!wSY=~6@jI2b%^Ho0^4h`N6bqMfQQ6em^T$yfj)V
@@ -30,8 +31,8 @@ g5*ip<N*NH2LN3I#21aJj($Hn^F!mAeRLol5%ecA&%UCtOO8MBUm^hj0iX{72mk;
 D&<6nk0RYhl0RRC2(gy(m0RYqo00031)dv9p0RRD@4*>xG{{R7D+smzL6f1mfhHr
 M?Dmb^7o!YnrD4_amY*z{2_V2C;0003HCjbBepbr56|NjA?4*>xG{{R7D+smzL6f
 1mfhHrM?Dmb^7o!YnrD4_amY*z{2_V2C$0000000000009A-Lt^#<o7_iKnHm3rg
-PTP19M$2#g+`BOLuuSUe5d4tSOgCE$PMCiR^LYgq}u}=!1Uuv##ECJ#WKG_?jV*t
-{32!m000001<(fsZeeX@00000(FX-|WpZtE00000(gzG_b8~fNWK(r;aBO)10002
+PTP19M$2#g+`BOLuuSUe5d4tSOgCE$PMCiR^LYgq}u}=!1Uuv##ECJ#WKG_?jV*!
+h$ChI000001<(fsZeeX@00000(FX-|WpZtE00000(gzG_b8~fNWK(r;aBO)10002
 g2M1(jbYW?1a{vGU0M!QxaB^j1X>)0BZU6uP00E#63So0|Wpqz>Ze?-+000000T3
 q$baG*Cb7p0700000000UAY;JHZVsI{Ra%TWk0003QZG|bw_S!^E6;6$ujJ=)@jf
 nzUJFt-<#ywK79)|@1rO*2^brT1EPanx(a*~2XpdO)&Y})mh+6z}TtOs7#1m;+OE

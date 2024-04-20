@@ -49,13 +49,13 @@ fn uda_lib() -> Lib {
         put     a16[0],0x00                 ;
         put     a16[1],0x00                 ;
         // Read global state into s[1]
-        ldg     0x0836,a8[0],s16[1]         ;
+        ldg     GS_TOKENS,a8[0],s16[1]         ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
         extr    s16[1],r128[1],a16[0]       ;
         // a32[0] now has token index from global state
         spy     a32[0],r128[1]              ;
         // Read owned state into s[1]
-        lds     0x0FA0,a16[1],s16[1]        ;
+        lds     OS_ASSET,a16[1],s16[1]        ;
         // Extract 128 bits from the beginning of s[1] into r128[1]
         extr    s16[1],r128[1],a16[0]       ;
         // a32[1] now has token index from allocation
@@ -88,7 +88,7 @@ fn uda_lib() -> Lib {
         // Put 0 to a16[0]
         put     a16[0],0                    ;
         // Read previous state into s[1]
-        ldp     0x0FA0,a16[0],s16[1]        ;
+        ldp     OS_ASSET,a16[0],s16[1]        ;
         // jump into SUBROUTINE 1 to reuse the code
         jmp     0x0005                      ;
     };

@@ -5,10 +5,10 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#fafec9e124b10d4653cec7ef7804e1a9bda97844"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#7e019e7475b1af58ae28870d2c91a9451090c707"
 dependencies = [
  "amplify",
- "ascii-armor",
+ "ascii-armor 0.2.0",
  "baid58",
  "blake3",
  "getrandom",
@@ -122,7 +122,21 @@ dependencies = [
 [[package]]
 name = "ascii-armor"
 version = "0.2.0"
-source = "git+https://github.com/UBIDECO/ascii-armor?branch=master#9e8f66717290907eeb753a5885ed29064c6f7598"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "743d90b41a39d6e3920eef64a70f6411097cbb47141606a45b2a96533ec7111c"
+dependencies = [
+ "amplify",
+ "baid58",
+ "base85",
+ "sha2",
+ "strict_encoding",
+]
+
+[[package]]
+name = "ascii-armor"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "44ce552de9efa4fdee1a7920f3587e17689bf4a4ba149a7892f91820673c1e29"
 dependencies = [
  "amplify",
  "baid58",
@@ -307,9 +321,9 @@ checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
 name = "cc"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17f6e324229dc011159fcc089755d1e2e216a90d43a7dea6853ca740b84f35e7"
+checksum = "d32a725bc159af97c3e629873bb9f88fb8cf8a4867175f76dc987815ea07c83b"
 
 [[package]]
 name = "cfg-if"
@@ -634,11 +648,11 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#bc8243c61de9eac0f8c1cbf2f92922efb216efc3"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#648bb45ab4dd4c000e8ba1872a2a7ce47cd2217e"
 dependencies = [
  "aluvm",
  "amplify",
- "ascii-armor",
+ "ascii-armor 0.2.0",
  "baid58",
  "bp-core",
  "chrono",
@@ -672,7 +686,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#25a9713127f8e5b04becd21945fa70f7230f421f"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#351cfe70795fdc7ef0a0eaeec692cd598347e8e7"
 dependencies = [
  "amplify",
  "baid58",
@@ -693,7 +707,7 @@ version = "0.11.0-beta.5"
 dependencies = [
  "aluvm",
  "amplify",
- "ascii-armor",
+ "ascii-armor 0.3.0",
  "bp-core",
  "chrono",
  "rgb-interfaces",
@@ -709,11 +723,11 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#25a9713127f8e5b04becd21945fa70f7230f421f"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#351cfe70795fdc7ef0a0eaeec692cd598347e8e7"
 dependencies = [
  "aluvm",
  "amplify",
- "ascii-armor",
+ "ascii-armor 0.3.0",
  "baid58",
  "base85",
  "bp-core",
@@ -922,7 +936,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "152bd04284e9093f23a911d0d89b7dd950a461af1ed5e243f6215fbcd45e9445"
 dependencies = [
  "amplify",
- "ascii-armor",
+ "ascii-armor 0.2.0",
  "baid58",
  "half",
  "indexmap",
