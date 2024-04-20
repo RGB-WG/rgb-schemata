@@ -25,7 +25,6 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use chrono::Utc;
 use ifaces::{rgb20, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
@@ -142,7 +141,7 @@ fn nia_rgb20() -> IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
-        timestamp: Utc::now().timestamp(),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
         global_state: tiny_bset! {
