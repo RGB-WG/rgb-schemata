@@ -25,7 +25,7 @@
 use aluvm::library::LibSite;
 use ifaces::rgb25::Rgb25;
 use ifaces::{rgb25, IssuerWrapper, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, VerNo};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema,
 };
@@ -35,7 +35,10 @@ use rgbstd::{GlobalStateType, Identity, OwnedStateSchema};
 use strict_types::TypeSystem;
 
 use crate::nia::{nia_lib, FN_NIA_GENESIS_OFFSET, FN_NIA_TRANSFER_OFFSET};
-use crate::{GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::{
+    ERRNO_ISSUED_MISMATCH, ERRNO_NON_EQUAL_IN_OUT, GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET,
+    TS_TRANSFER,
+};
 
 const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
 const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
@@ -44,8 +47,7 @@ const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
 pub fn cfa_schema() -> Schema {
     let types = StandardTypes::with(Rgb25::stl());
 
-    let alu_lib = nia_lib();
-    let alu_id = alu_lib.id();
+    let nia_id = nia_lib().id();
 
     Schema {
         ffv: zero!(),
@@ -78,7 +80,7 @@ pub fn cfa_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
-            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, alu_id)),
+            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, nia_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
@@ -92,7 +94,7 @@ pub fn cfa_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
-                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, alu_id))
+                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, nia_id))
             }
         },
         reserved: none!(),
@@ -125,7 +127,10 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: none!(), // TODO: Encode errors
+        errors: tiny_bset![
+            NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
+            NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
+        ],
     }
 }
 
