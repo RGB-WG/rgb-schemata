@@ -39,21 +39,25 @@ use rgbstd::vm::RgbIsa;
 use rgbstd::{rgbasm, Identity};
 use strict_types::TypeSystem;
 
-use crate::{ERRNO_INFLATION, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::{
+    ERRNO_ISSUED_MISMATCH, ERRNO_NON_EQUAL_IN_OUT, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS,
+    OS_ASSET, TS_TRANSFER,
+};
 
 pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
-        // SUBROUTINE 2: transfer validation
+        // SUBROUTINE Transfer validation
+        // Set errno
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        put     a8[0],0;
         pcvs    OS_ASSET;
-        // If the check succeeds we need to terminate the subroutine.
+        test;
         ret;
 
-        // SUBROUTINE 1: genesis validation
+        // SUBROUTINE Genesis validation
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
-        put     a8[0],0;
+        put     a8[0],ERRNO_ISSUED_MISMATCH;
         put     a8[1],0;
         put     a16[0],0;
         // Read global state into s16[0]
@@ -64,12 +68,12 @@ pub(crate) fn nia_lib() -> Lib {
         spy     a64[0],r128[0];
         // verify sum of pedersen commitments for assignments against a64[0] value
         pcas    OS_ASSET;
-        // No need to fail here since we test `st0` value on program termination
-        // verify sum of pedersen commitments from inputs against a64[0] value
+        test;
+        ret;
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
-pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 1;
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
 pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
@@ -154,7 +158,10 @@ fn nia_rgb20() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: tiny_bset![NamedVariant::with(ERRNO_INFLATION, vname!("nonEqualAmounts")),],
+        errors: tiny_bset![
+            NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
+            NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
+        ],
     }
 }
 
