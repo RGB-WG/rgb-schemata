@@ -61,10 +61,9 @@ pub(crate) fn nia_lib() -> Lib {
         put     a16[0],0;
         // Read global state into s16[0]
         ldg     GS_ISSUED_SUPPLY,a8[1],s16[0];
-        // Extract 64 bits from the beginning of s[1] into r128[1]
-        extr    s16[0],r128[0],a16[0];
-        // a64[0] now issued supply from global state
-        spy     a64[0],r128[0];
+        // Extract 64 bits from the beginning of s16[0] into a64[1]
+        // NB: if the global state is invalid, we will fail here and fail the validation
+        extr    s16[0],a64[0],a16[0];
         // verify sum of pedersen commitments for assignments against a64[0] value
         pcas    OS_ASSET;
         test;

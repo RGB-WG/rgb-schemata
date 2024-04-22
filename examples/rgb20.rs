@@ -17,7 +17,7 @@ fn main() {
 
     let contract = Rgb20::testnet::<NonInflatableAsset>("TEST", "Test asset", None, Precision::CentiMicro)
         .expect("invalid contract data")
-        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
+        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64)
         .expect("invalid allocations")
         .issue_contract()
         .expect("invalid contract data");

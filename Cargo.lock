@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#36573c94e3236732bcd1c1fa7f2cd863bf307954"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#3fc2434ee9af51e935b44e5ea682fef933019bda"
 dependencies = [
  "amplify",
  "ascii-armor 0.2.0",
@@ -243,7 +243,7 @@ dependencies = [
 [[package]]
 name = "bp-consensus"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#91e195d45a24c3e5623f0cbe0738ea2fca315bae"
 dependencies = [
  "amplify",
  "chrono",
@@ -257,7 +257,7 @@ dependencies = [
 [[package]]
 name = "bp-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#91e195d45a24c3e5623f0cbe0738ea2fca315bae"
 dependencies = [
  "amplify",
  "bp-consensus",
@@ -275,7 +275,7 @@ dependencies = [
 [[package]]
 name = "bp-dbc"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#91e195d45a24c3e5623f0cbe0738ea2fca315bae"
 dependencies = [
  "amplify",
  "base85",
@@ -289,7 +289,7 @@ dependencies = [
 [[package]]
 name = "bp-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#95ff22306108188729a0646838154efe8b7d715d"
+source = "git+https://github.com/BP-WG/bp-std?branch=v0.11#6741b11d42e92557ae884b7d5208013f0314807f"
 dependencies = [
  "amplify",
  "bech32",
@@ -300,7 +300,7 @@ dependencies = [
 [[package]]
 name = "bp-seals"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-core?branch=develop#fb281e3b2d81a9aee7d393b6c574a3a4f62ad132"
+source = "git+https://github.com/BP-WG/bp-core?branch=develop#91e195d45a24c3e5623f0cbe0738ea2fca315bae"
 dependencies = [
  "amplify",
  "baid58",
@@ -670,7 +670,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#855b3f2ba42b7b556baeced8e689320afa7f119d"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#22215a530e4e48220e44963ec5b3e8e156d69cf8"
 dependencies = [
  "aluvm",
  "amplify",
@@ -686,7 +686,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#351cfe70795fdc7ef0a0eaeec692cd598347e8e7"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#0a392e705e1cfd246508021467f2963552d366d7"
 dependencies = [
  "amplify",
  "baid58",
@@ -723,7 +723,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#351cfe70795fdc7ef0a0eaeec692cd598347e8e7"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#0a392e705e1cfd246508021467f2963552d366d7"
 dependencies = [
  "aluvm",
  "amplify",
@@ -983,18 +983,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.58"
+version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03468839009160513471e86a034bb2c5c0e4baae3b43f79ffc55c4a5427b3297"
+checksum = "f0126ad08bff79f29fc3ae6a55cc72352056dfff61e3ff8bb7129476d44b23aa"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.58"
+version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c61f3ba182994efc43764a46c018c347bc492c79f024e705f46567b418f6d4f7"
+checksum = "d1cd413b5d558b4c5bf3680e324a6fa5014e7b7c067a51e69dbdf47eb7148b66"
 dependencies = [
  "proc-macro2",
  "quote",
