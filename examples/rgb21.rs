@@ -48,7 +48,7 @@ fn main() {
     let mut stock = Stock::<MemStash, MemState, MemIndex>::default();
     stock.import_kit(kit).expect("invalid issuer kit");
 
-    let contract = stock.contract_builder(
+    let contract = stock.contract_builder("ssi:anonymous",
         UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",
         ).expect("schema fails to implement RGB21 interface")

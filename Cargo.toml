@@ -17,7 +17,7 @@ name = "schemata"
 
 [dependencies]
 amplify = "4.6.0"
-ascii-armor = "0.3.0"
+ascii-armor = "0.4.0"
 strict_encoding = "2.7.0-beta.3"
 strict_types = "2.7.0-beta.3"
 aluvm = "0.11.0-beta.5"
@@ -38,8 +38,11 @@ all = ["log"]
 log = ["aluvm/log"]
 
 [patch.crates-io]
-commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
-single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation", branch = "v0.11" }
+ascii-armor = { git = "https://github.com/UBIDECO/ascii-armor" }
+strict_encoding = { git = "https://github.com/strict-types/strict-encoding", branch = "develop" }
+strict_types = { git = "https://github.com/strict-types/strict-types", branch = "develop" }
+commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "develop" }
+single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation", branch = "develop" }
 bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
 bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
 bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }

@@ -46,7 +46,7 @@ fn nia() -> io::Result<()> {
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb20::iface(rgb20::Features::NONE))
+        .push(Rgb20::iface(rgb20::Features::FIXED))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();

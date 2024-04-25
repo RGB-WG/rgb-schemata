@@ -21,7 +21,7 @@ fn main() {
     let mut stock = Stock::<MemStash, MemState, MemIndex>::default();
     stock.import_kit(kit).expect("invalid issuer kit");
 
-    let contract = Rgb25::testnet::<CollectibleFungibleAsset>("Test asset", Precision::CentiMicro)
+    let contract = Rgb25::testnet::<CollectibleFungibleAsset>("ssi:anonymous", "Test asset", Precision::CentiMicro)
         .expect("invalid contract data")
         .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
         .expect("invalid allocations")

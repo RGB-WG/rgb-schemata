@@ -134,7 +134,7 @@ fn nia_schema() -> Schema {
 
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = Rgb20::iface(rgb20::Features::NONE);
+    let iface = Rgb20::iface(rgb20::Features::FIXED);
 
     IfaceImpl {
         version: VerNo::V1,
@@ -166,7 +166,7 @@ fn nia_rgb20() -> IfaceImpl {
 pub struct NonInflatableAsset;
 
 impl IssuerWrapper for NonInflatableAsset {
-    const FEATURES: rgb20::Features = rgb20::Features::NONE;
+    const FEATURES: rgb20::Features = rgb20::Features::FIXED;
     type IssuingIface = Rgb20;
 
     fn schema() -> Schema { nia_schema() }
