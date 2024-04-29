@@ -1,19 +1,19 @@
 -----BEGIN RGB KIT-----
-Id: rgb:kit:rhA@UX4M-ZAztGib-M5SG3lk-CtvohHS-SrQS8UD-Uc85AAI
+Id: rgb:kit:lzVBpr8E-G0AeJig-WmY8h9P-jVJEi91-A77xB89-wrWwtF0
 Version: 2
 Schema: CollectibleFungibleAsset;
-	id=Bh9m0x$VquGg1Nzk9MM7myc50dWORvh3B@whUbSbEpQ#octopus-bandit-spell;
+	id=H6roB2VrIyx4K2x5kADsI@MnMgG7nzp3cXHGJ56NTWU#kansas-fast-police;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
 Interface: RGB25Base;
 	id=Xwaeqhvo-BFatSYY-nA3kr3Q-wW3fGxN-vn5H8QZ-$Nky6C0#fiction-robot-parker;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
-Implementation: 3TZ6rfob-r9$trR2-wVF2aQI-H4RwIiR-wrYzDxl-krOw3PQ#bandit-stamp-divide;
+Implementation: xPanS4xZ-$5YVezV-4BsHGxF-jJDMvqi-FWWW5me-Qo@9K9k#lobby-vista-othello;
 	interface=Xwaeqhvo-BFatSYY-nA3kr3Q-wW3fGxN-vn5H8QZ-$Nky6C0#fiction-robot-parker;
-	schema=Bh9m0x$VquGg1Nzk9MM7myc50dWORvh3B@whUbSbEpQ#octopus-bandit-spell;
+	schema=H6roB2VrIyx4K2x5kADsI@MnMgG7nzp3cXHGJ56NTWU#kansas-fast-police;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
 Type-System: sts:X6MVH82h-MpI0B4a-XkYvSlO-6ex93XI-7jqe9pk-wx8znCg#slang-love-detail
-Alu-Lib: alu:5ie$c5Fl-ctf46kw-RB3Jh$$-qH8s5ek-$3EaTgb-XylMH2w#fluid-quality-plaza
-Check-SHA256: 51eb178e4d28aa929a18e45a11dd7cf65c7145bfca9b2cfcb210698f053938ac
+Alu-Lib: alu:q$CZ0ovt-UN9eBlc-VMn86mz-Kfd3ywu-f7$9jTB-k6A8tiY#japan-nylon-center
+Check-SHA256: 9fd3c19a3157aca0e0f857822748fd2b951e2b421d145f967de3c69fde931a52
 
 0s#RDQb$5EH9}!?Wddn+*!*t2<!yh2|4Ti-_$^#sI)8Dp0$j&qCeM~;3sBc{dOaKyPp>`{W+ev&_Ht^T
 vI2G1Jtsm#HCZ5u7Cwae0cHRI000033~6(7b!B8zb#QQOc>#!wSY=~6@jI2b%^Ho0^4h`N6bqMfQQ6em
@@ -27,15 +27,15 @@ Z*E0#bzy8lZEtmMbaO>?Xk{RCb!{MTW*~ELWo~pJVRLh3baNnNZ)J0CCv+fXadlyAAarjabZBKDb9HSX
 Z)PB2b8}^Mb0BGMAa8YaaCLNZGyrpRX*x_=Q!#aTEoW*(Ic```MlDZcWpq_lYga8cax-;PLsK>_VNqyv
 Iaf7iEjUU=H+KO5000<6Z)|L3V{~a^Y-L7uZf9v?Y-K@nb7gdpjUQ$J0000q0CRI`I!szqF?Dz?XKF+_
 Zdg!8El*=*bX8SrS1mSjGj&r#Q#LJOQD}2HS2boWI7&q~cK`*@2LOOx#k^Az$U%@qU7>2Bz={du0O&G0
-&#r1CLJBFZ06hT!(FXuqi^o(rG6hN<BEFO&Yv)so6FMe{9J)pm0(f}fTx|CN0MZ8lh>TceV><CWmAB0r
-jf(Qx!Q2!JmvT|r)Y|jMQ5=qh0RYqo06!~ox5Td+V+^*_{|Jk(H4u~TMq8eJM=D_eg5*ip<N*NH2LN3I
-#21aJj($Hn^F!mAeRLol5%ecA&%UCtOO8MBUm^hj0iX{72mk;D&<6nk0RYhl0RRC2(gy(m0RYqo00031
-)dv9p0RRD@4*>xG{{R8zC%<!%WpdZ}>P!&_a$*1ahw{!|ll{bLI2&InOdo6s0003HCjbBepbr56|NjA?
-4*>xG{{R8zC%<!%WpdZ}>P!&_a$*1ahw{!|ll{bLI2&InOdo6j000000000000998A7;}Z)vDp3)ZFCs
-!#kTNInmXQM)-FJ>>*LKn-Y{?2A--L=mb`+Nroo_c`Mxv7Txi&Hu?D<#2NhAGUzRkjUQ$J000001<(fs
-ZeeX@00000(FX-|WpZtE00000(gzG_b8~fNWK(r;aBO)10002g2M1(jbYW?1a{vGU0M!QxaB^j1X>)0B
-ZU6uP00E#63So0|Wpqz>Ze?-+000000T3q$baG*Cb7p070000000ICGX>)URWn@ihb8TUCV`u;X0003G
-Zf|ZyadlyAL2Yk!Zgg`10000q0CRI`I!szqF?Dz?XKF+_Zdg!8El*=*bX8SrS1mSjGj&r#Q#LJOQD}2H
+&#r1CLJBFZ06hT!(FXuqi^o(rG6hN<BEFO&Yv)so6FMe{9J)pm0(f}fTx|CN0MrKnKPz&##IG7-47St%
+2#c>Z5R>jkTb_MKDq#SE<Vn}$0RYtp09^yb7mcZoem^?%L*to!bRZoO^d~aUzM`;8jz95VA^`x}2LOnS
+SY=~6@jI2b%^Ho0^4h`N6bqMfQQ6em^T$yfj)VaK0iX{72mk;D&<6nk0RYhl0RRC2)CT|n0RYtp0RRC2
++6Msu0RRD@4*>xG{{R82@R`z!?NHxd23Hj_e>$5opLcw)x&Ht5G{KXgJhmnY0003HCjbBepbr56|NjA?
+4*>xG{{R82@R`z!?NHxd23Hj_e>$5opLcw)x&Ht5G{KXgJhmnP00000000000099Xs^|x0Ya=XpD{Og?
+0PG{<Co%!MpE`GOamFW}jZI}=2A--L=mb`+Nroo_c`Mxv7Txi&Hu?D<#2NhAGUzRkjUQ$J000001<(fs
+ZeeX@00000(FX-|WpZtE00000)CUJ-WprU_Y;ynr007ko32<^{V`+0~Z*Bkp007zt3~6(7b!B8zb#QQO
+c>n+a00E#63So0|Wpqz>Ze?-+000000T3q$baG*Cb7p070000000ICHZf|ZyadlyAL2Yk!Zgg`100001
+4rz09b!B8tX>)C1bYo}$0000q0CRI`I!szqF?Dz?XKF+_Zdg!8El*=*bX8SrS1mSjGj&r#Q#LJOQD}2H
 S2boWI7&q~cK}%c009|og(=AP+C)tiPK}(5y`B$^i2_<Xu#q9gJyNh9hXnzp&-*fU69;}zAIV^Hl7d8_
 9-)kE+Vz;)3s*I)2VU0%=2(9$_ISU8S>%Xzy^d7vHg1k5H90tF4%ya@=dSJu9IL;>*e1Zg(dl;zh@Se)
 i)R+C0ZKmX5VlzrFd~pb0000000000|NsC0000002eXhTbJc$66>)iENYm6sSix4*DK{%n(91s0BM>Eq
@@ -208,7 +208,7 @@ b#ioNWo|_WW@%=0Wo2$g^138|7M^`NNc{jXEg#>2x#JO!0is)`buE3*f$s=72pp@w!`LRkztQP;3W%Qi
 ya-6XBNr;@ghiU?gEXK9KMDE{F?;HZBRuDVqlk6qmbd@_00000001Wd00000008+H2n5}(1bO(?uXL+B
 (gNn{L2}utxi<$D8ry%w450%W0byYQVqyVfV*zAj0cB+YW@Z6rX8~wv0cmLgYH9&%YXNL*0c~voZf*f@
 Zvk*{0da8wa&iH4a{+X80d;i&c6I@GcL8{K0eN`=dV2e*SaKRYGgJn%Xv1$>f_VvG%;GuzyszPjx|liD
-+IRs000RR-OjQU%P((>bMN?D*Qb$4|01E&B0MMWh0S5~J0RRgK0RRgD0szR;2LU-S0MVci0S5#C0RR91
++IRs000RR-OjQU%P((>bMN?D*Qb$4|01E&B0MMWh0S5~J0RRgK000XC0szR`2LU-S0MVci0S5#C00961
 000
 
 -----END RGB KIT-----
