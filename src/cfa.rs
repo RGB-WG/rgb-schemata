@@ -40,9 +40,10 @@ use crate::{
     TS_TRANSFER,
 };
 
-const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
-const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
-const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
+const GS_ART: GlobalStateType = GlobalStateType::with(3000);
+const GS_NAME: GlobalStateType = GlobalStateType::with(3001);
+const GS_DETAILS: GlobalStateType = GlobalStateType::with(3004);
+const GS_PRECISION: GlobalStateType = GlobalStateType::with(3005);
 
 pub fn cfa_schema() -> Schema {
     let types = StandardTypes::with(Rgb25::stl());
@@ -57,6 +58,7 @@ pub fn cfa_schema() -> Schema {
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
+            GS_ART => GlobalStateSchema::once(types.get("RGBContract.Article")),
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
             GS_PRECISION => GlobalStateSchema::once(types.get("RGBContract.Precision")),
@@ -70,6 +72,7 @@ pub fn cfa_schema() -> Schema {
         genesis: GenesisSchema {
             metadata: none!(),
             globals: tiny_bmap! {
+                GS_ART => Occurrences::NoneOrOnce,
                 GS_NAME => Occurrences::Once,
                 GS_DETAILS => Occurrences::NoneOrOnce,
                 GS_PRECISION => Occurrences::Once,
@@ -113,6 +116,7 @@ pub fn cfa_rgb25() -> IfaceImpl {
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
         global_state: tiny_bset! {
+            NamedField::with(GS_ART, fname!("art")),
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
             NamedField::with(GS_PRECISION, fname!("precision")),

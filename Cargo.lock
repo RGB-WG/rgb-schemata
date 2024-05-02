@@ -656,7 +656,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#35bf72b4d2d3928300801f8d6c9a6b552134b351"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#d688b6a98f547f24b7edc7f96b30b6c1e94893ef"
 dependencies = [
  "aluvm",
  "amplify",
