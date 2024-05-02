@@ -150,3 +150,19 @@ impl IssuerWrapper for CollectibleFungibleAsset {
         confined_bmap! { lib.id() => lib }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iimpl_check() {
+        let iface = Rgb25::iface(CollectibleFungibleAsset::FEATURES);
+        if let Err(err) = cfa_rgb25().check(&iface, &cfa_schema()) {
+            for e in err {
+                eprintln!("{e}");
+            }
+            panic!("invalid CFA RGB25 interface implementation");
+        }
+    }
+}
