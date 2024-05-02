@@ -179,3 +179,19 @@ impl IssuerWrapper for NonInflatableAsset {
         confined_bmap! { lib.id() => lib }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iimpl_check() {
+        let iface = Rgb20::iface(NonInflatableAsset::FEATURES);
+        if let Err(err) = nia_rgb20().check(&iface, &nia_schema()) {
+            for e in err {
+                eprintln!("{e}");
+            }
+            panic!("invalid NIA RGB20 interface implementation");
+        }
+    }
+}
