@@ -45,8 +45,6 @@ pub const ERRNO_NON_EQUAL_IN_OUT: u8 = 0;
 pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
 
 pub mod dumb {
-    use std::convert::Infallible;
-
     use rgbstd::resolvers::ResolveHeight;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
     use rgbstd::{WitnessAnchor, XWitnessId, XWitnessTx};
@@ -61,8 +59,7 @@ pub mod dumb {
     }
 
     impl ResolveHeight for DumbResolver {
-        type Error = Infallible;
-        fn resolve_height(&mut self, _: XWitnessId) -> Result<WitnessAnchor, Self::Error> {
+        fn resolve_height(&mut self, _: XWitnessId) -> Result<WitnessAnchor, String> {
             Ok(WitnessAnchor::strict_dumb())
         }
     }

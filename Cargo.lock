@@ -152,9 +152,9 @@ dependencies = [
 
 [[package]]
 name = "base64"
-version = "0.22.0"
+version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
+checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "base85"
@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "bp-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/BP-WG/bp-std?branch=develop#987ed3cd2a3cb9619e62b1f887a46b412c52d27a"
+source = "git+https://github.com/BP-WG/bp-std?branch=develop#3703d406e76d7ce1f85dd811a416569b4fabd889"
 dependencies = [
  "amplify",
  "bech32",
@@ -308,9 +308,9 @@ checksum = "79296716171880943b8470b5f8d03aa55eb2e645a4874bdbb28adb49162e012c"
 
 [[package]]
 name = "cc"
-version = "1.0.95"
+version = "1.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d32a725bc159af97c3e629873bb9f88fb8cf8a4867175f76dc987815ea07c83b"
+checksum = "065a29261d53ba54260972629f9ca6bffa69bac13cd1fed61420f7fa68b9f8bd"
 
 [[package]]
 name = "cfg-if"
@@ -523,9 +523,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.153"
+version = "0.2.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
+checksum = "ae743338b92ff9146ce83992f766a31066a91a8c84a45e0e9f21e7cf6de6d346"
 
 [[package]]
 name = "log"
@@ -635,7 +635,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#3fa35c1428796cb607c8a627765aabb2e8329b62"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=develop#f0469333a36abcb70dff6667938fc1eae438e1d2"
 dependencies = [
  "aluvm",
  "amplify",
@@ -656,7 +656,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#1fb09cb8c23e062c8a059fb9afec7f2f135440ae"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=develop#a3ca2ee37858b7cfea7b4b45589465fb4a561069"
 dependencies = [
  "aluvm",
  "amplify",
@@ -672,7 +672,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#8ee3144315390b12dad6912b957e8e5e49378762"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#75fb0dd098574957478bf6d4bf3533abc325efb5"
 dependencies = [
  "amplify",
  "baid64",
@@ -709,7 +709,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#8ee3144315390b12dad6912b957e8e5e49378762"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=develop#75fb0dd098574957478bf6d4bf3533abc325efb5"
 dependencies = [
  "aluvm",
  "amplify",
@@ -810,18 +810,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.199"
+version = "1.0.200"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c9f6e76df036c77cd94996771fb40db98187f096dd0b9af39c6c6e452ba966a"
+checksum = "ddc6f9cc94d67c0e21aaf7eda3a010fd3af78ebf6e096aa6e2e13c79749cce4f"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.199"
+version = "1.0.200"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11bd257a6541e141e42ca6d24ae26f7714887b47e89aa739099104c7e4d3b7fc"
+checksum = "856f046b9400cee3c8c94ed572ecdb752444c24528c035cd35882aad6f492bcb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -916,7 +916,7 @@ dependencies = [
 [[package]]
 name = "strict_types"
 version = "2.7.0-beta.3"
-source = "git+https://github.com/strict-types/strict-types?branch=develop#4effa0b28804f7798a17f5dc6b4411ce6515f2f5"
+source = "git+https://github.com/strict-types/strict-types?branch=develop#86486d299bf068c734c406e529d35f0c25805293"
 dependencies = [
  "amplify",
  "ascii-armor",
