@@ -50,8 +50,8 @@ fn uda_lib() -> Lib {
         put     a16[0],0;
         // Read previous state into s16[0]
         ldp     OS_ASSET,a16[0],s16[0];
-        // jump into SUBROUTINE 1 to reuse the code
-        jmp     0x0005;
+        // jump into SUBROUTINE 3 to reuse the code
+        jmp     FN_SHARED_OFFSET;
 
         // SUBROUTINE 1: Genesis validation
         // Set offset to read state from strings
