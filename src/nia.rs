@@ -22,60 +22,78 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
+use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use chrono::Utc;
-use ifaces::{rgb20, IfaceWrapper, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, NamedVariant, VerNo};
+use ifaces::{rgb20, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::{INSTR_PCCS, INSTR_PCVS};
+use rgbstd::vm::opcodes::INSTR_PCVS;
 use rgbstd::vm::RgbIsa;
 use rgbstd::{rgbasm, Identity};
 use strict_types::TypeSystem;
 
-use crate::{ERRNO_INFLATION, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::{
+    ERRNO_ISSUED_MISMATCH, ERRNO_NON_EQUAL_IN_OUT, GS_ISSUED_SUPPLY, GS_NOMINAL, GS_TERMS,
+    OS_ASSET, TS_TRANSFER,
+};
 
 pub(crate) fn nia_lib() -> Lib {
     let code = rgbasm! {
-        // SUBROUTINE 1: genesis validation
+        // SUBROUTINE Transfer validation
+        // Set errno
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
+        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
+        pcvs    OS_ASSET;
+        test;
+        ret;
+
+        // SUBROUTINE Genesis validation
         // Checking pedersen commitments against reported amount of issued assets present in the
         // global state.
-        put     a8[0],0         ;
-        pccs    0x0FA0,0x07D2   ;
-        // If the check succeeds we need to terminate the subroutine.
-        ret                     ;
-        // SUBROUTINE 2: transfer validation
-        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        put     a8[0],0         ;
-        pcvs    0x0FA0          ;
+        put     a8[0],ERRNO_ISSUED_MISMATCH;
+        put     a8[1],0;
+        put     a16[0],0;
+        // Read global state into s16[0]
+        ldg     GS_ISSUED_SUPPLY,a8[1],s16[0];
+        // Extract 64 bits from the beginning of s16[0] into a64[1]
+        // NB: if the global state is invalid, we will fail here and fail the validation
+        extr    s16[0],a64[0],a16[0];
+        // verify sum of pedersen commitments for assignments against a64[0] value
+        pcas    OS_ASSET;
+        test;
+        ret;
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
 }
-pub(crate) const FN_GENESIS_OFFSET: u16 = 0;
-pub(crate) const FN_TRANSFER_OFFSET: u16 = 4 + 5 + 1;
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
+pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_GENESIS_OFFSET as usize + 4], INSTR_PCCS);
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("NonInflatableAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -93,7 +111,7 @@ fn nia_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
-            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
+            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, alu_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
@@ -107,21 +125,22 @@ fn nia_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
-                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
+                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, alu_id))
             }
         },
+        reserved: none!(),
     }
 }
 
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = Rgb20::iface(rgb20::Features::NONE);
+    let iface = Rgb20::iface(rgb20::Features::FIXED);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
-        timestamp: Utc::now().timestamp(),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
         global_state: tiny_bset! {
@@ -137,14 +156,17 @@ fn nia_rgb20() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: tiny_bset![NamedVariant::with(ERRNO_INFLATION, vname!("nonEqualAmounts")),],
+        errors: tiny_bset![
+            NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
+            NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
+        ],
     }
 }
 
 pub struct NonInflatableAsset;
 
 impl IssuerWrapper for NonInflatableAsset {
-    const FEATURES: rgb20::Features = rgb20::Features::NONE;
+    const FEATURES: rgb20::Features = rgb20::Features::FIXED;
     type IssuingIface = Rgb20;
 
     fn schema() -> Schema { nia_schema() }
@@ -155,5 +177,21 @@ impl IssuerWrapper for NonInflatableAsset {
     fn scripts() -> Scripts {
         let lib = nia_lib();
         confined_bmap! { lib.id() => lib }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iimpl_check() {
+        let iface = Rgb20::iface(NonInflatableAsset::FEATURES);
+        if let Err(err) = nia_rgb20().check(&iface, &nia_schema()) {
+            for e in err {
+                eprintln!("{e}");
+            }
+            panic!("invalid NIA RGB20 interface implementation");
+        }
     }
 }

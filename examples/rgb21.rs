@@ -2,14 +2,14 @@ use std::fs;
 
 use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
-use amplify::Wrapper;
+use amplify::{Bytes, Wrapper};
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
 use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
-use rgbstd::stl::{AssetSpec, AssetTerms, Attachment, MediaType, RicardianContract};
+use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
 use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
 use schemata::dumb::DumbResolver;
 use schemata::UniqueDigitalAsset;
@@ -28,11 +28,11 @@ fn main() {
     let mut hasher = Sha256::new();
     hasher.update(file_bytes);
     let file_hash = hasher.finalize();
-    let terms = AssetTerms {
+    let terms = ContractTerms {
         text: RicardianContract::default(),
         media: Some(Attachment {
             ty: MediaType::with("text/*"),
-            digest: file_hash.into(),
+            digest: Bytes::from_byte_array(file_hash),
         }),
     };
     let preview = EmbeddedMedia {
@@ -48,7 +48,7 @@ fn main() {
     let mut stock = Stock::<MemStash, MemState, MemIndex>::default();
     stock.import_kit(kit).expect("invalid issuer kit");
 
-    let contract = stock.contract_builder(
+    let contract = stock.contract_builder("ssi:anonymous",
         UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",
         ).expect("schema fails to implement RGB21 interface")
@@ -77,7 +77,7 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface(contract_id, UniqueDigitalAsset::issue_impl().iface_id).unwrap();
+    let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
     let contract = Rgb21::from(contract);
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 }

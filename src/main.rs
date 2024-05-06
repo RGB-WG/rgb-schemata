@@ -23,8 +23,9 @@ use std::io;
 use std::io::stdout;
 
 use ifaces::rgb21::Rgb21;
-use ifaces::{rgb20, rgb21, rgb25, IfaceWrapper, IssuerWrapper, Rgb20, Rgb25};
+use ifaces::{rgb20, rgb21, rgb25, IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
+use rgbstd::interface::IfaceClass;
 use rgbstd::vm::RgbIsa;
 use schemata::{CollectibleFungibleAsset, NonInflatableAsset, UniqueDigitalAsset};
 
@@ -45,7 +46,7 @@ fn nia() -> io::Result<()> {
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb20::iface(rgb20::Features::NONE))
+        .push(Rgb20::iface(rgb20::Features::FIXED))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();

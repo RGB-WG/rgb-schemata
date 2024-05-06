@@ -23,10 +23,9 @@
 //! interface.
 
 use aluvm::library::LibSite;
-use chrono::Utc;
 use ifaces::rgb25::Rgb25;
-use ifaces::{rgb25, IfaceWrapper, IssuerWrapper, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
+use ifaces::{rgb25, IssuerWrapper, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema,
 };
@@ -35,30 +34,35 @@ use rgbstd::validation::Scripts;
 use rgbstd::{GlobalStateType, Identity, OwnedStateSchema};
 use strict_types::TypeSystem;
 
-use crate::nia::{nia_lib, FN_GENESIS_OFFSET, FN_TRANSFER_OFFSET};
-use crate::{GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::nia::{nia_lib, FN_NIA_GENESIS_OFFSET, FN_NIA_TRANSFER_OFFSET};
+use crate::{
+    ERRNO_ISSUED_MISMATCH, ERRNO_NON_EQUAL_IN_OUT, GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET,
+    TS_TRANSFER,
+};
 
-const GS_NAME: GlobalStateType = GlobalStateType::with(2000);
-const GS_DETAILS: GlobalStateType = GlobalStateType::with(2004);
-const GS_PRECISION: GlobalStateType = GlobalStateType::with(2005);
+const GS_ART: GlobalStateType = GlobalStateType::with(3000);
+const GS_NAME: GlobalStateType = GlobalStateType::with(3001);
+const GS_DETAILS: GlobalStateType = GlobalStateType::with(3004);
+const GS_PRECISION: GlobalStateType = GlobalStateType::with(3005);
 
 pub fn cfa_schema() -> Schema {
     let types = StandardTypes::with(Rgb25::stl());
 
-    let alu_lib = nia_lib();
-    let alu_id = alu_lib.id();
+    let nia_id = nia_lib().id();
 
     Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("CollectibleFungibleAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
+            GS_ART => GlobalStateSchema::once(types.get("RGBContract.Article")),
             GS_NAME => GlobalStateSchema::once(types.get("RGBContract.Name")),
             GS_DETAILS => GlobalStateSchema::once(types.get("RGBContract.Details")),
             GS_PRECISION => GlobalStateSchema::once(types.get("RGBContract.Precision")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
@@ -68,6 +72,7 @@ pub fn cfa_schema() -> Schema {
         genesis: GenesisSchema {
             metadata: none!(),
             globals: tiny_bmap! {
+                GS_ART => Occurrences::NoneOrOnce,
                 GS_NAME => Occurrences::Once,
                 GS_DETAILS => Occurrences::NoneOrOnce,
                 GS_PRECISION => Occurrences::Once,
@@ -78,7 +83,7 @@ pub fn cfa_schema() -> Schema {
                 OS_ASSET => Occurrences::OnceOrMore,
             },
             valencies: none!(),
-            validator: Some(LibSite::with(FN_GENESIS_OFFSET, alu_id)),
+            validator: Some(LibSite::with(FN_NIA_GENESIS_OFFSET, nia_id)),
         },
         extensions: none!(),
         transitions: tiny_bmap! {
@@ -92,9 +97,10 @@ pub fn cfa_schema() -> Schema {
                     OS_ASSET => Occurrences::OnceOrMore
                 },
                 valencies: none!(),
-                validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id))
+                validator: Some(LibSite::with(FN_NIA_TRANSFER_OFFSET, nia_id))
             }
         },
+        reserved: none!(),
     }
 }
 
@@ -106,10 +112,11 @@ pub fn cfa_rgb25() -> IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
-        timestamp: Utc::now().timestamp(),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
         global_state: tiny_bset! {
+            NamedField::with(GS_ART, fname!("art")),
             NamedField::with(GS_NAME, fname!("name")),
             NamedField::with(GS_DETAILS, fname!("details")),
             NamedField::with(GS_PRECISION, fname!("precision")),
@@ -124,7 +131,10 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: none!(), // TODO: Encode errors
+        errors: tiny_bset![
+            NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
+            NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
+        ],
     }
 }
 
@@ -142,5 +152,21 @@ impl IssuerWrapper for CollectibleFungibleAsset {
     fn scripts() -> Scripts {
         let lib = nia_lib();
         confined_bmap! { lib.id() => lib }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iimpl_check() {
+        let iface = Rgb25::iface(CollectibleFungibleAsset::FEATURES);
+        if let Err(err) = cfa_rgb25().check(&iface, &cfa_schema()) {
+            for e in err {
+                eprintln!("{e}");
+            }
+            panic!("invalid CFA RGB25 interface implementation");
+        }
     }
 }

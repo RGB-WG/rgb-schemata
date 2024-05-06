@@ -21,76 +21,73 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
-use aluvm::isa::opcodes::INSTR_PUTA;
+use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use chrono::Utc;
-use ifaces::{rgb21, IfaceWrapper, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceImpl, NamedField, VerNo};
+use ifaces::{rgb21, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
+use rgbstd::vm::opcodes::INSTR_LDG;
 use rgbstd::vm::RgbIsa;
-use rgbstd::{rgbasm, GlobalStateType, Identity, OwnedStateSchema};
+use rgbstd::{rgbasm, Identity, OwnedStateSchema};
 use strict_types::TypeSystem;
 
-use crate::{GS_NOMINAL, GS_TERMS, OS_ASSET, TS_TRANSFER};
+use crate::{
+    ERRNO_NON_EQUAL_IN_OUT, ERRNO_NON_FRACTIONAL, GS_ATTACH, GS_NOMINAL, GS_TERMS, GS_TOKENS,
+    OS_ASSET, TS_TRANSFER,
+};
 
-const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
-#[allow(dead_code)]
-const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
-const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
+pub const FN_GENESIS_OFFSET: u16 = 4 + 4 + 3;
+pub const FN_TRANSFER_OFFSET: u16 = 0;
+pub const FN_SHARED_OFFSET: u16 = FN_GENESIS_OFFSET + 4 + 4 + 4;
 
 fn uda_lib() -> Lib {
     let code = rgbasm! {
-        // SUBROUTINE 1: genesis validation
-        // Initialize registers value
-        put     a8[0] ,0x00                 ;
-        put     a16[0],0x00                 ;
-        put     a16[1],0x00                 ;
-        // Read global state into s[1]
-        ldg     0x0836,a8[0],s16[1]         ;
-        // Extract 128 bits from the beginning of s[1] into r128[1]
-        extr    s16[1],r128[1],a16[0]       ;
-        // a32[0] now has token index from global state
-        spy     a32[0],r128[1]              ;
-        // Read owned state into s[1]
-        lds     0x0FA0,a16[1],s16[1]        ;
-        // Extract 128 bits from the beginning of s[1] into r128[1]
-        extr    s16[1],r128[1],a16[0]       ;
-        // a32[1] now has token index from allocation
-        spy     a32[1],r128[1]              ;
-        // check that token indexes match
-        eq.n    a32[0],a32[1]               ;
-        // if they do, jump to the next check
-        jif     0x002D                      ;
-        // we need to put a string into first string register which will be used as an error
-        // message
-        put     s16[0],"the allocated token has an invalid index";
-        // fail otherwise
-        fail                                ;
-        // offset_0x2D (pos 45):
-        // Put 4 to a16[0]
-        put     a16[0],4                    ;
-        // Extract 128 bits starting from the fifth byte of s[1] into r128[0]
-        extr    s16[1],r128[1],a16[0]       ;
-        // a64[1] now has owned fraction
-        spy     a64[1],r128[1]              ;
-        // put 1 to a64[0]
-        put     a64[0],1                    ;
-        // check that owned fraction == 1
-        eq.n    a64[0],a64[1]               ;
-        // terminate the subroutine
-        put     s16[0],"owned fraction is not 1";
-        ret                                 ;
-        // SUBROUTINE 2: transfer validation
-        // offset_0x45 (pos 69):
+        // SUBROUTINE 2: Transfer validation
         // Put 0 to a16[0]
-        put     a16[0],0                    ;
-        // Read previous state into s[1]
-        ldp     0x0FA0,a16[0],s16[1]        ;
-        // jump into SUBROUTINE 1 to reuse the code
-        jmp     0x0005                      ;
+        put     a16[0],0;
+        // Read previous state into s16[0]
+        ldp     OS_ASSET,a16[0],s16[0];
+        // jump into SUBROUTINE 3 to reuse the code
+        jmp     FN_SHARED_OFFSET;
+
+        // SUBROUTINE 1: Genesis validation
+        // Set offset to read state from strings
+        put     a16[0],0x00;
+        // Set which state index to read
+        put     a8[1],0x00;
+        // Read global state into s16[0]
+        ldg     GS_TOKENS,a8[1],s16[0];
+
+        // SUBROUTINE 3: Shared code
+        // Set errno
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
+        // Extract 128 bits from the beginning of s16[0] into a32[0]
+        extr    s16[0],a32[0],a16[0];
+        // Set which state index to read
+        put     a16[1],0x00;
+        // Read owned state into s16[1]
+        lds     OS_ASSET,a16[1],s16[1];
+        // Extract 128 bits from the beginning of s16[1] into a32[1]
+        extr    s16[1],a32[1],a16[0];
+        // Check that token indexes match
+        eq.n    a32[0],a32[1];
+        // Fail if they don't
+        test;
+
+        // Set errno
+        put     a8[0],ERRNO_NON_FRACTIONAL;
+        // Put offset for the data into a16[2]
+        put     a16[2],4;
+        // Extract 128 bits starting from the fifth byte of s16[1] into a64[0]
+        extr    s16[1],a64[0],a16[2];
+        // Check that owned fraction == 1
+        put     a64[1],1;
+        eq.n    a64[0],a64[1];
+        // Fail if not
+        test;
     };
     Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong unique digital asset script")
 }
@@ -100,21 +97,23 @@ fn uda_schema() -> Schema {
 
     let alu_lib = uda_lib();
     let alu_id = alu_lib.id();
-    const FN_GENESIS_OFFSET: u16 = 0x00;
-    const FN_TRANSFER_OFFSET: u16 = 0x45;
-    assert_eq!(alu_lib.code.as_ref()[0x00], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[0x2D], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_TRANSFER_OFFSET as usize], INSTR_PUTA);
+    let code = alu_lib.code.as_ref();
+    assert_eq!(code[FN_GENESIS_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(code[FN_GENESIS_OFFSET as usize + 8], INSTR_LDG);
+    assert_eq!(code[FN_TRANSFER_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(code[FN_SHARED_OFFSET as usize], INSTR_PUTA);
+    assert_eq!(code[FN_SHARED_OFFSET as usize + 4], INSTR_EXTR);
 
     Schema {
         ffv: zero!(),
         flags: none!(),
         name: tn!("UniqueDigitalAsset"),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         meta_types: none!(),
         global_types: tiny_bmap! {
             GS_NOMINAL => GlobalStateSchema::once(types.get("RGBContract.AssetSpec")),
-            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.AssetTerms")),
+            GS_TERMS => GlobalStateSchema::once(types.get("RGBContract.ContractTerms")),
             GS_TOKENS => GlobalStateSchema::once(types.get("RGB21.TokenData")),
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
@@ -151,6 +150,7 @@ fn uda_schema() -> Schema {
                 validator: Some(LibSite::with(FN_TRANSFER_OFFSET, alu_id)),
             }
         },
+        reserved: none!(),
     }
 }
 
@@ -162,13 +162,14 @@ fn uda_rgb21() -> IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
         iface_id: iface.iface_id(),
-        timestamp: Utc::now().timestamp(),
+        timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
         global_state: tiny_bset! {
             NamedField::with(GS_NOMINAL, fname!("spec")),
             NamedField::with(GS_TERMS, fname!("terms")),
             NamedField::with(GS_TOKENS, fname!("tokens")),
+            NamedField::with(GS_ATTACH, fname!("attachmentTypes")),
         },
         assignments: tiny_bset! {
             NamedField::with(OS_ASSET, fname!("assetOwner")),
@@ -178,7 +179,10 @@ fn uda_rgb21() -> IfaceImpl {
             NamedField::with(TS_TRANSFER, fname!("transfer")),
         },
         extensions: none!(),
-        errors: none!(), // TODO: Encode errors
+        errors: tiny_bset! {
+            NamedVariant::with(ERRNO_NON_FRACTIONAL, vname!("nonFractionalToken")),
+            NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("unknownToken")),
+        },
     }
 }
 
@@ -196,5 +200,21 @@ impl IssuerWrapper for UniqueDigitalAsset {
     fn scripts() -> Scripts {
         let lib = uda_lib();
         confined_bmap! { lib.id() => lib }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn iimpl_check() {
+        let iface = Rgb21::iface(UniqueDigitalAsset::FEATURES);
+        if let Err(err) = uda_rgb21().check(&iface, &uda_schema()) {
+            for e in err {
+                eprintln!("{e}");
+            }
+            panic!("invalid UDA RGB21 interface implementation");
+        }
     }
 }

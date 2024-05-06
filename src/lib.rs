@@ -33,16 +33,25 @@ pub use nia::NonInflatableAsset;
 use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
 pub use uda::UniqueDigitalAsset;
 
+// RGB20
 pub const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
 pub const GS_TERMS: GlobalStateType = GlobalStateType::with(2001);
-pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2002);
+pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2010);
+
+// RGB21
+pub const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
+pub const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
+pub const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
+
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
+
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);
-pub const ERRNO_INFLATION: u8 = 0;
+
+pub const ERRNO_NON_EQUAL_IN_OUT: u8 = 0;
+pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
+pub const ERRNO_NON_FRACTIONAL: u8 = 10;
 
 pub mod dumb {
-    use std::convert::Infallible;
-
     use rgbstd::resolvers::ResolveHeight;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
     use rgbstd::{WitnessAnchor, XWitnessId, XWitnessTx};
@@ -57,8 +66,7 @@ pub mod dumb {
     }
 
     impl ResolveHeight for DumbResolver {
-        type Error = Infallible;
-        fn resolve_height(&mut self, _: XWitnessId) -> Result<WitnessAnchor, Self::Error> {
+        fn resolve_height(&mut self, _: XWitnessId) -> Result<WitnessAnchor, String> {
             Ok(WitnessAnchor::strict_dumb())
         }
     }
