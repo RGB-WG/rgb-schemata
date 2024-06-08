@@ -1,15 +1,15 @@
 -----BEGIN RGB KIT-----
-Id: rgb:kit:5PUJnwwq-gWA$Umh-W9Ong@D-CtLpgvO-4QBQPm@-CDFpNMo
+Id: rgb:kit:5PUJnwwq-gWA$Umh-W9Ong!D-CtLpgvO-4QBQPm!-CDFpNMo
 Version: 2
 Schema: NonInflatableAsset;
-	id=KzMZV9bO7gFhox97@klj0FonG2ZKnjuOIg2tFChu$YA#lucas-episode-silicon;
+	id=KzMZV9bO7gFhox97!klj0FonG2ZKnjuOIg2tFChu$YA#lucas-episode-silicon;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
 Interface: RGB20Fixed;
-	id=$iUnO9aO-1xhqUd6-1Jm5S5@-wM3ngby-5GVEylQ-ZTAMYDk#tornado-pioneer-bucket;
+	id=$iUnO9aO-1xhqUd6-1Jm5S5!-wM3ngby-5GVEylQ-ZTAMYDk#tornado-pioneer-bucket;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
-Implementation: fCZya@Pz-CmBj4J0-@kJDktb-iK20O6K-0RaiYjg-yER1uoI#regard-palma-common;
-	interface=$iUnO9aO-1xhqUd6-1Jm5S5@-wM3ngby-5GVEylQ-ZTAMYDk#tornado-pioneer-bucket;
-	schema=KzMZV9bO7gFhox97@klj0FonG2ZKnjuOIg2tFChu$YA#lucas-episode-silicon;
+Implementation: fCZya!Pz-CmBj4J0-!kJDktb-iK20O6K-0RaiYjg-yER1uoI#regard-palma-common;
+	interface=$iUnO9aO-1xhqUd6-1Jm5S5!-wM3ngby-5GVEylQ-ZTAMYDk#tornado-pioneer-bucket;
+	schema=KzMZV9bO7gFhox97!klj0FonG2ZKnjuOIg2tFChu$YA#lucas-episode-silicon;
 	dev=ssi:LZS1ux-gjD9nXPF-OcetUUkW-6r3uSCS6-aQhs9W5f-8JE7w
 Type-System: sts:X6MVH82h-MpI0B4a-XkYvSlO-6ex93XI-7jqe9pk-wx8znCg#slang-love-detail
 Alu-Lib: alu:q$CZ0ovt-UN9eBlc-VMn86mz-Kfd3ywu-f7$9jTB-k6A8tiY#japan-nylon-center

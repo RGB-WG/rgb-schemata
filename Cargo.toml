@@ -1,6 +1,6 @@
 [package]
 name = "rgb-schemata"
-version = "0.11.0-beta.5"
+version = "0.11.0-beta.6"
 description = "Collection of the official RGB smart contract schemata"
 keywords = ["bitcoin", "lightning", "rgb", "smart-contracts", "lnp-bp"]
 categories = ["cryptography::cryptocurrencies"]
@@ -17,12 +17,12 @@ name = "schemata"
 
 [dependencies]
 amplify = "4.6.0"
-strict_encoding = "2.7.0-beta.3"
-strict_types = "2.7.0-beta.3"
-aluvm = "0.11.0-beta.5"
-bp-core = "0.11.0-beta.5"
-rgb-std = { version = "0.11.0-beta.5", features = ["serde", "fs"] }
-rgb-interfaces = "0.11.0-beta.5"
+strict_encoding = "2.7.0-beta.4"
+strict_types = "2.7.0-beta.4"
+aluvm = "0.11.0-beta.6"
+bp-core = "0.11.0-beta.6"
+rgb-std = { version = "0.11.0-beta.6", features = ["serde", "fs"] }
+rgb-interfaces = "0.11.0-beta.6"
 chrono = "0.4.37"
 serde = "1.0"
 serde_json = "1.0"
@@ -35,19 +35,3 @@ serde_yaml = "0.9.27"
 [features]
 all = ["log"]
 log = ["aluvm/log"]
-
-[patch.crates-io]
-strict_encoding = { git = "https://github.com/strict-types/strict-encoding", branch = "develop" }
-strict_types = { git = "https://github.com/strict-types/strict-types", branch = "develop" }
-commit_verify = { git = "https://github.com/LNP-BP/client_side_validation", branch = "develop" }
-single_use_seals = { git = "https://github.com/LNP-BP/client_side_validation", branch = "develop" }
-bp-consensus = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
-bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
-bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
-bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
-bp-invoice = { git = "https://github.com/BP-WG/bp-std", branch = "develop" }
-aluvm = { git = "https://github.com/AluVM/rust-aluvm", branch = "develop" }
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "develop" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "develop" }
-rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "develop" }
-rgb-interfaces = { git = "https://github.com/RGB-WG/rgb-interfaces", branch = "develop" }
