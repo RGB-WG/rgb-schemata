@@ -27,16 +27,19 @@ extern crate strict_types;
 mod cfa;
 mod nia;
 mod uda;
+mod ia;
 
 pub use cfa::CollectibleFungibleAsset;
+pub use ia::InflatableAsset;
 pub use nia::NonInflatableAsset;
-use rgbstd::{AssignmentType, GlobalStateType, TransitionType};
+use rgbstd::{AssignmentType, GlobalStateType, MetaType, TransitionType};
 pub use uda::UniqueDigitalAsset;
 
 // RGB20
 pub const GS_NOMINAL: GlobalStateType = GlobalStateType::with(2000);
 pub const GS_TERMS: GlobalStateType = GlobalStateType::with(2001);
 pub const GS_ISSUED_SUPPLY: GlobalStateType = GlobalStateType::with(2010);
+pub const GS_MAX_SUPPLY: GlobalStateType = GlobalStateType::with(2011);
 
 // RGB21
 pub const GS_TOKENS: GlobalStateType = GlobalStateType::with(2102);
@@ -44,11 +47,17 @@ pub const GS_ENGRAVINGS: GlobalStateType = GlobalStateType::with(2103);
 pub const GS_ATTACH: GlobalStateType = GlobalStateType::with(2104);
 
 pub const OS_ASSET: AssignmentType = AssignmentType::with(4000);
+pub const OS_INFLATION_ALLOWANCE: AssignmentType = AssignmentType::with(4001);
+
+pub const MS_ALLOWED_INFLATION: MetaType = MetaType::with(5000);
 
 pub const TS_TRANSFER: TransitionType = TransitionType::with(10000);
+pub const TS_ISSUE: TransitionType = TransitionType::with(10001);
 
 pub const ERRNO_NON_EQUAL_IN_OUT: u8 = 0;
 pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
+pub const ERRNO_INFLATION_MISMATCH: u8 = 2;
+pub const ERRNO_INFLATION_EXCEEDED_ALLOWANCE: u8 = 3;
 pub const ERRNO_NON_FRACTIONAL: u8 = 10;
 
 pub mod dumb {

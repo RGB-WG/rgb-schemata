@@ -27,13 +27,33 @@ use ifaces::{rgb20, rgb21, rgb25, IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::interface::IfaceClass;
 use rgbstd::vm::RgbIsa;
-use schemata::{CollectibleFungibleAsset, NonInflatableAsset, UniqueDigitalAsset};
+use schemata::{CollectibleFungibleAsset, InflatableAsset, NonInflatableAsset, UniqueDigitalAsset};
 
 fn main() -> io::Result<()> {
     nia()?;
     uda()?;
     cfa()?;
+    ia()?;
+    Ok(())
+}
 
+fn ia() -> io::Result<()> {
+    let schema = InflatableAsset::schema();
+    let iimpl = InflatableAsset::issue_impl();
+    let lib = InflatableAsset::scripts();
+    let types = InflatableAsset::types();
+
+    let mut kit = Kit::default();
+    kit.schemata.push(schema).unwrap();
+    kit.ifaces
+        .push(Rgb20::iface(rgb20::Features::INFLATABLE))
+        .unwrap();
+    kit.iimpls.push(iimpl).unwrap();
+    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.types = types;
+    kit.save_file("schemata/InflatableAssets.rgb")?;
+    kit.save_armored("schemata/InflatableAssets.rgba")?;
+    print_lib(&kit);
     Ok(())
 }
 
