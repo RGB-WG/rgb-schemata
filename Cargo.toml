@@ -21,7 +21,7 @@ strict_encoding = "2.7.0-beta.4"
 strict_types = "2.7.0-beta.4"
 aluvm = "0.11.0-beta.6"
 bp-core = "0.11.0-beta.6"
-rgb-std = { version = "0.11.0-beta.6", features = ["serde", "fs"] }
+rgb-std = { version = "0.11.0-beta.6", features = ["serde"] }
 rgb-interfaces = "0.11.0-beta.6"
 chrono = "0.4.37"
 serde = "1.0"
@@ -33,5 +33,7 @@ chrono = "0.4.31"
 serde_yaml = "0.9.27"
 
 [features]
-all = ["log"]
+default = []
+all = ["log", "fs"]
 log = ["aluvm/log"]
+fs = ["rgb-std/fs"]
