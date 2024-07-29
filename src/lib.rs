@@ -52,9 +52,10 @@ pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
 pub const ERRNO_NON_FRACTIONAL: u8 = 10;
 
 pub mod dumb {
-    use rgbstd::resolvers::ResolveHeight;
+    use rgbstd::resolvers::ResolveWitnessAnchor;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-    use rgbstd::{WitnessAnchor, XWitnessId, XWitnessTx};
+    use rgbstd::vm::WitnessAnchor;
+    use rgbstd::{XWitnessId, XWitnessTx};
     use strict_encoding::StrictDumb;
 
     pub struct DumbResolver;
@@ -65,8 +66,8 @@ pub mod dumb {
         }
     }
 
-    impl ResolveHeight for DumbResolver {
-        fn resolve_height(&mut self, _: XWitnessId) -> Result<WitnessAnchor, String> {
+    impl ResolveWitnessAnchor for DumbResolver {
+        fn resolve_witness_anchor(&mut self, _: XWitnessId) -> Result<WitnessAnchor, String> {
             Ok(WitnessAnchor::strict_dumb())
         }
     }

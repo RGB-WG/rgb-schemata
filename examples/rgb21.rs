@@ -5,8 +5,8 @@ use amplify::hex::FromHex;
 use amplify::{Bytes, Wrapper};
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
-use ifaces::{IssuerWrapper, Rgb21};
-use rgbstd::containers::{FileContent, Kit};
+use ifaces::{Dumb, IssuerWrapper, Rgb21};
+use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
@@ -49,7 +49,7 @@ fn main() {
     stock.import_kit(kit).expect("invalid issuer kit");
 
     let contract = stock.contract_builder("ssi:anonymous",
-        UniqueDigitalAsset::schema().schema_id(),
+        UniqueDigitalAsset::<Dumb>::schema().schema_id(),
         "RGB21Unique",
         ).expect("schema fails to implement RGB21 interface")
 
@@ -77,7 +77,7 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
+    let contract = stock.contract_iface_class::<Rgb21<_>>(contract_id).unwrap();
     let contract = Rgb21::from(contract);
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 }

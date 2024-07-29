@@ -23,7 +23,7 @@ use std::io;
 use std::io::stdout;
 
 use ifaces::rgb21::Rgb21;
-use ifaces::{rgb20, rgb21, rgb25, IssuerWrapper, Rgb20, Rgb25};
+use ifaces::{rgb20, rgb21, rgb25, Dumb, IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
 use rgbstd::interface::IfaceClass;
 use rgbstd::vm::RgbIsa;
@@ -38,15 +38,15 @@ fn main() -> io::Result<()> {
 }
 
 fn nia() -> io::Result<()> {
-    let schema = NonInflatableAsset::schema();
-    let iimpl = NonInflatableAsset::issue_impl();
-    let lib = NonInflatableAsset::scripts();
-    let types = NonInflatableAsset::types();
+    let schema = NonInflatableAsset::<Dumb>::schema();
+    let iimpl = NonInflatableAsset::<Dumb>::issue_impl();
+    let lib = NonInflatableAsset::<Dumb>::scripts();
+    let types = NonInflatableAsset::<Dumb>::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb20::iface(rgb20::Features::FIXED))
+        .push(Rgb20::<Dumb>::iface(rgb20::Features::FIXED))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
@@ -60,15 +60,15 @@ fn nia() -> io::Result<()> {
 }
 
 fn uda() -> io::Result<()> {
-    let schema = UniqueDigitalAsset::schema();
-    let iimpl = UniqueDigitalAsset::issue_impl();
-    let lib = UniqueDigitalAsset::scripts();
-    let types = UniqueDigitalAsset::types();
+    let schema = UniqueDigitalAsset::<Dumb>::schema();
+    let iimpl = UniqueDigitalAsset::<Dumb>::issue_impl();
+    let lib = UniqueDigitalAsset::<Dumb>::scripts();
+    let types = UniqueDigitalAsset::<Dumb>::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb21::iface(rgb21::Features::NONE))
+        .push(Rgb21::<Dumb>::iface(rgb21::Features::NONE))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
@@ -82,15 +82,15 @@ fn uda() -> io::Result<()> {
 }
 
 fn cfa() -> io::Result<()> {
-    let schema = CollectibleFungibleAsset::schema();
-    let iimpl = CollectibleFungibleAsset::issue_impl();
-    let lib = CollectibleFungibleAsset::scripts();
-    let types = CollectibleFungibleAsset::types();
+    let schema = CollectibleFungibleAsset::<Dumb>::schema();
+    let iimpl = CollectibleFungibleAsset::<Dumb>::issue_impl();
+    let lib = CollectibleFungibleAsset::<Dumb>::scripts();
+    let types = CollectibleFungibleAsset::<Dumb>::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces
-        .push(Rgb25::iface(rgb25::Features::NONE))
+        .push(Rgb25::<Dumb>::iface(rgb25::Features::NONE))
         .unwrap();
     kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();

@@ -22,11 +22,14 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
+use std::marker::PhantomData;
+
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use ifaces::{rgb20, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
+use ifaces::{rgb20, Dumb, IssuerWrapper, Rgb20, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
+use rgbstd::persistence::ContractStateRead;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
@@ -75,7 +78,7 @@ pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
 pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
-    let types = StandardTypes::with(Rgb20::stl());
+    let types = StandardTypes::with(Rgb20::<Dumb>::stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
@@ -134,7 +137,7 @@ fn nia_schema() -> Schema {
 
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
-    let iface = Rgb20::iface(rgb20::Features::FIXED);
+    let iface = Rgb20::<Dumb>::iface(rgb20::Features::FIXED);
 
     IfaceImpl {
         version: VerNo::V1,
@@ -163,16 +166,17 @@ fn nia_rgb20() -> IfaceImpl {
     }
 }
 
-pub struct NonInflatableAsset;
+#[derive(Default)]
+pub struct NonInflatableAsset<S: ContractStateRead>(PhantomData<S>);
 
-impl IssuerWrapper for NonInflatableAsset {
+impl<S: ContractStateRead> IssuerWrapper for NonInflatableAsset<S> {
     const FEATURES: rgb20::Features = rgb20::Features::FIXED;
-    type IssuingIface = Rgb20;
+    type IssuingIface = Rgb20<S>;
 
     fn schema() -> Schema { nia_schema() }
     fn issue_impl() -> IfaceImpl { nia_rgb20() }
 
-    fn types() -> TypeSystem { StandardTypes::with(Rgb20::stl()).type_system() }
+    fn types() -> TypeSystem { StandardTypes::with(Rgb20::<Dumb>::stl()).type_system() }
 
     fn scripts() -> Scripts {
         let lib = nia_lib();
@@ -187,7 +191,7 @@ mod test {
     use bp::seals::txout::{BlindSeal, CloseMethod};
     use bp::Txid;
     use chrono::DateTime;
-    use rgbstd::containers::BuilderSeal;
+    use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
     use rgbstd::invoice::Precision;
     use rgbstd::stl::*;
@@ -197,7 +201,7 @@ mod test {
 
     #[test]
     fn iimpl_check() {
-        let iface = Rgb20::iface(NonInflatableAsset::FEATURES);
+        let iface = Rgb20::<Dumb>::iface(NonInflatableAsset::<Dumb>::FEATURES);
         if let Err(err) = nia_rgb20().check(&iface, &nia_schema()) {
             for e in err {
                 eprintln!("{e}");
@@ -239,11 +243,11 @@ mod test {
 
         let builder = ContractBuilder::deterministic(
             Identity::default(),
-            Rgb20::iface(rgb20::Features::FIXED),
-            NonInflatableAsset::schema(),
-            NonInflatableAsset::issue_impl(),
-            NonInflatableAsset::types(),
-            NonInflatableAsset::scripts(),
+            Rgb20::<Dumb>::iface(rgb20::Features::FIXED),
+            NonInflatableAsset::<Dumb>::schema(),
+            NonInflatableAsset::<Dumb>::issue_impl(),
+            NonInflatableAsset::<Dumb>::types(),
+            NonInflatableAsset::<Dumb>::scripts(),
         )
         .add_global_state("spec", spec)
         .unwrap()
@@ -268,7 +272,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:qFuT6DN8-9AuO95M-7R8R8Mc-AZvs7zG-obum1Va-BRnweKk")
+            s!("rgb:OZkpU1Li-zXGR2tC-A0q8FfY-TgyqVi0-92fAfja-jOHd6w4")
         );
     }
 }
