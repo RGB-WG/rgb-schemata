@@ -22,13 +22,10 @@
 //! Collectible Fungible Assets (CFA) schema implementing RGB25 fungible assets
 //! interface.
 
-use std::marker::PhantomData;
-
 use aluvm::library::LibSite;
 use ifaces::rgb25::Rgb25;
-use ifaces::{rgb25, Dumb, IssuerWrapper, LNPBP_IDENTITY};
+use ifaces::{IssuerWrapper, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
-use rgbstd::persistence::ContractStateRead;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema,
 };
@@ -49,7 +46,7 @@ const GS_DETAILS: GlobalStateType = GlobalStateType::with(3004);
 const GS_PRECISION: GlobalStateType = GlobalStateType::with(3005);
 
 pub fn cfa_schema() -> Schema {
-    let types = StandardTypes::with(Rgb25::<Dumb>::stl());
+    let types = StandardTypes::with(Rgb25::NONE.stl());
 
     let nia_id = nia_lib().id();
 
@@ -109,12 +106,11 @@ pub fn cfa_schema() -> Schema {
 
 pub fn cfa_rgb25() -> IfaceImpl {
     let schema = cfa_schema();
-    let iface = Rgb25::<Dumb>::iface(rgb25::Features::NONE);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
-        iface_id: iface.iface_id(),
+        iface_id: Rgb25::NONE.iface_id(),
         timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
@@ -142,16 +138,16 @@ pub fn cfa_rgb25() -> IfaceImpl {
 }
 
 #[derive(Default)]
-pub struct CollectibleFungibleAsset<S: ContractStateRead>(PhantomData<S>);
+pub struct CollectibleFungibleAsset;
 
-impl<S: ContractStateRead> IssuerWrapper for CollectibleFungibleAsset<S> {
-    const FEATURES: rgb25::Features = rgb25::Features::NONE;
-    type IssuingIface = Rgb25<S>;
+impl IssuerWrapper for CollectibleFungibleAsset {
+    type IssuingIface = Rgb25;
+    const FEATURES: Rgb25 = Rgb25::NONE;
 
     fn schema() -> Schema { cfa_schema() }
     fn issue_impl() -> IfaceImpl { cfa_rgb25() }
 
-    fn types() -> TypeSystem { StandardTypes::with(Rgb25::<Dumb>::stl()).type_system() }
+    fn types() -> TypeSystem { StandardTypes::with(Rgb25::NONE.stl()).type_system() }
 
     fn scripts() -> Scripts {
         let lib = nia_lib();
@@ -165,7 +161,7 @@ mod test {
 
     #[test]
     fn iimpl_check() {
-        let iface = Rgb25::<Dumb>::iface(CollectibleFungibleAsset::<Dumb>::FEATURES);
+        let iface = CollectibleFungibleAsset::FEATURES.iface();
         if let Err(err) = cfa_rgb25().check(&iface, &cfa_schema()) {
             for e in err {
                 eprintln!("{e}");

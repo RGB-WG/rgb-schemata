@@ -21,14 +21,12 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
-use std::marker::PhantomData;
-
 use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use ifaces::{rgb21, Dumb, IssuerWrapper, Rgb21, LNPBP_IDENTITY};
+use ifaces::{IssuerWrapper, Rgb21, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
-use rgbstd::persistence::ContractStateRead;
+use rgbstd::persistence::MemContract;
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
@@ -92,11 +90,11 @@ fn uda_lib() -> Lib {
         // Fail if not
         test;
     };
-    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong unique digital asset script")
+    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong unique digital asset script")
 }
 
 fn uda_schema() -> Schema {
-    let types = StandardTypes::with(Rgb21::<Dumb>::stl());
+    let types = StandardTypes::with(Rgb21::NONE.stl());
 
     let alu_lib = uda_lib();
     let alu_id = alu_lib.id();
@@ -159,12 +157,11 @@ fn uda_schema() -> Schema {
 
 fn uda_rgb21() -> IfaceImpl {
     let schema = uda_schema();
-    let iface = Rgb21::<Dumb>::iface(rgb21::Features::NONE);
 
     IfaceImpl {
         version: VerNo::V1,
         schema_id: schema.schema_id(),
-        iface_id: iface.iface_id(),
+        iface_id: Rgb21::NONE.iface_id(),
         timestamp: 1713343888,
         developer: Identity::from(LNPBP_IDENTITY),
         metadata: none!(),
@@ -190,16 +187,16 @@ fn uda_rgb21() -> IfaceImpl {
 }
 
 #[derive(Default)]
-pub struct UniqueDigitalAsset<S: ContractStateRead>(PhantomData<S>);
+pub struct UniqueDigitalAsset;
 
-impl<S: ContractStateRead> IssuerWrapper for UniqueDigitalAsset<S> {
-    const FEATURES: rgb21::Features = rgb21::Features::NONE;
-    type IssuingIface = Rgb21<S>;
+impl IssuerWrapper for UniqueDigitalAsset {
+    type IssuingIface = Rgb21;
+    const FEATURES: Rgb21 = Rgb21::NONE;
 
     fn schema() -> Schema { uda_schema() }
     fn issue_impl() -> IfaceImpl { uda_rgb21() }
 
-    fn types() -> TypeSystem { StandardTypes::with(Rgb21::<Dumb>::stl()).type_system() }
+    fn types() -> TypeSystem { StandardTypes::with(Self::FEATURES.stl()).type_system() }
 
     fn scripts() -> Scripts {
         let lib = uda_lib();
@@ -213,7 +210,7 @@ mod test {
 
     #[test]
     fn iimpl_check() {
-        let iface = Rgb21::<Dumb>::iface(UniqueDigitalAsset::<Dumb>::FEATURES);
+        let iface = UniqueDigitalAsset::FEATURES.iface();
         if let Err(err) = uda_rgb21().check(&iface, &uda_schema()) {
             for e in err {
                 eprintln!("{e}");

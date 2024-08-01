@@ -27,6 +27,7 @@ use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use ifaces::{IssuerWrapper, Rgb20, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
+use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
     TransitionSchema,
@@ -69,7 +70,7 @@ pub(crate) fn nia_lib() -> Lib {
         test;
         ret;
     };
-    Lib::assemble::<Instr<RgbIsa>>(&code).expect("wrong non-inflatable asset script")
+    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong non-inflatable asset script")
 }
 pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
 pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
@@ -269,7 +270,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:OZkpU1Li-zXGR2tC-A0q8FfY-TgyqVi0-92fAfja-jOHd6w4")
+            s!("rgb:FnPSAtZ1-Pz7NyB7-SB8uiJN-VGXsr0T-2lUAaGI-agUu7z4")
         );
     }
 }
