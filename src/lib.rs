@@ -55,20 +55,19 @@ pub mod dumb {
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
     use rgbstd::vm::{WitnessOrd, XWitnessTx};
     use rgbstd::XWitnessId;
-    use strict_encoding::StrictDumb;
 
-    pub struct DumbResolver;
+    pub struct NoResolver;
 
-    impl ResolveWitness for DumbResolver {
+    impl ResolveWitness for NoResolver {
         fn resolve_pub_witness(&self, _: XWitnessId) -> Result<XWitnessTx, WitnessResolverError> {
-            Ok(XWitnessTx::strict_dumb())
+            unreachable!()
         }
 
         fn resolve_pub_witness_ord(
             &self,
             _: XWitnessId,
         ) -> Result<WitnessOrd, WitnessResolverError> {
-            Ok(WitnessOrd::strict_dumb())
+            unreachable!()
         }
     }
 }

@@ -25,8 +25,10 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
-use ifaces::{IssuerWrapper, Rgb20, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
+use bp::dbc::Method;
+use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
+use rgbstd::containers::ValidContract;
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
@@ -36,7 +38,8 @@ use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
 use rgbstd::vm::opcodes::INSTR_PCVS;
 use rgbstd::vm::RgbIsa;
-use rgbstd::{rgbasm, Identity};
+use rgbstd::{rgbasm, Amount, Identity, Precision};
+use strict_encoding::InvalidRString;
 use strict_types::TypeSystem;
 
 use crate::{
@@ -179,6 +182,26 @@ impl IssuerWrapper for NonInflatableAsset {
     fn scripts() -> Scripts {
         let lib = nia_lib();
         confined_bmap! { lib.id() => lib }
+    }
+}
+
+impl NonInflatableAsset {
+    pub fn testnet(
+        issuer: &str,
+        ticker: &str,
+        name: &str,
+        details: Option<&str>,
+        precision: Precision,
+        allocations: impl IntoIterator<Item = (Method, impl TxOutpoint, impl Into<Amount>)>,
+    ) -> Result<ValidContract, InvalidRString> {
+        let mut issuer =
+            Rgb20Wrapper::<MemContract>::testnet::<Self>(issuer, ticker, name, details, precision)?;
+        for (method, beneficiary, amount) in allocations {
+            issuer = issuer
+                .allocate(method, beneficiary, amount)
+                .expect("invalid contract data");
+        }
+        Ok(issuer.issue_contract().expect("invalid contract data"))
     }
 }
 

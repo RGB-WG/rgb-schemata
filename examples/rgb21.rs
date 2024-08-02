@@ -11,7 +11,7 @@ use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
 use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
-use schemata::dumb::DumbResolver;
+use schemata::dumb::NoResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
 
@@ -74,7 +74,7 @@ fn main() {
     contract.save_file("test/rgb21-example.rgb").expect("unable to save contract");
     contract.save_armored("test/rgb21-example.rgba").expect("unable to save armored contract");
 
-    stock.import_contract(contract, DumbResolver).unwrap();
+    stock.import_contract(contract, NoResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();

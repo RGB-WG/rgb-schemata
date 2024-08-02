@@ -7,7 +7,7 @@ use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemContract, Stock};
 use rgbstd::XWitnessId;
-use schemata::dumb::DumbResolver;
+use schemata::dumb::NoResolver;
 use schemata::CollectibleFungibleAsset;
 
 #[rustfmt::skip]
@@ -35,7 +35,7 @@ fn main() {
     contract.save_file("test/rgb25-example.rgb").expect("unable to save contract");
     contract.save_armored("test/rgb25-example.rgba").expect("unable to save armored contract");
 
-    stock.import_contract(contract, DumbResolver).unwrap();
+    stock.import_contract(contract, NoResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb25>(contract_id).unwrap();
