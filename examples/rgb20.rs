@@ -1,7 +1,7 @@
 use amplify::hex::FromHex;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
-use ifaces::{IssuerWrapper, Rgb20};
+use ifaces::Rgb20;
 use rgbstd::containers::{ConsignmentExt, FileContent};
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
@@ -27,7 +27,6 @@ fn main() {
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let mut stock = Stock::in_memory();
-    stock.import_kit(NonInflatableAsset::kit()).expect("invalid issuer kit");
     stock.import_contract(contract, NoResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
