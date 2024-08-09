@@ -5,13 +5,13 @@ use amplify::hex::FromHex;
 use amplify::{Bytes, Wrapper};
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
-use ifaces::{Dumb, IssuerWrapper, Rgb21};
+use ifaces::{IssuerWrapper, Rgb21, Rgb21Wrapper};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
-use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
+use rgbstd::persistence::Stock;
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
 use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
-use schemata::dumb::DumbResolver;
+use schemata::dumb::NoResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
 
@@ -45,11 +45,11 @@ fn main() {
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let kit = Kit::load_file("schemata/UniqueDigitalAsset.rgb").unwrap().validate().unwrap();
-    let mut stock = Stock::<MemStash, MemState, MemIndex>::default();
+    let mut stock = Stock::in_memory();
     stock.import_kit(kit).expect("invalid issuer kit");
 
     let contract = stock.contract_builder("ssi:anonymous",
-        UniqueDigitalAsset::<Dumb>::schema().schema_id(),
+        UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",
         ).expect("schema fails to implement RGB21 interface")
 
@@ -74,10 +74,10 @@ fn main() {
     contract.save_file("test/rgb21-example.rgb").expect("unable to save contract");
     contract.save_armored("test/rgb21-example.rgba").expect("unable to save armored contract");
 
-    stock.import_contract(contract, &mut DumbResolver).unwrap();
+    stock.import_contract(contract, NoResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_class::<Rgb21<_>>(contract_id).unwrap();
-    let contract = Rgb21::from(contract);
+    let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
+    let contract = Rgb21Wrapper::from(contract);
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 }

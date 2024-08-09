@@ -651,7 +651,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=mining#5a824a3c973c28285d116049a43c15bb26d9c7e6"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=master#f47d1a33e189d8b88c869e39527c525f90aafda5"
 dependencies = [
  "aluvm",
  "amplify",
@@ -672,7 +672,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-interfaces.git?branch=mining#95755d67def14b89ad48e4811f6e72efcc0928ff"
+source = "git+https://github.com/RGB-WG/rgb-interfaces.git?branch=master#eca2fa65d306b83e158b12957f6f72681b93c15f"
 dependencies = [
  "aluvm",
  "amplify",
@@ -688,7 +688,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=mining#120e01957af037fa95e1fa611ee90235b48e6645"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=master#a90e556dc9fe8adb9584992c643318c68ff26a0f"
 dependencies = [
  "amplify",
  "baid64",
@@ -726,7 +726,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.6"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=mining#120e01957af037fa95e1fa611ee90235b48e6645"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=master#a90e556dc9fe8adb9584992c643318c68ff26a0f"
 dependencies = [
  "aluvm",
  "amplify",

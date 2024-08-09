@@ -52,23 +52,22 @@ pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
 pub const ERRNO_NON_FRACTIONAL: u8 = 10;
 
 pub mod dumb {
-    use rgbstd::resolvers::ResolveWitnessAnchor;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-    use rgbstd::vm::WitnessAnchor;
-    use rgbstd::{XWitnessId, XWitnessTx};
-    use strict_encoding::StrictDumb;
+    use rgbstd::vm::{WitnessOrd, XWitnessTx};
+    use rgbstd::XWitnessId;
 
-    pub struct DumbResolver;
+    pub struct NoResolver;
 
-    impl ResolveWitness for DumbResolver {
+    impl ResolveWitness for NoResolver {
         fn resolve_pub_witness(&self, _: XWitnessId) -> Result<XWitnessTx, WitnessResolverError> {
-            Ok(XWitnessTx::strict_dumb())
+            unreachable!()
         }
-    }
 
-    impl ResolveWitnessAnchor for DumbResolver {
-        fn resolve_witness_anchor(&mut self, _: XWitnessId) -> Result<WitnessAnchor, String> {
-            Ok(WitnessAnchor::strict_dumb())
+        fn resolve_pub_witness_ord(
+            &self,
+            _: XWitnessId,
+        ) -> Result<WitnessOrd, WitnessResolverError> {
+            unreachable!()
         }
     }
 }
