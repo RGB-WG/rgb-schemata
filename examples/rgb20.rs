@@ -1,8 +1,8 @@
 use amplify::hex::FromHex;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
-use ifaces::Rgb20;
-use rgbstd::containers::{FileContent, Kit};
+use ifaces::{Dumb, Rgb20};
+use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemIndex, MemStash, MemState, Stock};
@@ -15,7 +15,7 @@ fn main() {
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
     let beneficiary = Outpoint::new(beneficiary_txid, 1);
 
-    let contract = Rgb20::testnet::<NonInflatableAsset>("ssi:anonymous","TEST", "Test asset", None, Precision::CentiMicro)
+    let contract = Rgb20::testnet::<NonInflatableAsset<Dumb>>("ssi:anonymous","TEST", "Test asset", None, Precision::CentiMicro)
         .expect("invalid contract data")
         .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64)
         .expect("invalid allocations")
@@ -36,9 +36,9 @@ fn main() {
     stock.import_contract(contract, &mut DumbResolver).unwrap();
 
     // Reading contract state through the interface from the stock:
-    let contract = stock.contract_iface_class::<Rgb20>(contract_id).unwrap();
+    let contract = stock.contract_iface_class::<Rgb20<_>>(contract_id).unwrap();
     let contract = Rgb20::from(contract);
-    let allocations = contract.fungible("assetOwner", &FilterIncludeAll).unwrap();
+    let allocations = contract.allocations(&FilterIncludeAll);
     eprintln!("\nThe issued contract data:");
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
