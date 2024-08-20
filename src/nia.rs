@@ -25,6 +25,7 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
+use amplify::confinement::Confined;
 use bp::dbc::Method;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
@@ -181,7 +182,7 @@ impl IssuerWrapper for NonInflatableAsset {
 
     fn scripts() -> Scripts {
         let lib = nia_lib();
-        confined_bmap! { lib.id() => lib }
+        Confined::from_checked(bmap! { lib.id() => lib })
     }
 }
 
@@ -192,7 +193,7 @@ impl NonInflatableAsset {
         name: &str,
         details: Option<&str>,
         precision: Precision,
-        allocations: impl IntoIterator<Item = (Method, impl TxOutpoint, impl Into<Amount>)>,
+        allocations: impl IntoIterator<Item=(Method, impl TxOutpoint, impl Into<Amount>)>,
     ) -> Result<ValidContract, InvalidRString> {
         let mut issuer =
             Rgb20Wrapper::<MemContract>::testnet::<Self>(issuer, ticker, name, details, precision)?;
@@ -270,24 +271,24 @@ mod test {
             NonInflatableAsset::types(),
             NonInflatableAsset::scripts(),
         )
-        .add_global_state("spec", spec)
-        .unwrap()
-        .add_global_state("terms", terms)
-        .unwrap()
-        .add_global_state("issuedSupply", Amount::from(issued_supply))
-        .unwrap()
-        .add_asset_tag("assetOwner", asset_tag)
-        .unwrap()
-        .add_fungible_state_det(
-            "assetOwner",
-            BuilderSeal::from(seal),
-            issued_supply,
-            BlindingFactor::from_str(
-                "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
+            .add_global_state("spec", spec)
+            .unwrap()
+            .add_global_state("terms", terms)
+            .unwrap()
+            .add_global_state("issuedSupply", Amount::from(issued_supply))
+            .unwrap()
+            .add_asset_tag("assetOwner", asset_tag)
+            .unwrap()
+            .add_fungible_state_det(
+                "assetOwner",
+                BuilderSeal::from(seal),
+                issued_supply,
+                BlindingFactor::from_str(
+                    "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
+                )
+                    .unwrap(),
             )
-            .unwrap(),
-        )
-        .unwrap();
+            .unwrap();
 
         let contract = builder.issue_contract_det(created_at).unwrap();
 
