@@ -5,7 +5,7 @@ use amplify::hex::FromHex;
 use amplify::{Bytes, Wrapper};
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
-use ifaces::{IssuerWrapper, Rgb21, Rgb21Wrapper};
+use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
@@ -78,6 +78,5 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
-    let contract = Rgb21Wrapper::from(contract);
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 }
