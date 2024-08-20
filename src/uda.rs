@@ -24,6 +24,7 @@
 use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
+use amplify::confinement::Confined;
 use ifaces::{IssuerWrapper, Rgb21, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::persistence::MemContract;
@@ -200,7 +201,7 @@ impl IssuerWrapper for UniqueDigitalAsset {
 
     fn scripts() -> Scripts {
         let lib = uda_lib();
-        confined_bmap! { lib.id() => lib }
+        Confined::from_checked(bmap! { lib.id() => lib })
     }
 }
 

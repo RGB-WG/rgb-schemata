@@ -25,6 +25,7 @@
 use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
+use amplify::confinement::Confined;
 use bp::dbc::Method;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
@@ -181,7 +182,7 @@ impl IssuerWrapper for NonInflatableAsset {
 
     fn scripts() -> Scripts {
         let lib = nia_lib();
-        confined_bmap! { lib.id() => lib }
+        Confined::from_checked(bmap! { lib.id() => lib })
     }
 }
 

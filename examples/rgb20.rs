@@ -16,6 +16,7 @@ fn main() {
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
     let beneficiary = Outpoint::new(beneficiary_txid, 1);
 
+    #[allow(clippy::inconsistent_digit_grouping)]
     let contract = NonInflatableAsset::testnet("ssi:anonymous","TEST", "Test asset", None, Precision::CentiMicro, [(Method::TapretFirst, beneficiary, 1_000_000_000_00u64)])
         .expect("invalid contract data");
 

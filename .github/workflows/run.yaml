@@ -1,0 +1,25 @@
+name: Generate schemata
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v[0-9]+\.*'
+  pull_request:
+    branches:
+      - master
+      - develop
+      - 'v[0-9]+.[0-9]+'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  gen-schemata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo run --features fs
+      - run: git diff | grep -q . && exit 1

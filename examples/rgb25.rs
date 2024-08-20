@@ -22,6 +22,7 @@ fn main() {
     let mut stock = Stock::in_memory();
     stock.import_kit(kit).expect("invalid issuer kit");
 
+    #[allow(clippy::inconsistent_digit_grouping)]
     let contract = Rgb25Wrapper::<MemContract>::testnet::<CollectibleFungibleAsset>("ssi:anonymous", "Test asset", Precision::CentiMicro)
         .expect("invalid contract data")
         .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
@@ -39,7 +40,6 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb25>(contract_id).unwrap();
-    let contract = Rgb25Wrapper::from(contract);
     let allocations = contract.allocations(&FilterIncludeAll);
     eprintln!("\nThe issued contract data:");
     eprintln!("{}", contract.name());

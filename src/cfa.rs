@@ -23,6 +23,7 @@
 //! interface.
 
 use aluvm::library::LibSite;
+use amplify::confinement::Confined;
 use ifaces::rgb25::Rgb25;
 use ifaces::{IssuerWrapper, LNPBP_IDENTITY};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
@@ -151,7 +152,7 @@ impl IssuerWrapper for CollectibleFungibleAsset {
 
     fn scripts() -> Scripts {
         let lib = nia_lib();
-        confined_bmap! { lib.id() => lib }
+        Confined::from_checked(bmap! { lib.id() => lib })
     }
 }
 
