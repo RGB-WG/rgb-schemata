@@ -294,7 +294,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:FnPSAtZ1-Pz7NyB7-SB8uiJN-VGXsr0T-2lUAaGI-agUu7z4")
+            s!("rgb:pOIzGFyQ-mA!yQq2-QH8vB5!-5fAplY!-x2lW!vz-JHDbYPg")
         );
     }
 }
