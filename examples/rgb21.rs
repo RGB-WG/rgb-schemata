@@ -4,15 +4,14 @@ use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
 use amplify::{Bytes, Wrapper};
 use bp::Txid;
-use ifaces::rgb21::{EmbeddedMedia, TokenData};
+use ifaces::rgb21::{EmbeddedMedia, NftAllocation, TokenData, TokenIndex};
+use ifaces::stl::*;
 use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
-use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
-use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
-use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
-use schemata::dumb::NoResolver;
+use rgbstd::{GenesisSeal, XChain};
 use schemata::UniqueDigitalAsset;
+use schemata::dumb::NoResolver;
 use sha2::{Digest, Sha256};
 
 #[rustfmt::skip]
@@ -41,7 +40,7 @@ fn main() {
     };
 
     let token_data = TokenData { index, preview: Some(preview), ..Default::default() };
-    let allocation = Allocation::with(index, 1);
+    let allocation = NftAllocation::with(index, 1);
 
     // Let's create some stock - an in-memory stash and inventory around it:
     let kit = Kit::load_file("schemata/UniqueDigitalAsset.rgb").unwrap().validate().unwrap();
@@ -53,16 +52,16 @@ fn main() {
         "RGB21Unique",
         ).expect("schema fails to implement RGB21 interface")
 
-        .add_global_state("tokens", token_data)
+        .serialize_global_state("tokens", &token_data)
         .expect("invalid token data")
 
-        .add_global_state("spec", spec)
+        .serialize_global_state("spec", &spec)
         .expect("invalid nominal")
 
-        .add_global_state("terms", terms)
+        .serialize_global_state("terms", &terms)
         .expect("invalid contract text")
 
-        .add_data("assetOwner", beneficiary, allocation)
+        .serialize_owned_state("assetOwner", beneficiary, &allocation, None)
         .expect("invalid asset blob")
 
         .issue_contract()

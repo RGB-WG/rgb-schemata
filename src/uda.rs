@@ -21,19 +21,19 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
-use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::isa::Instr;
+use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
-use ifaces::{IssuerWrapper, Rgb21, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
+use ifaces::stl::StandardTypes;
+use ifaces::{IssuerWrapper, LNPBP_IDENTITY, Rgb21};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, StateAbi, VerNo};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
-use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::INSTR_LDG;
 use rgbstd::vm::RgbIsa;
-use rgbstd::{rgbasm, Identity, OwnedStateSchema};
+use rgbstd::vm::opcodes::INSTR_LDG;
+use rgbstd::{Identity, OwnedStateSchema, rgbasm};
 use strict_types::TypeSystem;
 
 use crate::{
@@ -120,7 +120,7 @@ fn uda_schema() -> Schema {
             GS_ATTACH => GlobalStateSchema::once(types.get("RGB21.AttachmentType")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => OwnedStateSchema::Structured(types.get("RGBContract.Allocation")),
+            OS_ASSET => OwnedStateSchema::from(types.get("RGBContract.NftAllocation")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
@@ -183,6 +183,12 @@ fn uda_rgb21() -> IfaceImpl {
         errors: tiny_bset! {
             NamedVariant::with(ERRNO_NON_FRACTIONAL, vname!("nonFractionalToken")),
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("unknownToken")),
+        },
+        state_abi: StateAbi {
+            reg_input: Default::default(),
+            reg_output: Default::default(),
+            calc_output: Default::default(),
+            calc_change: Default::default(),
         },
     }
 }

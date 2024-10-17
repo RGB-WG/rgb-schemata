@@ -22,24 +22,24 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
-use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
+use aluvm::isa::opcodes::{INSTR_PUTA, INSTR_TEST};
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use bp::dbc::Method;
-use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
+use ifaces::stl::{Amount, Precision, StandardTypes};
+use ifaces::{IssuerWrapper, LNPBP_IDENTITY, Rgb20, Rgb20Wrapper};
 use rgbstd::containers::ValidContract;
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
+use rgbstd::interface::{
+    IfaceClass, IfaceImpl, NamedField, NamedVariant, StateAbi, TxOutpoint, VerNo,
+};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
-    TransitionSchema,
+    GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema, TransitionSchema,
 };
-use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::INSTR_PCVS;
 use rgbstd::vm::RgbIsa;
-use rgbstd::{rgbasm, Amount, Identity, Precision};
+use rgbstd::{Identity, rgbasm};
 use strict_encoding::InvalidRString;
 use strict_types::TypeSystem;
 
@@ -54,7 +54,7 @@ pub(crate) fn nia_lib() -> Lib {
         // Set errno
         put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
         // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        pcvs    OS_ASSET;
+        // ..................
         test;
         ret;
 
@@ -70,13 +70,13 @@ pub(crate) fn nia_lib() -> Lib {
         // NB: if the global state is invalid, we will fail here and fail the validation
         extr    s16[0],a64[0],a16[0];
         // verify sum of pedersen commitments for assignments against a64[0] value
-        pcas    OS_ASSET;
+        // ..................
         test;
         ret;
     };
     Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong non-inflatable asset script")
 }
-pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2 - 3;
 pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
 
 fn nia_schema() -> Schema {
@@ -84,7 +84,7 @@ fn nia_schema() -> Schema {
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_TEST);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
@@ -102,7 +102,7 @@ fn nia_schema() -> Schema {
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => OwnedStateSchema::from(types.get("RGBContract.Amount")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
@@ -165,6 +165,12 @@ fn nia_rgb20() -> IfaceImpl {
             NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
         ],
+        state_abi: StateAbi {
+            reg_input: Default::default(),
+            reg_output: Default::default(),
+            calc_output: Default::default(),
+            calc_change: Default::default(),
+        },
     }
 }
 
@@ -210,13 +216,11 @@ impl NonInflatableAsset {
 mod test {
     use std::str::FromStr;
 
-    use bp::seals::txout::{BlindSeal, CloseMethod};
     use bp::Txid;
-    use chrono::DateTime;
+    use bp::seals::txout::{BlindSeal, CloseMethod};
+    use ifaces::stl::*;
     use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
-    use rgbstd::invoice::Precision;
-    use rgbstd::stl::*;
     use rgbstd::*;
 
     use super::*;
@@ -245,7 +249,7 @@ mod test {
             details: None,
             precision: Precision::try_from(2).unwrap(),
         };
-        let issued_supply = 999u64;
+        let issued_supply = Amount::from(999u64);
         let seal: XChain<BlindSeal<Txid>> = XChain::with(
             Layer1::Bitcoin,
             GenesisSeal::from(BlindSeal::with_blinding(
@@ -256,14 +260,8 @@ mod test {
                 654321,
             )),
         );
-        let asset_tag = AssetTag::new_deterministic(
-            "contract_domain",
-            AssignmentType::with(0),
-            DateTime::from_timestamp(created_at, 0).unwrap(),
-            123456,
-        );
 
-        let builder = ContractBuilder::deterministic(
+        let builder = ContractBuilder::with(
             Identity::default(),
             NonInflatableAsset::FEATURES.iface(),
             NonInflatableAsset::schema(),
@@ -271,23 +269,13 @@ mod test {
             NonInflatableAsset::types(),
             NonInflatableAsset::scripts(),
         )
-        .add_global_state("spec", spec)
+        .serialize_global_state("spec", &spec)
         .unwrap()
-        .add_global_state("terms", terms)
+        .serialize_global_state("terms", &terms)
         .unwrap()
-        .add_global_state("issuedSupply", Amount::from(issued_supply))
+        .serialize_global_state("issuedSupply", &issued_supply)
         .unwrap()
-        .add_asset_tag("assetOwner", asset_tag)
-        .unwrap()
-        .add_fungible_state_det(
-            "assetOwner",
-            BuilderSeal::from(seal),
-            issued_supply,
-            BlindingFactor::from_str(
-                "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
-            )
-            .unwrap(),
-        )
+        .serialize_owned_state("assetOwner", BuilderSeal::from(seal), &issued_supply, None)
         .unwrap();
 
         let contract = builder.issue_contract_det(created_at).unwrap();
