@@ -25,17 +25,15 @@
 use aluvm::library::LibSite;
 use amplify::confinement::Confined;
 use ifaces::rgb25::Rgb25;
+use ifaces::stl::StandardTypes;
 use ifaces::{IssuerWrapper, LNPBP_IDENTITY};
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
-use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema,
-};
-use rgbstd::stl::StandardTypes;
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, StateAbi, VerNo};
+use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::validation::Scripts;
 use rgbstd::{GlobalStateType, Identity, OwnedStateSchema};
 use strict_types::TypeSystem;
 
-use crate::nia::{nia_lib, FN_NIA_GENESIS_OFFSET, FN_NIA_TRANSFER_OFFSET};
+use crate::nia::{FN_NIA_GENESIS_OFFSET, FN_NIA_TRANSFER_OFFSET, nia_lib};
 use crate::{
     ERRNO_ISSUED_MISMATCH, ERRNO_NON_EQUAL_IN_OUT, GS_ISSUED_SUPPLY, GS_TERMS, OS_ASSET,
     TS_TRANSFER,
@@ -67,7 +65,7 @@ pub fn cfa_schema() -> Schema {
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => OwnedStateSchema::from(types.get("RGBContract.Amount")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
@@ -135,6 +133,12 @@ pub fn cfa_rgb25() -> IfaceImpl {
             NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
         ],
+        state_abi: StateAbi {
+            reg_input: Default::default(),
+            reg_output: Default::default(),
+            calc_output: Default::default(),
+            calc_change: Default::default(),
+        },
     }
 }
 
