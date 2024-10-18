@@ -22,8 +22,6 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
-use aluvm::isa::Instr;
-use aluvm::isa::opcodes::{INSTR_PUTA, INSTR_TEST};
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use bp::dbc::Method;
@@ -38,7 +36,6 @@ use rgbstd::schema::{
     GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema, TransitionSchema,
 };
 use rgbstd::validation::Scripts;
-use rgbstd::vm::RgbIsa;
 use rgbstd::{Identity, rgbasm};
 use strict_encoding::InvalidRString;
 use strict_types::TypeSystem;
@@ -48,33 +45,78 @@ use crate::{
     OS_ASSET, TS_TRANSFER,
 };
 
-pub(crate) fn nia_lib() -> Lib {
-    let code = rgbasm! {
-        // SUBROUTINE Transfer validation
-        // Set errno
-        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
-        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        // ..................
-        test;
-        ret;
+pub(crate) fn util_lib() -> Lib {
+    rgbasm! {
+        // SUBROUTINE Compute sum of inputs
+        // Input: a16[16] - state to compute
+        // Output: a64[16] - sum
+        // Uses: a16[0] - counter, a16[10] - zero constant, a64[0] - extracted amounts
+        // Fails: on sum overflow or invalid state (should not happen)
+        // St0: unmodified if not fails
+        put     a16[10],0;              // zero constant
+        put     a64[16],0;              // init sum with 0
+        cn.i    a16[0],a16[16];         // count state
+        dec     a16[0];                 // counter = len - 1
+    /**/ld.i    s16[0],a16[16],a16[0];  // load state
+        extr    s16[4],a64[0],a16[10];  // extract 64 bits
+        test;                           // fail if state is absent or invalid
+        add.uc  a64[16],a64[0];         // add amount to the sum
+        test;                           // fail on sum overflow
+        dec     a16[0];                 // dec counter
+        jif     0/**/;                  // repeat for all assignments
+        inv     st0;                    // reset status flag
+        ret;                            // finish
 
+        // SUBROUTINE Compute sum of outputs
+        // Input: a16[16] - state to compute
+        // Output: a64[17] - sum
+        // Uses: a16[0] - counter, a16[10] - zero constant, a64[0] - extracted amounts
+        // Fails: on sum overflow or invalid state (should not happen)
+        // St0: unmodified if not fails
+        put     a16[10],0;              // zero constant
+        put     a64[17],0;              // init sum with 0
+        cn.o    a16[0],a16[16];         // count state
+        dec     a16[0];                 // counter = len - 1
+    /**/ld.o    s16[0],a16[16],a16[0];  // load state
+        extr    s16[4],a64[0],a16[10];  // extract 64 bits
+        test;                           // fail if state is absent or invalid
+        add.uc  a64[17],a64[0];         // add amount to the sum
+        test;                           // fail on sum overflow
+        dec     a16[0];                 // dec counter
+        jif     0/**/;                  // repeat for all assignments
+        inv     st0;                    // reset status flag
+        ret;                            // finish
+    }
+}
+
+pub(crate) fn nia_lib() -> Lib {
+    let util = util_lib().id();
+    const ISSUED: u16 = GS_ISSUED_SUPPLY.to_u16();
+    const DISTRIBUTED: u16 = OS_ASSET.to_u16();
+    rgbasm! {
         // SUBROUTINE Genesis validation
-        // Checking pedersen commitments against reported amount of issued assets present in the
-        // global state.
-        put     a8[0],ERRNO_ISSUED_MISMATCH;
-        put     a8[1],0;
-        put     a16[0],0;
-        // Read global state into s16[0]
-        ldg     GS_ISSUED_SUPPLY,a8[1],s16[0];
-        // Extract 64 bits from the beginning of s16[0] into a64[1]
-        // NB: if the global state is invalid, we will fail here and fail the validation
-        extr    s16[0],a64[0],a16[0];
-        // verify sum of pedersen commitments for assignments against a64[0] value
-        // ..................
-        test;
-        ret;
-    };
-    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong non-inflatable asset script")
+        put     a16[0],ISSUED;                  // global state to load
+        ld.g    s16[3],a16[16],a16[0];          // load reported issued amount
+        put     a16[10],0;                      // zero offset
+        extr    s16[3],a64[15],a16[10];         // a64[15] <- GS_ISSUED_SUPPLY
+        test;                                   // fail if state is absent or invalid
+
+        put     a16[16],DISTRIBUTED;            // owned state to load
+        call    0x00 @ util;                    // a64[17] <- sum of OS_ASSET allocations
+        put     a8[0],ERRNO_ISSUED_MISMATCH;    // set errno to return if we fail
+        eq.n    a64[15],a64[17];                // check if ISSUED =? sum(DISTRIBUTED)
+        test;                                   // fail if not
+        ret;                                    // complete
+
+        // SUBROUTINE Transfer validation
+        put     a16[16],DISTRIBUTED;            // owned state to load
+        call    0x00 @ util;                    // a64[16] <- sum of inputs
+        call    0x21 @ util;                    // a64[17] <- sum of outputs
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;   // set errno to return if we fail
+        eq.n    a64[16],a64[17];                // check if sum(inputs) =? sum(outputs)
+        test;                                   // fail if not
+        ret;                                    // complete
+    }
 }
 pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2 - 3;
 pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
@@ -84,10 +126,6 @@ fn nia_schema() -> Schema {
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_TEST);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),
@@ -187,8 +225,9 @@ impl IssuerWrapper for NonInflatableAsset {
     fn types() -> TypeSystem { StandardTypes::with(Self::FEATURES.stl()).type_system() }
 
     fn scripts() -> Scripts {
+        let util = util_lib();
         let lib = nia_lib();
-        Confined::from_checked(bmap! { lib.id() => lib })
+        Confined::from_checked(bmap! { lib.id() => lib, util.id() => util })
     }
 }
 
@@ -221,9 +260,15 @@ mod test {
     use ifaces::stl::*;
     use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
-    use rgbstd::*;
+    use rgbstd::{disassemble, *};
 
     use super::*;
+
+    #[test]
+    fn lib_check() {
+        let util = util_lib();
+        println!("{}", disassemble(&util));
+    }
 
     #[test]
     fn iimpl_check() {
@@ -282,7 +327,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:pOIzGFyQ-mA!yQq2-QH8vB5!-5fAplY!-x2lW!vz-JHDbYPg")
+            s!("rgb:vGAyeGF9-bPAAV8T-w1V46jM-Iz7TW7K-QzZBzcf-RMuzznw")
         );
     }
 }

@@ -52,7 +52,7 @@ bp-dbc = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
 bp-seals = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
 bp-core = { git = "https://github.com/BP-WG/bp-core", branch = "develop" }
 bp-invoice = { git = "https://github.com/BP-WG/bp-std", branch = "develop" }
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "feat/fungible-nonconf" }
+rgb-core = { git = "https://github.com/RGB-WG/rgb-core", branch = "feat/asm" }
 rgb-invoice = { git = "https://github.com/RGB-WG/rgb-std", branch = "feat/fungible-nonconf" }
 rgb-std = { git = "https://github.com/RGB-WG/rgb-std", branch = "feat/fungible-nonconf" }
 rgb-interfaces = { git = "https://github.com/RGB-WG/rgb-interfaces", branch = "feat/fungible-nonconf" }

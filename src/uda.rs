@@ -21,18 +21,13 @@
 
 //! Unique digital asset (UDA) schema implementing RGB21 NFT interface.
 
-use aluvm::isa::Instr;
-use aluvm::isa::opcodes::{INSTR_EXTR, INSTR_PUTA};
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use ifaces::stl::StandardTypes;
 use ifaces::{IssuerWrapper, LNPBP_IDENTITY, Rgb21};
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, StateAbi, VerNo};
-use rgbstd::persistence::MemContract;
 use rgbstd::schema::{GenesisSchema, GlobalStateSchema, Occurrences, Schema, TransitionSchema};
 use rgbstd::validation::Scripts;
-use rgbstd::vm::RgbIsa;
-use rgbstd::vm::opcodes::INSTR_LDG;
 use rgbstd::{Identity, OwnedStateSchema, rgbasm};
 use strict_types::TypeSystem;
 
@@ -46,52 +41,37 @@ pub const FN_TRANSFER_OFFSET: u16 = 0;
 pub const FN_SHARED_OFFSET: u16 = FN_GENESIS_OFFSET + 4 + 4 + 4;
 
 fn uda_lib() -> Lib {
-    let code = rgbasm! {
+    const TOKEN: u16 = OS_ASSET.to_u16();
+    const ISSUE: u16 = GS_TOKENS.to_u16();
+
+    rgbasm! {
         // SUBROUTINE 2: Transfer validation
-        // Put 0 to a16[0]
-        put     a16[0],0;
-        // Read previous state into s16[0]
-        ldp     OS_ASSET,a16[0],s16[0];
-        // jump into SUBROUTINE 3 to reuse the code
-        jmp     FN_SHARED_OFFSET;
+        put     a16[0],0;                       // zero constant
+        put     a16[16],TOKEN;                  // owned state type
+        ld.i    s16[0],a16[16],a16[0];          // load spent token
+        jmp     FN_SHARED_OFFSET;               // jump into SUBROUTINE 3 to reuse the code
 
         // SUBROUTINE 1: Genesis validation
-        // Set offset to read state from strings
-        put     a16[0],0x00;
-        // Set which state index to read
-        put     a8[1],0x00;
-        // Read global state into s16[0]
-        ldg     GS_TOKENS,a8[1],s16[0];
+        put     a16[0],0;                       // zero constant
+        put     a16[15],ISSUE;                  // global state type
+        ld.g    s16[0],a16[15],a16[0];          // load token declaration
 
         // SUBROUTINE 3: Shared code
-        // Set errno
-        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
-        // Extract 128 bits from the beginning of s16[0] into a32[0]
-        extr    s16[0],a32[0],a16[0];
-        // Set which state index to read
-        put     a16[1],0x00;
-        // Read owned state into s16[1]
-        lds     OS_ASSET,a16[1],s16[1];
-        // Extract 128 bits from the beginning of s16[1] into a32[1]
-        extr    s16[1],a32[1],a16[0];
-        // Check that token indexes match
-        eq.n    a32[0],a32[1];
-        // Fail if they don't
-        test;
+        extr    s16[0],a32[0],a16[0];           // 32 bits from the beginning of s16[0] to a32[0]
+        put     a16[16],TOKEN;                  // owned state type
+        ld.o    s16[1],a16[1],a16[0];           // read allocation into s16[1]
+        extr    s16[1],a32[1],a16[0];           // 32 bits from the beginning of s16[0] to a32[1]
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;   // set failure code
+        eq.n    a32[0],a32[1];                  // check that token indexes match
+        test;                                   // fail if they don't
 
-        // Set errno
-        put     a8[0],ERRNO_NON_FRACTIONAL;
-        // Put offset for the data into a16[2]
-        put     a16[2],4;
-        // Extract 128 bits starting from the fifth byte of s16[1] into a64[0]
-        extr    s16[1],a64[0],a16[2];
-        // Check that owned fraction == 1
+        put     a8[0],ERRNO_NON_FRACTIONAL;     // set failure code
+        put     a16[2],4;                       // offset for the token fractions into a16[2]
+        extr    s16[1],a64[0],a16[2];           // 64 bit from the fifth byte of s16[1] to a64[0]
         put     a64[1],1;
-        eq.n    a64[0],a64[1];
-        // Fail if not
-        test;
-    };
-    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong unique digital asset script")
+        eq.n    a64[0],a64[1];                  // check that owned fraction == 1
+        test;                                   // fail if not
+    }
 }
 
 fn uda_schema() -> Schema {
@@ -99,12 +79,6 @@ fn uda_schema() -> Schema {
 
     let alu_lib = uda_lib();
     let alu_id = alu_lib.id();
-    let code = alu_lib.code.as_ref();
-    assert_eq!(code[FN_GENESIS_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(code[FN_GENESIS_OFFSET as usize + 8], INSTR_LDG);
-    assert_eq!(code[FN_TRANSFER_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(code[FN_SHARED_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(code[FN_SHARED_OFFSET as usize + 4], INSTR_EXTR);
 
     Schema {
         ffv: zero!(),
