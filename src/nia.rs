@@ -22,24 +22,21 @@
 //! Non-Inflatable Assets (NIA) schema implementing RGB20 fungible assets
 //! interface.
 
-use aluvm::isa::opcodes::INSTR_PUTA;
-use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use bp::dbc::Method;
-use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
+use ifaces::stl::{Amount, Precision, StandardTypes};
+use ifaces::{IssuerWrapper, LNPBP_IDENTITY, Rgb20, Rgb20Wrapper};
 use rgbstd::containers::ValidContract;
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
+use rgbstd::interface::{
+    IfaceClass, IfaceImpl, NamedField, NamedVariant, StateAbi, TxOutpoint, VerNo,
+};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
-    FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
-    TransitionSchema,
+    GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema, TransitionSchema,
 };
-use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::INSTR_PCVS;
-use rgbstd::vm::RgbIsa;
-use rgbstd::{rgbasm, Amount, Identity, Precision};
+use rgbstd::{Identity, rgbasm};
 use strict_encoding::InvalidRString;
 use strict_types::TypeSystem;
 
@@ -48,46 +45,100 @@ use crate::{
     OS_ASSET, TS_TRANSFER,
 };
 
-pub(crate) fn nia_lib() -> Lib {
-    let code = rgbasm! {
-        // SUBROUTINE Transfer validation
-        // Set errno
-        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
-        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        pcvs    OS_ASSET;
-        test;
-        ret;
+pub(crate) fn util_lib() -> Lib {
+    rgbasm! {
+        // SUBROUTINE Compute sum of inputs
+        // Input: a16[16] - state to compute
+        // Output: a64[16] - sum
+        // Uses:
+        // - a16[0]: counter,
+        // - a16[10]: zero constant,
+        // - a64[0]: extracted amounts
+        // - s16[4]: extracted state
+        // Fails: on sum overflow or invalid state (should not happen)
+        // St0: unmodified if not fails
+        put     a16[10],0;              // zero constant
+        put     a64[16],0;              // init sum with 0
+        cn.i    a16[0],a16[16];         // count state
+        dec     a16[0];                 // counter = len - 1
+        test;                           // fail if there is no state to load
+    /**/ld.i    s16[4],a16[16],a16[0];  // load state
+        extr    s16[4],a64[0],a16[10];  // extract 64 bits
+        test;                           // fail if state is absent or invalid
+        add.uc  a64[16],a64[0];         // add amount to the sum
+        test;                           // fail on sum overflow
+        dec     a16[0];                 // dec counter
+        jif     0x0E;                   // repeat for all assignments
+        inv     st0;                    // reset status flag
+        ret;                            // finish
 
-        // SUBROUTINE Genesis validation
-        // Checking pedersen commitments against reported amount of issued assets present in the
-        // global state.
-        put     a8[0],ERRNO_ISSUED_MISMATCH;
-        put     a8[1],0;
-        put     a16[0],0;
-        // Read global state into s16[0]
-        ldg     GS_ISSUED_SUPPLY,a8[1],s16[0];
-        // Extract 64 bits from the beginning of s16[0] into a64[1]
-        // NB: if the global state is invalid, we will fail here and fail the validation
-        extr    s16[0],a64[0],a16[0];
-        // verify sum of pedersen commitments for assignments against a64[0] value
-        pcas    OS_ASSET;
-        test;
-        ret;
-    };
-    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong non-inflatable asset script")
+        // SUBROUTINE Compute sum of outputs
+        // Input: a16[16] - state to compute
+        // Output: a64[17] - sum
+        // Uses:
+        // - a16[0]: counter,
+        // - a16[10]: zero constant,
+        // - a64[0]: extracted amounts
+        // - s16[5]: extracted state
+        // Fails: on sum overflow or invalid state (should not happen)
+        // St0: unmodified if not fails
+        put     a16[10],0;              // zero constant
+        put     a64[17],0;              // init sum with 0
+        cn.o    a16[0],a16[16];         // count state
+        dec     a16[0];                 // counter = len - 1
+        test;                           // fail if there is no state to load
+    /**/ld.o    s16[5],a16[16],a16[0];  // load state
+        extr    s16[5],a64[0],a16[10];  // extract 64 bits
+        test;                           // fail if state is absent or invalid
+        add.uc  a64[17],a64[0];         // add amount to the sum
+        test;                           // fail on sum overflow
+        dec     a16[0];                 // dec counter
+        jif     0x29;                   // repeat for all assignments
+        inv     st0;                    // reset status flag
+        ret;                            // finish
+    }
 }
-pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2;
-pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
+pub(crate) const FN_UTIL_SUM_INPUTS: u16 = 0;
+pub(crate) const FN_UTIL_SUM_OUTPUTS: u16 = 0x22;
+
+pub(crate) fn nia_lib() -> Lib {
+    let util = util_lib().id();
+    const ISSUED: u16 = GS_ISSUED_SUPPLY.to_u16();
+    const DISTRIBUTED: u16 = OS_ASSET.to_u16();
+    rgbasm! {
+        // SUBROUTINE Genesis validation
+        put     a16[0],0;                       // zero constant
+        put     a16[15],ISSUED;                 // global state to load
+        ld.g    s16[3],a16[15],a16[0];          // load reported issued amount
+        put     a16[10],0;                      // zero offset
+        extr    s16[3],a64[15],a16[10];         // a64[15] <- GS_ISSUED_SUPPLY
+        test;                                   // fail if state is absent or invalid
+
+        put     a16[16],DISTRIBUTED;            // owned state to load
+        call    FN_UTIL_SUM_OUTPUTS @ util;     // a64[17] <- sum of OS_ASSET allocations
+        put     a8[0],ERRNO_ISSUED_MISMATCH;    // set errno to return if we fail
+        eq.n    a64[15],a64[17];                // check if ISSUED =? sum(DISTRIBUTED)
+        test;                                   // fail if not
+        ret;                                    // complete
+
+        // SUBROUTINE Transfer validation
+        put     a16[16],DISTRIBUTED;            // owned state to load
+        call    FN_UTIL_SUM_INPUTS @ util;      // a64[16] <- sum of inputs
+        call    FN_UTIL_SUM_OUTPUTS @ util;     // a64[17] <- sum of outputs
+        put     a8[0],ERRNO_NON_EQUAL_IN_OUT;   // set errno to return if we fail
+        eq.n    a64[16],a64[17];                // check if sum(inputs) =? sum(outputs)
+        test;                                   // fail if not
+        ret;                                    // complete
+    }
+}
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 0;
+pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0x24;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::FIXED.stl());
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
 
     Schema {
         ffv: zero!(),
@@ -102,7 +153,7 @@ fn nia_schema() -> Schema {
             GS_ISSUED_SUPPLY => GlobalStateSchema::once(types.get("RGBContract.Amount")),
         },
         owned_types: tiny_bmap! {
-            OS_ASSET => OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
+            OS_ASSET => OwnedStateSchema::from(types.get("RGBContract.Amount")),
         },
         valency_types: none!(),
         genesis: GenesisSchema {
@@ -140,6 +191,7 @@ fn nia_schema() -> Schema {
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
     let iface = Rgb20::FIXED;
+    let lib_id = nia_lib().id();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -165,6 +217,12 @@ fn nia_rgb20() -> IfaceImpl {
             NamedVariant::with(ERRNO_ISSUED_MISMATCH, vname!("issuedMismatch")),
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
         ],
+        state_abi: StateAbi {
+            reg_input: LibSite::with(0, lib_id),
+            reg_output: LibSite::with(0, lib_id),
+            calc_output: LibSite::with(0, lib_id),
+            calc_change: LibSite::with(0, lib_id),
+        },
     }
 }
 
@@ -181,8 +239,9 @@ impl IssuerWrapper for NonInflatableAsset {
     fn types() -> TypeSystem { StandardTypes::with(Self::FEATURES.stl()).type_system() }
 
     fn scripts() -> Scripts {
+        let util = util_lib();
         let lib = nia_lib();
-        Confined::from_checked(bmap! { lib.id() => lib })
+        Confined::from_checked(bmap! { lib.id() => lib, util.id() => util })
     }
 }
 
@@ -210,16 +269,20 @@ impl NonInflatableAsset {
 mod test {
     use std::str::FromStr;
 
-    use bp::seals::txout::{BlindSeal, CloseMethod};
     use bp::Txid;
-    use chrono::DateTime;
+    use bp::seals::txout::{BlindSeal, CloseMethod};
+    use ifaces::stl::*;
     use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
-    use rgbstd::invoice::Precision;
-    use rgbstd::stl::*;
-    use rgbstd::*;
+    use rgbstd::{disassemble, *};
 
     use super::*;
+
+    #[test]
+    fn lib_check() {
+        let util = util_lib();
+        println!("{}", disassemble(&util));
+    }
 
     #[test]
     fn iimpl_check() {
@@ -245,7 +308,7 @@ mod test {
             details: None,
             precision: Precision::try_from(2).unwrap(),
         };
-        let issued_supply = 999u64;
+        let issued_supply = Amount::from(999u64);
         let seal: XChain<BlindSeal<Txid>> = XChain::with(
             Layer1::Bitcoin,
             GenesisSeal::from(BlindSeal::with_blinding(
@@ -256,14 +319,8 @@ mod test {
                 654321,
             )),
         );
-        let asset_tag = AssetTag::new_deterministic(
-            "contract_domain",
-            AssignmentType::with(0),
-            DateTime::from_timestamp(created_at, 0).unwrap(),
-            123456,
-        );
 
-        let builder = ContractBuilder::deterministic(
+        let builder = ContractBuilder::with(
             Identity::default(),
             NonInflatableAsset::FEATURES.iface(),
             NonInflatableAsset::schema(),
@@ -271,30 +328,20 @@ mod test {
             NonInflatableAsset::types(),
             NonInflatableAsset::scripts(),
         )
-        .add_global_state("spec", spec)
+        .serialize_global_state("spec", &spec)
         .unwrap()
-        .add_global_state("terms", terms)
+        .serialize_global_state("terms", &terms)
         .unwrap()
-        .add_global_state("issuedSupply", Amount::from(issued_supply))
+        .serialize_global_state("issuedSupply", &issued_supply)
         .unwrap()
-        .add_asset_tag("assetOwner", asset_tag)
-        .unwrap()
-        .add_fungible_state_det(
-            "assetOwner",
-            BuilderSeal::from(seal),
-            issued_supply,
-            BlindingFactor::from_str(
-                "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
-            )
-            .unwrap(),
-        )
+        .serialize_owned_state("assetOwner", BuilderSeal::from(seal), &issued_supply, None)
         .unwrap();
 
         let contract = builder.issue_contract_det(created_at).unwrap();
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:pOIzGFyQ-mA!yQq2-QH8vB5!-5fAplY!-x2lW!vz-JHDbYPg")
+            s!("rgb:vGAyeGF9-bPAAV8T-w1V46jM-Iz7TW7K-QzZBzcf-RMuzznw")
         );
     }
 }

@@ -2,13 +2,13 @@ use amplify::hex::FromHex;
 use bp::dbc::Method;
 use bp::{Outpoint, Txid};
 use ifaces::Rgb20;
-use rgbstd::containers::{ConsignmentExt, FileContent};
-use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
-use rgbstd::invoice::Precision;
-use rgbstd::persistence::Stock;
+use ifaces::stl::Precision;
 use rgbstd::XWitnessId;
-use schemata::dumb::NoResolver;
+use rgbstd::containers::{ConsignmentExt, FileContent};
+use rgbstd::interface::{FilterIncludeAll, Output};
+use rgbstd::persistence::Stock;
 use schemata::NonInflatableAsset;
+use schemata::dumb::NoResolver;
 
 #[rustfmt::skip]
 fn main() {
@@ -33,12 +33,11 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb20>(contract_id).unwrap();
     let allocations = contract.allocations(&FilterIncludeAll);
-    eprintln!("\nThe issued contract data:");
-    eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
+    eprintln!("{}", contract.spec());
 
-    for FungibleAllocation  { seal, state, witness, .. } in allocations {
+    for Output  { seal, state, witness, .. } in allocations {
         let witness = witness.as_ref().map(XWitnessId::to_string).unwrap_or("~".to_owned());
-        eprintln!("amount={state}, owner={seal}, witness={witness}");
+        eprintln!("state {state}, owner {seal}, witness {witness}");
     }
-    eprintln!("totalSupply={}", contract.total_supply());
+    eprintln!("totalSupply {}", contract.total_supply());
 }
