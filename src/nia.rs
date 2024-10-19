@@ -50,44 +50,56 @@ pub(crate) fn util_lib() -> Lib {
         // SUBROUTINE Compute sum of inputs
         // Input: a16[16] - state to compute
         // Output: a64[16] - sum
-        // Uses: a16[0] - counter, a16[10] - zero constant, a64[0] - extracted amounts
+        // Uses:
+        // - a16[0]: counter,
+        // - a16[10]: zero constant,
+        // - a64[0]: extracted amounts
+        // - s16[4]: extracted state
         // Fails: on sum overflow or invalid state (should not happen)
         // St0: unmodified if not fails
         put     a16[10],0;              // zero constant
         put     a64[16],0;              // init sum with 0
         cn.i    a16[0],a16[16];         // count state
         dec     a16[0];                 // counter = len - 1
-    /**/ld.i    s16[0],a16[16],a16[0];  // load state
+        test;                           // fail if there is no state to load
+    /**/ld.i    s16[4],a16[16],a16[0];  // load state
         extr    s16[4],a64[0],a16[10];  // extract 64 bits
         test;                           // fail if state is absent or invalid
         add.uc  a64[16],a64[0];         // add amount to the sum
         test;                           // fail on sum overflow
         dec     a16[0];                 // dec counter
-        jif     0/**/;                  // repeat for all assignments
+        jif     0x0E;                   // repeat for all assignments
         inv     st0;                    // reset status flag
         ret;                            // finish
 
         // SUBROUTINE Compute sum of outputs
         // Input: a16[16] - state to compute
         // Output: a64[17] - sum
-        // Uses: a16[0] - counter, a16[10] - zero constant, a64[0] - extracted amounts
+        // Uses:
+        // - a16[0]: counter,
+        // - a16[10]: zero constant,
+        // - a64[0]: extracted amounts
+        // - s16[5]: extracted state
         // Fails: on sum overflow or invalid state (should not happen)
         // St0: unmodified if not fails
         put     a16[10],0;              // zero constant
         put     a64[17],0;              // init sum with 0
         cn.o    a16[0],a16[16];         // count state
         dec     a16[0];                 // counter = len - 1
-    /**/ld.o    s16[0],a16[16],a16[0];  // load state
-        extr    s16[4],a64[0],a16[10];  // extract 64 bits
+        test;                           // fail if there is no state to load
+    /**/ld.o    s16[5],a16[16],a16[0];  // load state
+        extr    s16[5],a64[0],a16[10];  // extract 64 bits
         test;                           // fail if state is absent or invalid
         add.uc  a64[17],a64[0];         // add amount to the sum
         test;                           // fail on sum overflow
         dec     a16[0];                 // dec counter
-        jif     0/**/;                  // repeat for all assignments
+        jif     0x29;                   // repeat for all assignments
         inv     st0;                    // reset status flag
         ret;                            // finish
     }
 }
+pub(crate) const FN_UTIL_SUM_INPUTS: u16 = 0;
+pub(crate) const FN_UTIL_SUM_OUTPUTS: u16 = 0x22;
 
 pub(crate) fn nia_lib() -> Lib {
     let util = util_lib().id();
@@ -95,14 +107,15 @@ pub(crate) fn nia_lib() -> Lib {
     const DISTRIBUTED: u16 = OS_ASSET.to_u16();
     rgbasm! {
         // SUBROUTINE Genesis validation
-        put     a16[0],ISSUED;                  // global state to load
-        ld.g    s16[3],a16[16],a16[0];          // load reported issued amount
+        put     a16[0],0;                       // zero constant
+        put     a16[15],ISSUED;                 // global state to load
+        ld.g    s16[3],a16[15],a16[0];          // load reported issued amount
         put     a16[10],0;                      // zero offset
         extr    s16[3],a64[15],a16[10];         // a64[15] <- GS_ISSUED_SUPPLY
         test;                                   // fail if state is absent or invalid
 
         put     a16[16],DISTRIBUTED;            // owned state to load
-        call    0x00 @ util;                    // a64[17] <- sum of OS_ASSET allocations
+        call    FN_UTIL_SUM_OUTPUTS @ util;     // a64[17] <- sum of OS_ASSET allocations
         put     a8[0],ERRNO_ISSUED_MISMATCH;    // set errno to return if we fail
         eq.n    a64[15],a64[17];                // check if ISSUED =? sum(DISTRIBUTED)
         test;                                   // fail if not
@@ -110,16 +123,16 @@ pub(crate) fn nia_lib() -> Lib {
 
         // SUBROUTINE Transfer validation
         put     a16[16],DISTRIBUTED;            // owned state to load
-        call    0x00 @ util;                    // a64[16] <- sum of inputs
-        call    0x21 @ util;                    // a64[17] <- sum of outputs
+        call    FN_UTIL_SUM_INPUTS @ util;      // a64[16] <- sum of inputs
+        call    FN_UTIL_SUM_OUTPUTS @ util;     // a64[17] <- sum of outputs
         put     a8[0],ERRNO_NON_EQUAL_IN_OUT;   // set errno to return if we fail
         eq.n    a64[16],a64[17];                // check if sum(inputs) =? sum(outputs)
         test;                                   // fail if not
         ret;                                    // complete
     }
 }
-pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 4 + 3 + 2 - 3;
-pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0;
+pub(crate) const FN_NIA_GENESIS_OFFSET: u16 = 0;
+pub(crate) const FN_NIA_TRANSFER_OFFSET: u16 = 0x24;
 
 fn nia_schema() -> Schema {
     let types = StandardTypes::with(Rgb20::FIXED.stl());
@@ -178,6 +191,7 @@ fn nia_schema() -> Schema {
 fn nia_rgb20() -> IfaceImpl {
     let schema = nia_schema();
     let iface = Rgb20::FIXED;
+    let lib_id = nia_lib().id();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -204,10 +218,10 @@ fn nia_rgb20() -> IfaceImpl {
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("nonEqualAmounts")),
         ],
         state_abi: StateAbi {
-            reg_input: Default::default(),
-            reg_output: Default::default(),
-            calc_output: Default::default(),
-            calc_change: Default::default(),
+            reg_input: LibSite::with(0, lib_id),
+            reg_output: LibSite::with(0, lib_id),
+            calc_output: LibSite::with(0, lib_id),
+            calc_change: LibSite::with(0, lib_id),
         },
     }
 }

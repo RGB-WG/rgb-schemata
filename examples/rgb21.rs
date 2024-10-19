@@ -8,8 +8,9 @@ use ifaces::rgb21::{EmbeddedMedia, NftAllocation, TokenData, TokenIndex};
 use ifaces::stl::*;
 use ifaces::{IssuerWrapper, Rgb21};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
+use rgbstd::interface::{FilterIncludeAll, Output};
 use rgbstd::persistence::Stock;
-use rgbstd::{GenesisSeal, XChain};
+use rgbstd::{GenesisSeal, XChain, XWitnessId};
 use schemata::UniqueDigitalAsset;
 use schemata::dumb::NoResolver;
 use sha2::{Digest, Sha256};
@@ -77,5 +78,11 @@ fn main() {
 
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb21>(contract_id).unwrap();
-    eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
+    let allocations = contract.allocations(&FilterIncludeAll);
+
+    eprintln!("{}", contract.spec());
+    for Output  { seal, state, witness, .. } in allocations {
+        let witness = witness.as_ref().map(XWitnessId::to_string).unwrap_or("~".to_owned());
+        eprintln!("state ({state}), owner {seal}, witness {witness}");
+    }
 }

@@ -41,14 +41,14 @@ fn main() -> io::Result<()> {
 fn nia() -> io::Result<()> {
     let schema = NonInflatableAsset::schema();
     let iimpl = NonInflatableAsset::issue_impl();
-    let lib = NonInflatableAsset::scripts();
+    let libs = NonInflatableAsset::scripts();
     let types = NonInflatableAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces.push(Rgb20::FIXED.iface()).unwrap();
     kit.iimpls.push(iimpl).unwrap();
-    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.scripts.extend(libs.into_values()).unwrap();
     kit.types = types;
 
     kit.save_file("schemata/NonInflatableAssets.rgb")?;
@@ -61,14 +61,14 @@ fn nia() -> io::Result<()> {
 fn uda() -> io::Result<()> {
     let schema = UniqueDigitalAsset::schema();
     let iimpl = UniqueDigitalAsset::issue_impl();
-    let lib = UniqueDigitalAsset::scripts();
+    let libs = UniqueDigitalAsset::scripts();
     let types = UniqueDigitalAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces.push(Rgb21::NONE.iface()).unwrap();
     kit.iimpls.push(iimpl).unwrap();
-    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.scripts.extend(libs.into_values()).unwrap();
     kit.types = types;
 
     kit.save_file("schemata/UniqueDigitalAsset.rgb")?;
@@ -81,14 +81,14 @@ fn uda() -> io::Result<()> {
 fn cfa() -> io::Result<()> {
     let schema = CollectibleFungibleAsset::schema();
     let iimpl = CollectibleFungibleAsset::issue_impl();
-    let lib = CollectibleFungibleAsset::scripts();
+    let libs = CollectibleFungibleAsset::scripts();
     let types = CollectibleFungibleAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
     kit.ifaces.push(Rgb25::NONE.iface()).unwrap();
     kit.iimpls.push(iimpl).unwrap();
-    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.scripts.extend(libs.into_values()).unwrap();
     kit.types = types;
 
     kit.save_file("schemata/CollectibleFungibleAsset.rgb")?;
@@ -99,9 +99,11 @@ fn cfa() -> io::Result<()> {
 }
 
 fn print_lib(kit: &Kit) {
-    let alu_lib = kit.scripts.first().unwrap();
-    eprintln!("{alu_lib}");
-    alu_lib
-        .print_disassemble::<RgbIsa<MemContract>>(stdout())
-        .unwrap();
+    for alu_lib in &kit.scripts {
+        eprintln!("------------------------------------");
+        eprintln!("{alu_lib}");
+        alu_lib
+            .print_disassemble::<RgbIsa<MemContract>>(stdout())
+            .unwrap();
+    }
 }

@@ -14,7 +14,19 @@ readme = "README.md"
 
 [[bin]]
 name = "rgb-schemata"
-required-features = ["fs"]
+required-features = ["fs", "log"]
+
+[[example]]
+name = "rgb20"
+required-features = ["fs", "log"]
+
+[[example]]
+name = "rgb21"
+required-features = ["fs", "log"]
+
+[[example]]
+name = "rgb25"
+required-features = ["fs", "log"]
 
 [lib]
 name = "schemata"

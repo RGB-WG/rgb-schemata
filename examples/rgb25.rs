@@ -41,12 +41,17 @@ fn main() {
     // Reading contract state through the interface from the stock:
     let contract = stock.contract_iface_class::<Rgb25>(contract_id).unwrap();
     let allocations = contract.allocations(&FilterIncludeAll);
-    eprintln!("\nThe issued contract data:");
-    eprintln!("{}", contract.name());
+    eprint!("name {}, details ", contract.name());
+    if let Some(details) = contract.details() {
+        eprint!("{details}");
+    } else {
+        eprint!("~");
+    }
+    eprintln!(", precision {}", contract.precision());
 
     for Output  { seal, state, witness, .. } in allocations {
         let witness = witness.as_ref().map(XWitnessId::to_string).unwrap_or("~".to_owned());
-        eprintln!("amount {state}, owner {seal}, witness {witness}");
+        eprintln!("state {state}, owner {seal}, witness {witness}");
     }
-    eprintln!("totalSupply={}", contract.total_issued_supply());
+    eprintln!("totalSupply {}", contract.total_issued_supply());
 }

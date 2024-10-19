@@ -36,30 +36,30 @@ use crate::{
     OS_ASSET, TS_TRANSFER,
 };
 
-pub const FN_GENESIS_OFFSET: u16 = 4 + 4 + 3;
-pub const FN_TRANSFER_OFFSET: u16 = 0;
-pub const FN_SHARED_OFFSET: u16 = FN_GENESIS_OFFSET + 4 + 4 + 4;
+pub const FN_GENESIS_OFFSET: u16 = 0x00;
+pub const FN_TRANSFER_OFFSET: u16 = 0x0E;
+pub const FN_SHARED_OFFSET: u16 = 0x19;
 
 fn uda_lib() -> Lib {
     const TOKEN: u16 = OS_ASSET.to_u16();
     const ISSUE: u16 = GS_TOKENS.to_u16();
 
     rgbasm! {
-        // SUBROUTINE 2: Transfer validation
-        put     a16[0],0;                       // zero constant
-        put     a16[16],TOKEN;                  // owned state type
-        ld.i    s16[0],a16[16],a16[0];          // load spent token
-        jmp     FN_SHARED_OFFSET;               // jump into SUBROUTINE 3 to reuse the code
-
         // SUBROUTINE 1: Genesis validation
         put     a16[0],0;                       // zero constant
         put     a16[15],ISSUE;                  // global state type
         ld.g    s16[0],a16[15],a16[0];          // load token declaration
+        jmp     FN_SHARED_OFFSET;               // jump into SUBROUTINE 3 to reuse the code
+
+        // SUBROUTINE 2: Transfer validation
+        put     a16[0],0;                       // zero constant
+        put     a16[16],TOKEN;                  // owned state type
+        ld.i    s16[0],a16[16],a16[0];          // load spent token
 
         // SUBROUTINE 3: Shared code
         extr    s16[0],a32[0],a16[0];           // 32 bits from the beginning of s16[0] to a32[0]
         put     a16[16],TOKEN;                  // owned state type
-        ld.o    s16[1],a16[1],a16[0];           // read allocation into s16[1]
+        ld.o    s16[1],a16[16],a16[0];          // read allocation into s16[1]
         extr    s16[1],a32[1],a16[0];           // 32 bits from the beginning of s16[0] to a32[1]
         put     a8[0],ERRNO_NON_EQUAL_IN_OUT;   // set failure code
         eq.n    a32[0],a32[1];                  // check that token indexes match
@@ -132,6 +132,7 @@ fn uda_schema() -> Schema {
 
 fn uda_rgb21() -> IfaceImpl {
     let schema = uda_schema();
+    let lib_id = uda_lib().id();
 
     IfaceImpl {
         version: VerNo::V1,
@@ -159,10 +160,10 @@ fn uda_rgb21() -> IfaceImpl {
             NamedVariant::with(ERRNO_NON_EQUAL_IN_OUT, vname!("unknownToken")),
         },
         state_abi: StateAbi {
-            reg_input: Default::default(),
-            reg_output: Default::default(),
-            calc_output: Default::default(),
-            calc_change: Default::default(),
+            reg_input: LibSite::with(0, lib_id),
+            reg_output: LibSite::with(0, lib_id),
+            calc_output: LibSite::with(0, lib_id),
+            calc_change: LibSite::with(0, lib_id),
         },
     }
 }

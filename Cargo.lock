@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "aluvm"
 version = "0.11.0-beta.9"
-source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#9a99445dcb5a6dac98f6650ff0015062cea010ce"
+source = "git+https://github.com/AluVM/rust-aluvm?branch=develop#bedd86c160bab2398c07901728fd06b6bab13ddc"
 dependencies = [
  "amplify",
  "ascii-armor",
@@ -307,9 +307,9 @@ checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "cc"
-version = "1.1.30"
+version = "1.1.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b16803a61b81d9eabb7eae2588776c4c1e584b738ede45fdbb4c972cec1e9945"
+checksum = "c2e7962b54006dcfcc61cb72735f4d89bb97061dd6a7ed882ec6b8ee53714c6f"
 dependencies = [
  "shlex",
 ]
@@ -648,7 +648,7 @@ dependencies = [
 [[package]]
 name = "rgb-core"
 version = "0.11.0-beta.9"
-source = "git+https://github.com/RGB-WG/rgb-core?branch=feat/asm#d6bba7a7660b4b616aec8f7dfccc152a4a5a01b3"
+source = "git+https://github.com/RGB-WG/rgb-core?branch=feat/asm#ba885579fae1c1c4966c9bb4f68fa7b48db5da91"
 dependencies = [
  "aluvm",
  "amplify",
@@ -668,7 +668,7 @@ dependencies = [
 [[package]]
 name = "rgb-interfaces"
 version = "0.11.0-beta.8"
-source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=feat/fungible-nonconf#844736271f2bdc7789278f4b4517ab9cbdb8aae7"
+source = "git+https://github.com/RGB-WG/rgb-interfaces?branch=feat/fungible-nonconf#f44cb123bb48a6e0a79f1a23d7e1dd6c038a66d0"
 dependencies = [
  "aluvm",
  "amplify",
@@ -688,7 +688,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.9"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=feat/fungible-nonconf#50a76079864c35fc8229bb861f17ad8c6e45f566"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=feat/fungible-nonconf#355b9516c3c3bfe69208d33ecea7fed0acb20d17"
 dependencies = [
  "amplify",
  "baid64",
@@ -724,7 +724,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.9"
-source = "git+https://github.com/RGB-WG/rgb-std?branch=feat/fungible-nonconf#50a76079864c35fc8229bb861f17ad8c6e45f566"
+source = "git+https://github.com/RGB-WG/rgb-std?branch=feat/fungible-nonconf#355b9516c3c3bfe69208d33ecea7fed0acb20d17"
 dependencies = [
  "aluvm",
  "amplify",
@@ -804,9 +804,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.130"
+version = "1.0.131"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "610f75ff4a8e3cb29b85da56eabdd1bff5b06739059a4b8e2967fef32e5d9944"
+checksum = "67d42a0bd4ac281beff598909bb56a86acaf979b84483e1c79c10dcaf98f8cf3"
 dependencies = [
  "itoa",
  "memchr",
