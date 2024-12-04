@@ -17,7 +17,7 @@ fn main() {
     let beneficiary = Outpoint::new(beneficiary_txid, 1);
 
     #[allow(clippy::inconsistent_digit_grouping)]
-    let contract = NonInflatableAsset::testnet("ssi:anonymous","TEST", "Test asset", None, Precision::CentiMicro, [(Method::TapretFirst, beneficiary, 1_000_000_000_00u64)])
+    let contract = NonInflatableAsset::testnet(Method::TapretFirst, "ssi:anonymous","TEST", "Test asset", None, Precision::CentiMicro, [(beneficiary, 1_000_000_000_00u64)])
         .expect("invalid contract data");
 
     let contract_id = contract.contract_id();

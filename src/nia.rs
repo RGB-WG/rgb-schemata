@@ -26,7 +26,7 @@ use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
-use bp::dbc::Method;
+use bp::seals::txout::CloseMethod;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
 use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
@@ -188,18 +188,25 @@ impl IssuerWrapper for NonInflatableAsset {
 
 impl NonInflatableAsset {
     pub fn testnet(
+        close_method: CloseMethod,
         issuer: &str,
         ticker: &str,
         name: &str,
         details: Option<&str>,
         precision: Precision,
-        allocations: impl IntoIterator<Item = (Method, impl TxOutpoint, impl Into<Amount>)>,
+        allocations: impl IntoIterator<Item = (impl TxOutpoint, impl Into<Amount>)>,
     ) -> Result<ValidContract, InvalidRString> {
-        let mut issuer =
-            Rgb20Wrapper::<MemContract>::testnet::<Self>(issuer, ticker, name, details, precision)?;
-        for (method, beneficiary, amount) in allocations {
+        let mut issuer = Rgb20Wrapper::<MemContract>::testnet::<Self>(
+            close_method,
+            issuer,
+            ticker,
+            name,
+            details,
+            precision,
+        )?;
+        for (beneficiary, amount) in allocations {
             issuer = issuer
-                .allocate(method, beneficiary, amount)
+                .allocate(beneficiary, amount)
                 .expect("invalid contract data");
         }
         Ok(issuer.issue_contract().expect("invalid contract data"))
@@ -249,7 +256,6 @@ mod test {
         let seal: XChain<BlindSeal<Txid>> = XChain::with(
             Layer1::Bitcoin,
             GenesisSeal::from(BlindSeal::with_blinding(
-                CloseMethod::OpretFirst,
                 Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
                     .unwrap(),
                 0,
@@ -264,6 +270,7 @@ mod test {
         );
 
         let builder = ContractBuilder::deterministic(
+            CloseMethod::OpretFirst,
             Identity::default(),
             NonInflatableAsset::FEATURES.iface(),
             NonInflatableAsset::schema(),
@@ -294,7 +301,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:pOIzGFyQ-mA!yQq2-QH8vB5!-5fAplY!-x2lW!vz-JHDbYPg")
+            s!("rgb:XO8d$U!l-i2N5GHH-Rh6TONM-95aiue5-qpA3GQZ-97brf7o")
         );
     }
 }
