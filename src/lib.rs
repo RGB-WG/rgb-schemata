@@ -52,21 +52,19 @@ pub const ERRNO_ISSUED_MISMATCH: u8 = 1;
 pub const ERRNO_NON_FRACTIONAL: u8 = 10;
 
 pub mod dumb {
+    use bp::Tx;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
-    use rgbstd::vm::{WitnessOrd, XWitnessTx};
-    use rgbstd::XWitnessId;
+    use rgbstd::vm::WitnessOrd;
+    use rgbstd::Txid;
 
     pub struct NoResolver;
 
     impl ResolveWitness for NoResolver {
-        fn resolve_pub_witness(&self, _: XWitnessId) -> Result<XWitnessTx, WitnessResolverError> {
+        fn resolve_pub_witness(&self, _: Txid) -> Result<Tx, WitnessResolverError> {
             unreachable!()
         }
 
-        fn resolve_pub_witness_ord(
-            &self,
-            _: XWitnessId,
-        ) -> Result<WitnessOrd, WitnessResolverError> {
+        fn resolve_pub_witness_ord(&self, _: Txid) -> Result<WitnessOrd, WitnessResolverError> {
             unreachable!()
         }
     }

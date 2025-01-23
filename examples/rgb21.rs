@@ -11,7 +11,7 @@ use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
-use rgbstd::{Allocation, GenesisSeal, Layer1, TokenIndex, XChain};
+use rgbstd::{Allocation, GenesisSeal, Layer1, TokenIndex};
 use schemata::dumb::NoResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
@@ -21,7 +21,7 @@ fn main() {
     let spec = AssetSpec::new("TEST", "Test uda", Precision::Indivisible);
     let beneficiary_txid =
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
-    let beneficiary = XChain::Bitcoin(GenesisSeal::new_random(beneficiary_txid, 1));
+    let beneficiary = GenesisSeal::new_random(beneficiary_txid, 1);
 
     let index = TokenIndex::from_inner(2);
 

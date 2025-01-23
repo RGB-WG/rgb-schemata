@@ -27,9 +27,10 @@ use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
 use bp::seals::txout::CloseMethod;
+use bp::Outpoint;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
@@ -194,7 +195,7 @@ impl NonInflatableAsset {
         name: &str,
         details: Option<&str>,
         precision: Precision,
-        allocations: impl IntoIterator<Item = (impl TxOutpoint, impl Into<Amount>)>,
+        allocations: impl IntoIterator<Item = (Outpoint, impl Into<Amount>)>,
     ) -> Result<ValidContract, InvalidRString> {
         let mut issuer = Rgb20Wrapper::<MemContract>::testnet::<Self>(
             close_method,
@@ -252,15 +253,12 @@ mod test {
             precision: Precision::try_from(2).unwrap(),
         };
         let issued_supply = 999u64;
-        let seal: XChain<BlindSeal<Txid>> = XChain::with(
-            Layer1::Bitcoin,
-            GenesisSeal::from(BlindSeal::with_blinding(
-                Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
-                    .unwrap(),
-                0,
-                654321,
-            )),
-        );
+        let seal: BlindSeal<Txid> = GenesisSeal::from(BlindSeal::with_blinding(
+            Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
+                .unwrap(),
+            0,
+            654321,
+        ));
 
         let builder = ContractBuilder::deterministic(
             CloseMethod::OpretFirst,

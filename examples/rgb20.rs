@@ -6,7 +6,6 @@ use rgbstd::containers::{ConsignmentExt, FileContent};
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
-use rgbstd::XWitnessId;
 use schemata::dumb::NoResolver;
 use schemata::NonInflatableAsset;
 
@@ -37,7 +36,7 @@ fn main() {
     eprintln!("{}", serde_json::to_string(&contract.spec()).unwrap());
 
     for FungibleAllocation  { seal, state, witness, .. } in allocations {
-        let witness = witness.as_ref().map(XWitnessId::to_string).unwrap_or("~".to_owned());
+        let witness = witness.as_ref().map(Txid::to_string).unwrap_or("~".to_owned());
         eprintln!("amount={state}, owner={seal}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_supply());
