@@ -3,7 +3,6 @@ use std::fs;
 use amplify::confinement::SmallBlob;
 use amplify::hex::FromHex;
 use amplify::{Bytes, Wrapper};
-use bp::dbc::Method;
 use bp::Txid;
 use ifaces::rgb21::{EmbeddedMedia, TokenData};
 use ifaces::{IssuerWrapper, Rgb21};
@@ -50,7 +49,6 @@ fn main() {
     stock.import_kit(kit).expect("invalid issuer kit");
 
     let contract = stock.contract_builder(
-        Method::OpretFirst,
         "ssi:anonymous",
         UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",

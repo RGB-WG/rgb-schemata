@@ -1,5 +1,4 @@
 use amplify::hex::FromHex;
-use bp::dbc::Method;
 use bp::{Outpoint, Txid};
 use ifaces::{Rgb25, Rgb25Wrapper};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
@@ -22,7 +21,7 @@ fn main() {
     stock.import_kit(kit).expect("invalid issuer kit");
 
     #[allow(clippy::inconsistent_digit_grouping)]
-    let contract = Rgb25Wrapper::<MemContract>::testnet::<CollectibleFungibleAsset>(Method::TapretFirst, "ssi:anonymous", "Test asset", Precision::CentiMicro)
+    let contract = Rgb25Wrapper::<MemContract>::testnet::<CollectibleFungibleAsset>("ssi:anonymous", "Test asset", Precision::CentiMicro)
         .expect("invalid contract data")
         .allocate(beneficiary, 1_000_000_000_00u64.into())
         .expect("invalid allocations")

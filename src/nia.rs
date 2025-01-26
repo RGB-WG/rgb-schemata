@@ -26,7 +26,6 @@ use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
-use bp::seals::txout::CloseMethod;
 use bp::Outpoint;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
@@ -189,7 +188,6 @@ impl IssuerWrapper for NonInflatableAsset {
 
 impl NonInflatableAsset {
     pub fn testnet(
-        close_method: CloseMethod,
         issuer: &str,
         ticker: &str,
         name: &str,
@@ -197,14 +195,8 @@ impl NonInflatableAsset {
         precision: Precision,
         allocations: impl IntoIterator<Item = (Outpoint, impl Into<Amount>)>,
     ) -> Result<ValidContract, InvalidRString> {
-        let mut issuer = Rgb20Wrapper::<MemContract>::testnet::<Self>(
-            close_method,
-            issuer,
-            ticker,
-            name,
-            details,
-            precision,
-        )?;
+        let mut issuer =
+            Rgb20Wrapper::<MemContract>::testnet::<Self>(issuer, ticker, name, details, precision)?;
         for (beneficiary, amount) in allocations {
             issuer = issuer
                 .allocate(beneficiary, amount)
@@ -218,7 +210,7 @@ impl NonInflatableAsset {
 mod test {
     use std::str::FromStr;
 
-    use bp::seals::txout::{BlindSeal, CloseMethod};
+    use bp::seals::txout::BlindSeal;
     use bp::Txid;
     use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
@@ -261,7 +253,6 @@ mod test {
         ));
 
         let builder = ContractBuilder::deterministic(
-            CloseMethod::OpretFirst,
             Identity::default(),
             NonInflatableAsset::FEATURES.iface(),
             NonInflatableAsset::schema(),
@@ -283,7 +274,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:YOuqECXu-dD83k1O-anQpcFl-JiArTWz-rxmrARH-uSuhdLE")
+            s!("rgb:hTs4dfUY-xcVG6Pc-IDdJOZ!-PketwpC-qNBGPPE-wZkBtpI")
         );
     }
 }
