@@ -259,7 +259,7 @@ mod test {
             NonInflatableAsset::issue_impl(),
             NonInflatableAsset::types(),
             NonInflatableAsset::scripts(),
-            Layer1::Bitcoin,
+            ChainNet::BitcoinTestnet4,
         )
         .add_global_state("spec", spec)
         .unwrap()
@@ -274,7 +274,7 @@ mod test {
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:hTs4dfUY-xcVG6Pc-IDdJOZ!-PketwpC-qNBGPPE-wZkBtpI")
+            s!("rgb:QRmoA2Ly-vpemU23-gVV4oFj-NDtLJzH-BUmHok3-YaABLnQ")
         );
     }
 }

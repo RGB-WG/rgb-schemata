@@ -10,7 +10,7 @@ use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
-use rgbstd::{Allocation, GenesisSeal, Layer1, TokenIndex};
+use rgbstd::{Allocation, ChainNet, GenesisSeal, TokenIndex};
 use schemata::dumb::NoResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
@@ -52,7 +52,7 @@ fn main() {
         "ssi:anonymous",
         UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",
-        Layer1::Bitcoin,
+        ChainNet::BitcoinTestnet4,
         ).expect("schema fails to implement RGB21 interface")
 
         .add_global_state("tokens", token_data)

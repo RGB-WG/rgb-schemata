@@ -55,7 +55,7 @@ pub mod dumb {
     use bp::Tx;
     use rgbstd::validation::{ResolveWitness, WitnessResolverError};
     use rgbstd::vm::WitnessOrd;
-    use rgbstd::Txid;
+    use rgbstd::{ChainNet, Txid};
 
     pub struct NoResolver;
 
@@ -65,6 +65,10 @@ pub mod dumb {
         }
 
         fn resolve_pub_witness_ord(&self, _: Txid) -> Result<WitnessOrd, WitnessResolverError> {
+            unreachable!()
+        }
+
+        fn check_chain_net(&self, _: ChainNet) -> Result<(), WitnessResolverError> {
             unreachable!()
         }
     }
