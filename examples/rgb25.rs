@@ -1,12 +1,10 @@
 use amplify::hex::FromHex;
-use bp::dbc::Method;
 use bp::{Outpoint, Txid};
 use ifaces::{Rgb25, Rgb25Wrapper};
 use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::interface::{FilterIncludeAll, FungibleAllocation};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::{MemContract, Stock};
-use rgbstd::XWitnessId;
 use schemata::dumb::NoResolver;
 use schemata::CollectibleFungibleAsset;
 
@@ -25,7 +23,7 @@ fn main() {
     #[allow(clippy::inconsistent_digit_grouping)]
     let contract = Rgb25Wrapper::<MemContract>::testnet::<CollectibleFungibleAsset>("ssi:anonymous", "Test asset", Precision::CentiMicro)
         .expect("invalid contract data")
-        .allocate(Method::TapretFirst, beneficiary, 1_000_000_000_00u64.into())
+        .allocate(beneficiary, 1_000_000_000_00u64.into())
         .expect("invalid allocations")
         .issue_contract()
         .expect("invalid contract data");
@@ -45,7 +43,7 @@ fn main() {
     eprintln!("{}", contract.name());
 
     for FungibleAllocation  { seal, state, witness, .. } in allocations {
-        let witness = witness.as_ref().map(XWitnessId::to_string).unwrap_or("~".to_owned());
+        let witness = witness.as_ref().map(Txid::to_string).unwrap_or("~".to_owned());
         eprintln!("amount={state}, owner={seal}, witness={witness}");
     }
     eprintln!("totalSupply={}", contract.total_issued_supply());

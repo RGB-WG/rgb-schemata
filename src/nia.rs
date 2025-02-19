@@ -26,10 +26,10 @@ use aluvm::isa::opcodes::INSTR_PUTA;
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
 use amplify::confinement::Confined;
-use bp::dbc::Method;
+use bp::Outpoint;
 use ifaces::{IssuerWrapper, Rgb20, Rgb20Wrapper, LNPBP_IDENTITY};
 use rgbstd::containers::ValidContract;
-use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, TxOutpoint, VerNo};
+use rgbstd::interface::{IfaceClass, IfaceImpl, NamedField, NamedVariant, VerNo};
 use rgbstd::persistence::MemContract;
 use rgbstd::schema::{
     FungibleType, GenesisSchema, GlobalStateSchema, Occurrences, OwnedStateSchema, Schema,
@@ -37,7 +37,7 @@ use rgbstd::schema::{
 };
 use rgbstd::stl::StandardTypes;
 use rgbstd::validation::Scripts;
-use rgbstd::vm::opcodes::INSTR_PCVS;
+use rgbstd::vm::opcodes::INSTR_SVS;
 use rgbstd::vm::RgbIsa;
 use rgbstd::{rgbasm, Amount, Identity, Precision};
 use strict_encoding::InvalidRString;
@@ -53,14 +53,14 @@ pub(crate) fn nia_lib() -> Lib {
         // SUBROUTINE Transfer validation
         // Set errno
         put     a8[0],ERRNO_NON_EQUAL_IN_OUT;
-        // Checking that the sum of pedersen commitments in inputs is equal to the sum in outputs.
-        pcvs    OS_ASSET;
+        // Checking that the sum of inputs is equal to the sum of outputs.
+        svs     OS_ASSET;
         test;
         ret;
 
         // SUBROUTINE Genesis validation
-        // Checking pedersen commitments against reported amount of issued assets present in the
-        // global state.
+        // Checking genesis assignments amount against reported amount of issued assets present in
+        // the global state.
         put     a8[0],ERRNO_ISSUED_MISMATCH;
         put     a8[1],0;
         put     a16[0],0;
@@ -69,8 +69,8 @@ pub(crate) fn nia_lib() -> Lib {
         // Extract 64 bits from the beginning of s16[0] into a64[1]
         // NB: if the global state is invalid, we will fail here and fail the validation
         extr    s16[0],a64[0],a16[0];
-        // verify sum of pedersen commitments for assignments against a64[0] value
-        pcas    OS_ASSET;
+        // verify sum of outputs against a64[0] value
+        sas     OS_ASSET;
         test;
         ret;
     };
@@ -84,7 +84,7 @@ fn nia_schema() -> Schema {
 
     let alu_lib = nia_lib();
     let alu_id = alu_lib.id();
-    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_PCVS);
+    assert_eq!(alu_lib.code.as_ref()[FN_NIA_TRANSFER_OFFSET as usize + 4], INSTR_SVS);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize], INSTR_PUTA);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 4], INSTR_PUTA);
     assert_eq!(alu_lib.code.as_ref()[FN_NIA_GENESIS_OFFSET as usize + 8], INSTR_PUTA);
@@ -193,13 +193,13 @@ impl NonInflatableAsset {
         name: &str,
         details: Option<&str>,
         precision: Precision,
-        allocations: impl IntoIterator<Item = (Method, impl TxOutpoint, impl Into<Amount>)>,
+        allocations: impl IntoIterator<Item = (Outpoint, impl Into<Amount>)>,
     ) -> Result<ValidContract, InvalidRString> {
         let mut issuer =
             Rgb20Wrapper::<MemContract>::testnet::<Self>(issuer, ticker, name, details, precision)?;
-        for (method, beneficiary, amount) in allocations {
+        for (beneficiary, amount) in allocations {
             issuer = issuer
-                .allocate(method, beneficiary, amount)
+                .allocate(beneficiary, amount)
                 .expect("invalid contract data");
         }
         Ok(issuer.issue_contract().expect("invalid contract data"))
@@ -210,9 +210,8 @@ impl NonInflatableAsset {
 mod test {
     use std::str::FromStr;
 
-    use bp::seals::txout::{BlindSeal, CloseMethod};
+    use bp::seals::txout::BlindSeal;
     use bp::Txid;
-    use chrono::DateTime;
     use rgbstd::containers::{BuilderSeal, ConsignmentExt};
     use rgbstd::interface::*;
     use rgbstd::invoice::Precision;
@@ -246,22 +245,12 @@ mod test {
             precision: Precision::try_from(2).unwrap(),
         };
         let issued_supply = 999u64;
-        let seal: XChain<BlindSeal<Txid>> = XChain::with(
-            Layer1::Bitcoin,
-            GenesisSeal::from(BlindSeal::with_blinding(
-                CloseMethod::OpretFirst,
-                Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
-                    .unwrap(),
-                0,
-                654321,
-            )),
-        );
-        let asset_tag = AssetTag::new_deterministic(
-            "contract_domain",
-            AssignmentType::with(0),
-            DateTime::from_timestamp(created_at, 0).unwrap(),
-            123456,
-        );
+        let seal: BlindSeal<Txid> = GenesisSeal::from(BlindSeal::with_blinding(
+            Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
+                .unwrap(),
+            0,
+            654321,
+        ));
 
         let builder = ContractBuilder::deterministic(
             Identity::default(),
@@ -270,6 +259,7 @@ mod test {
             NonInflatableAsset::issue_impl(),
             NonInflatableAsset::types(),
             NonInflatableAsset::scripts(),
+            ChainNet::BitcoinTestnet4,
         )
         .add_global_state("spec", spec)
         .unwrap()
@@ -277,24 +267,14 @@ mod test {
         .unwrap()
         .add_global_state("issuedSupply", Amount::from(issued_supply))
         .unwrap()
-        .add_asset_tag("assetOwner", asset_tag)
-        .unwrap()
-        .add_fungible_state_det(
-            "assetOwner",
-            BuilderSeal::from(seal),
-            issued_supply,
-            BlindingFactor::from_str(
-                "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
-            )
-            .unwrap(),
-        )
+        .add_fungible_state("assetOwner", BuilderSeal::from(seal), issued_supply)
         .unwrap();
 
         let contract = builder.issue_contract_det(created_at).unwrap();
 
         assert_eq!(
             contract.contract_id().to_string(),
-            s!("rgb:pOIzGFyQ-mA!yQq2-QH8vB5!-5fAplY!-x2lW!vz-JHDbYPg")
+            s!("rgb:QRmoA2Ly-vpemU23-gVV4oFj-NDtLJzH-BUmHok3-YaABLnQ")
         );
     }
 }

@@ -10,7 +10,7 @@ use rgbstd::containers::{ConsignmentExt, FileContent, Kit};
 use rgbstd::invoice::Precision;
 use rgbstd::persistence::Stock;
 use rgbstd::stl::{AssetSpec, Attachment, ContractTerms, MediaType, RicardianContract};
-use rgbstd::{Allocation, GenesisSeal, TokenIndex, XChain};
+use rgbstd::{Allocation, ChainNet, GenesisSeal, TokenIndex};
 use schemata::dumb::NoResolver;
 use schemata::UniqueDigitalAsset;
 use sha2::{Digest, Sha256};
@@ -20,7 +20,7 @@ fn main() {
     let spec = AssetSpec::new("TEST", "Test uda", Precision::Indivisible);
     let beneficiary_txid =
         Txid::from_hex("14295d5bb1a191cdb6286dc0944df938421e3dfcbf0811353ccac4100c2068c5").unwrap();
-    let beneficiary = XChain::Bitcoin(GenesisSeal::tapret_first_rand(beneficiary_txid, 1));
+    let beneficiary = GenesisSeal::new_random(beneficiary_txid, 1);
 
     let index = TokenIndex::from_inner(2);
 
@@ -48,9 +48,11 @@ fn main() {
     let mut stock = Stock::in_memory();
     stock.import_kit(kit).expect("invalid issuer kit");
 
-    let contract = stock.contract_builder("ssi:anonymous",
+    let contract = stock.contract_builder(
+        "ssi:anonymous",
         UniqueDigitalAsset::schema().schema_id(),
         "RGB21Unique",
+        ChainNet::BitcoinTestnet4,
         ).expect("schema fails to implement RGB21 interface")
 
         .add_global_state("tokens", token_data)
