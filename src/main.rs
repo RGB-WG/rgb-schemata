@@ -22,37 +22,54 @@
 use std::io;
 use std::io::stdout;
 
-use ifaces::rgb21::Rgb21;
-use ifaces::{IssuerWrapper, Rgb20, Rgb25};
 use rgbstd::containers::{FileContent, Kit};
-use rgbstd::interface::IfaceClass;
+use rgbstd::contract::IssuerWrapper;
 use rgbstd::persistence::MemContract;
 use rgbstd::vm::RgbIsa;
-use schemata::{CollectibleFungibleAsset, NonInflatableAsset, UniqueDigitalAsset};
+use schemata::{
+    CollectibleFungibleAsset, InflatableFungibleAsset, NonInflatableAsset,
+    PermissionedFungibleAsset, UniqueDigitalAsset,
+};
 
 fn main() -> io::Result<()> {
-    nia()?;
-    uda()?;
     cfa()?;
+    ifa()?;
+    nia()?;
+    pfa()?;
+    uda()?;
 
     Ok(())
 }
 
 fn nia() -> io::Result<()> {
     let schema = NonInflatableAsset::schema();
-    let iimpl = NonInflatableAsset::issue_impl();
     let lib = NonInflatableAsset::scripts();
     let types = NonInflatableAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
-    kit.ifaces.push(Rgb20::FIXED.iface()).unwrap();
-    kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
     kit.types = types;
 
-    kit.save_file("schemata/NonInflatableAssets.rgb")?;
-    kit.save_armored("schemata/NonInflatableAssets.rgba")?;
+    kit.save_file("schemata/NonInflatableAsset.rgb")?;
+    kit.save_armored("schemata/NonInflatableAsset.rgba")?;
+    print_lib(&kit);
+
+    Ok(())
+}
+
+fn pfa() -> io::Result<()> {
+    let schema = PermissionedFungibleAsset::schema();
+    let lib = PermissionedFungibleAsset::scripts();
+    let types = PermissionedFungibleAsset::types();
+
+    let mut kit = Kit::default();
+    kit.schemata.push(schema).unwrap();
+    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.types = types;
+
+    kit.save_file("schemata/PermissionedFungibleAsset.rgb")?;
+    kit.save_armored("schemata/PermissionedFungibleAsset.rgba")?;
     print_lib(&kit);
 
     Ok(())
@@ -60,14 +77,11 @@ fn nia() -> io::Result<()> {
 
 fn uda() -> io::Result<()> {
     let schema = UniqueDigitalAsset::schema();
-    let iimpl = UniqueDigitalAsset::issue_impl();
     let lib = UniqueDigitalAsset::scripts();
     let types = UniqueDigitalAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
-    kit.ifaces.push(Rgb21::NONE.iface()).unwrap();
-    kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
     kit.types = types;
 
@@ -80,19 +94,33 @@ fn uda() -> io::Result<()> {
 
 fn cfa() -> io::Result<()> {
     let schema = CollectibleFungibleAsset::schema();
-    let iimpl = CollectibleFungibleAsset::issue_impl();
     let lib = CollectibleFungibleAsset::scripts();
     let types = CollectibleFungibleAsset::types();
 
     let mut kit = Kit::default();
     kit.schemata.push(schema).unwrap();
-    kit.ifaces.push(Rgb25::NONE.iface()).unwrap();
-    kit.iimpls.push(iimpl).unwrap();
     kit.scripts.extend(lib.into_values()).unwrap();
     kit.types = types;
 
     kit.save_file("schemata/CollectibleFungibleAsset.rgb")?;
     kit.save_armored("schemata/CollectibleFungibleAsset.rgba")?;
+    print_lib(&kit);
+
+    Ok(())
+}
+
+fn ifa() -> io::Result<()> {
+    let schema = InflatableFungibleAsset::schema();
+    let lib = InflatableFungibleAsset::scripts();
+    let types = InflatableFungibleAsset::types();
+
+    let mut kit = Kit::default();
+    kit.schemata.push(schema).unwrap();
+    kit.scripts.extend(lib.into_values()).unwrap();
+    kit.types = types;
+
+    kit.save_file("schemata/InflatableFungibleAsset.rgb")?;
+    kit.save_armored("schemata/InflatableFungibleAsset.rgba")?;
     print_lib(&kit);
 
     Ok(())

@@ -22,17 +22,17 @@ Association][Association].
 
 This repository provides the following RGB schemata:
 
-* __Non-inflatable assets (NIA)__, implementing RGB20 interface.
+* __Non-inflatable assets (NIA)__.
   This is the simplest form of a fungible asset/token, which doesn't provide
   such features as secondary issue, ability to change asset name and
   parameters, ability to burn or replace the asset.
 
-* __Unique digital asset (UDA)__, implementing RGB21 interface.
+* __Unique digital asset (UDA)__.
   This is the simplest form of an NFT, which has one issuance of a single
   non-fungible and non-fractionable token with a representative attached
   media file and a preview.
 
-* __Collectible fungible assets (CFA)__, implementing RGB25 interface.
+* __Collectible fungible assets (CFA)__.
   This is the simplest form of collectible fungible assets
 
 ## Library
