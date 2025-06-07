@@ -55,5 +55,5 @@ We prefer all communications to be in English.
 
 We follow the principle of [Coordinated Vulnerability Disclosure][disclosure].
 
-[definition]: https://aka.ms/opensource/security/definition
+[definition]: https://www.microsoft.com/msrc/definition-of-a-security-vulnerability
 [disclosure]: https://aka.ms/opensource/security/cvd
