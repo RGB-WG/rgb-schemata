@@ -20,6 +20,7 @@
 // limitations under the License.
 
 //! Permissioned Fungible Assets (PFA) schema.
+//! (!) Not safe to use in a production environment!
 
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};

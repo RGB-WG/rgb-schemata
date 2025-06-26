@@ -33,7 +33,16 @@ This repository provides the following RGB schemata:
   media file and a preview.
 
 * __Collectible fungible assets (CFA)__.
-  This is the simplest form of collectible fungible assets
+  This is the simplest form of collectible fungible assets.
+
+* __Permissioned fungible assets (PFA)__.
+  **Not production-ready**
+  This is a fungible asset in which the issuer needs to approve every transfer.
+
+* __Inflatable fungible assets (IFA)__.
+  **Not production-ready**
+  This is a fungible asset that supports *inflate*, *burn* and *replace* transitions.
+
 
 ## Library
 

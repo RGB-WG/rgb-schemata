@@ -20,6 +20,7 @@
 // limitations under the License.
 
 //! Inflatable Fungible Assets (IFA) schema.
+//! (!) Not safe to use in a production environment!
 
 use aluvm::isa::Instr;
 use aluvm::library::{Lib, LibSite};
@@ -47,8 +48,8 @@ use crate::{
 };
 
 pub const IFA_SCHEMA_ID: SchemaId = SchemaId::from_array([
-    0xff, 0x79, 0x94, 0x70, 0x37, 0xc1, 0x38, 0xd7, 0x5f, 0xa3, 0x27, 0x47, 0x20, 0xde, 0x9a, 0xa2,
-    0x77, 0xae, 0xbe, 0x9d, 0xcc, 0xce, 0xda, 0x83, 0xdf, 0x47, 0xc7, 0xe3, 0xcc, 0x37, 0xc6, 0x5d,
+    0x6e, 0x80, 0x49, 0x7c, 0x88, 0x47, 0x62, 0x61, 0x51, 0x16, 0xf7, 0x8d, 0x17, 0x94, 0x2f, 0x9b,
+    0x2b, 0xe0, 0x0d, 0x58, 0x77, 0x4f, 0x91, 0xa2, 0x72, 0xa8, 0x3a, 0x03, 0xff, 0x9c, 0xcd, 0xf6,
 ]);
 
 pub(crate) fn ifa_lib_genesis() -> Lib {
@@ -80,15 +81,38 @@ pub(crate) fn ifa_lib_genesis() -> Lib {
         .expect("wrong inflatable asset genesis valdiation script")
 }
 
-pub(crate) fn ifa_lib_transition() -> Lib {
+pub(crate) fn ifa_lib_transfer() -> Lib {
     let code = rgbasm! {
         // Checking that the sum of inputs is equal to the sum of outputs
         put     a8[0],ERRNO_NON_EQUAL_IN_OUT;  // set errno
         svs     OS_ASSET;  // verify sum
         test;  // check it didn't fail
+        svs     OS_INFLATION;  // verify sum
+        test;  // check it didn't fail
+
+        // Replace rights validation
+        cnp     OS_REPLACE,a16[0];  // count input replace rights
+        cns     OS_REPLACE,a16[1];  // count output replace rights
+
+        // Check if input count is 0
+        put     a16[2],0;
+        eq.n    a16[0],a16[2];  // check if input_count == 0
+        jif     39;  // jump to 0x27 if input_count == 0
+
+        // Input count > 0, check that output count > 0
+        put     a16[2],0;
+        gt.u    a16[1],a16[2];  // check if output_count > 0
+        test;  // fail if output_count == 0
+        ret;  // return execution flow
+
+        // 0x27: Input count is 0, output count must also be 0
+        put     a16[2],0;
+        eq.n    a16[1],a16[2];  // check if output_count == 0
+        test;  // fail if output_count != 0
+
         ret;  // return execution flow
     };
-    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong transition validation script")
+    Lib::assemble::<Instr<RgbIsa<MemContract>>>(&code).expect("wrong transfer validation script")
 }
 
 pub(crate) fn ifa_lib_inflation() -> Lib {
@@ -130,7 +154,7 @@ fn ifa_standard_types() -> StandardTypes { StandardTypes::with(rgb_contract_stl(
 fn ifa_schema() -> Schema {
     let types = ifa_standard_types();
 
-    let alu_id_transition = ifa_lib_transition().id();
+    let alu_id_transfer = ifa_lib_transfer().id();
 
     Schema {
         ffv: zero!(),
@@ -172,12 +196,12 @@ fn ifa_schema() -> Schema {
             OS_INFLATION => AssignmentDetails {
                 owned_state_schema: OwnedStateSchema::Fungible(FungibleType::Unsigned64Bit),
                 name: fname!("inflationAllowance"),
-                default_transition: TS_INFLATION,
+                default_transition: TS_TRANSFER
             },
             OS_REPLACE => AssignmentDetails {
                 owned_state_schema: OwnedStateSchema::Declarative,
                 name: fname!("replaceRight"),
-                default_transition: TS_REPLACE,
+                default_transition: TS_TRANSFER,
             }
         },
         genesis: GenesisSchema {
@@ -202,12 +226,16 @@ fn ifa_schema() -> Schema {
                     metadata: none!(),
                     globals: none!(),
                     inputs: tiny_bmap! {
-                        OS_ASSET => Occurrences::OnceOrMore
+                        OS_ASSET => Occurrences::NoneOrMore,
+                        OS_INFLATION => Occurrences::NoneOrMore,
+                        OS_REPLACE => Occurrences::NoneOrMore
                     },
                     assignments: tiny_bmap! {
-                        OS_ASSET => Occurrences::OnceOrMore
+                        OS_ASSET => Occurrences::NoneOrMore,
+                        OS_INFLATION => Occurrences::NoneOrMore,
+                        OS_REPLACE => Occurrences::NoneOrMore
                     },
-                    validator: Some(LibSite::with(0, alu_id_transition))
+                    validator: Some(LibSite::with(0, alu_id_transfer))
                 },
                 name: fname!("transfer"),
             },
@@ -221,7 +249,7 @@ fn ifa_schema() -> Schema {
                         OS_INFLATION => Occurrences::OnceOrMore
                     },
                     assignments: tiny_bmap! {
-                        OS_ASSET => Occurrences::NoneOrMore,  // allow moving right alone
+                        OS_ASSET => Occurrences::OnceOrMore,
                         OS_INFLATION => Occurrences::NoneOrMore
                     },
                     validator: Some(LibSite::with(0, ifa_lib_inflation().id()))
@@ -247,14 +275,14 @@ fn ifa_schema() -> Schema {
                     metadata: none!(),
                     globals: none!(),
                     inputs: tiny_bmap! {
-                        OS_ASSET => Occurrences::NoneOrMore,  // allow moving right alone
+                        OS_ASSET => Occurrences::OnceOrMore,
                         OS_REPLACE => Occurrences::OnceOrMore,
                     },
                     assignments: tiny_bmap! {
-                        OS_ASSET => Occurrences::NoneOrMore,  // allow moving right alone
+                        OS_ASSET => Occurrences::OnceOrMore,
                         OS_REPLACE => Occurrences::OnceOrMore,
                     },
-                    validator: Some(LibSite::with(0, alu_id_transition))
+                    validator: Some(LibSite::with(0, alu_id_transfer))
                 },
                 name: fname!("replace"),
             },
@@ -277,15 +305,15 @@ impl IssuerWrapper for InflatableFungibleAsset {
         let alu_lib_genesis = ifa_lib_genesis();
         let alu_id_genesis = alu_lib_genesis.id();
 
-        let alu_lib_transition = ifa_lib_transition();
-        let alu_id_transition = alu_lib_transition.id();
+        let alu_lib_transfer = ifa_lib_transfer();
+        let alu_id_transfer = alu_lib_transfer.id();
 
         let alu_lib_inflation = ifa_lib_inflation();
         let alu_id_inflation = alu_lib_inflation.id();
 
         Confined::from_checked(bmap! {
             alu_id_genesis => alu_lib_genesis,
-            alu_id_transition => alu_lib_transition,
+            alu_id_transfer => alu_lib_transfer,
             alu_id_inflation => alu_lib_inflation,
         })
     }

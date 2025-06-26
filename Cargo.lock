@@ -735,9 +735,8 @@ dependencies = [
 
 [[package]]
 name = "rgb-core"
-version = "0.11.1-alpha.2+unreviewed"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eba005ded4929a2d7a6e4cb97103858b9e0d47e9fe7a378ca2b2f1595451d659"
+version = "0.11.1-alpha.3+unreviewed"
+source = "git+https://github.com/zoedberg/rgb-core?branch=0.11.1-4#e9b05f394f9d185ff9cbe651e81f4c82370e8c37"
 dependencies = [
  "aluvm",
  "amplify",
@@ -757,9 +756,8 @@ dependencies = [
 
 [[package]]
 name = "rgb-invoice"
-version = "0.11.1-alpha.2+unreviewed"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c74a3dc19886db08f3492634b3a2b978cf722b0014a8c5d6af46a627c1674179"
+version = "0.11.1-alpha.3+unreviewed"
+source = "git+https://github.com/zoedberg/rgb-std?branch=0.11.1-4#ac1d2bfc793cc70c50309b82cb9438181ecd2ffd"
 dependencies = [
  "amplify",
  "baid64",
@@ -793,9 +791,8 @@ dependencies = [
 
 [[package]]
 name = "rgb-std"
-version = "0.11.1-alpha.2+unreviewed"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7484c24898614862d547316b631ac8c6bb34f401a56f32249b9d1dd4677dc739"
+version = "0.11.1-alpha.3+unreviewed"
+source = "git+https://github.com/zoedberg/rgb-std?branch=0.11.1-4#ac1d2bfc793cc70c50309b82cb9438181ecd2ffd"
 dependencies = [
  "aluvm",
  "amplify",
